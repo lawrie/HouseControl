@@ -1,0 +1,190 @@
+<house>
+    <floor id="1" name="Ground floor">
+        <room id="7" name="Hall">
+            <camera id="1" name="Snooper" type="rpi" host="192.168.0.8:8081"></camera>
+            <socket id="3" name="Snoopy" type="LWRF"></socket>
+        </room>
+        <room id="5" name="Dining">
+            <emontx id="10">
+                <battery low="3000"></battery>
+                <power></power>
+            </emontx>
+        </room>
+        <room id="6" name="Utility">
+            <appliance id="1" name="Dryer" type="IAM" code="1884046140"></appliance>
+            <appliance id="2" name="Washer" type="IAM" code="1567559737"></appliance>
+        </room>
+    </floor>
+    <floor id="2" name="First floor">
+        <room id="1" name="Living">
+            <light id="3" name="Pollock" type="LWRF"></light>
+            <light id="4" name="Picasso" type="LWRF"></light>
+            <socket id="1" name="Fan" type="LWRF"></socket>
+            <socket id="2" name="Spy" type="LWRF"></socket>
+            <socket id="4" name="Frame" type="LWRF"></socket>
+            <socket id="5" name="Dock" type="LWRF"></socket>
+            <appliance id="4" name="tv" code="2037787242" type="IAM"></appliance>
+            <appliance id="5" name="rpi" code="1880848504" type="IAM"></appliance>
+            <tv id="1" type="LG"></tv>
+            <stb id="1" type="vt">
+            	<channel id="101" name="bbc1"></channel>
+            	<channel id="102" name="bbc2"></channel>
+            	<channel id="103" name="itv"></channel>
+            	<channel id="104" name="c4"></channel>
+            	<channel id="105" name="five"></channel>
+            	<channel id="106" name="bbc3"></channel>
+            	<channel id="107" name="bbc4"></channel>
+            	<channel id="108" name="bbc1 hd"></channel>
+            </stb>
+            <receiver id="1" type="LG"></receiver>
+            <musicserver id="1" name="musicserver" host="musicserver" socket_timeout="5000">
+                <spotify>
+      				<playlist name="hiatt" link="http://open.spotify.com/user/grabbas/playlist/7kqeUug8LFcc1G5x85Vs3u"></playlist>
+      				<playlist name="bluegrass" link="http://open.spotify.com/user/grabbas/playlist/1rNcNwvAEhkr8SpMMr544H"></playlist>
+      				<playlist name="dylan" link="http://open.spotify.com/user/grabbas/playlist/5bB3gAtMpGZf3ZchfLrA3C"></playlist>
+      				<playlist name="marley" link="http://open.spotify.com/user/grabbas/playlist/7yQ6qTXmUvAU2QWWIOZoSL"></playlist>
+                    <playlist name="springsteen" link="http://open.spotify.com/user/grabbas/playlist/280kYcQxqNwn8bR2bcen4M"></playlist>
+                    <playlist name="country" link="http://open.spotify.com/user/grabbas/playlist/22xSqobsRdCYndbOCSpQhm"></playlist>
+                    <playlist name="cult" link="http://open.spotify.com/user/grabbas/playlist/7KORIvehmmAaMelCEcfXeW"></playlist>
+                    <playlist name="dire" link="http://open.spotify.com/user/grabbas/playlist/4ux4XpOau6yDj8tMjyfAfP"></playlist>
+                    <playlist name="dido" link="http://open.spotify.com/user/grabbas/playlist/4PatpiTDxd2TiILksMKFXC"></playlist>
+                    <playlist name="early" link="http://open.spotify.com/user/grabbas/playlist/7CFyd9y1mc3BSciNUooydk"></playlist>
+                    <playlist name="elvis" link="http://open.spotify.com/user/grabbas/playlist/5hKu9DamfyD1okIOtqi6UU"></playlist>
+                    <playlist name="folk" link="http://open.spotify.com/user/grabbas/playlist/2iWMpiGgRMVhLtWkeo1Aql"></playlist>
+                    <playlist name="glam" link="http://open.spotify.com/user/grabbas/playlist/71qODECLpEXYqhd9sVet7D"></playlist>
+                    <playlist name="jimi" link="http://open.spotify.com/user/grabbas/playlist/54WN7FjYmGJDbfaLGTd4PF"></playlist>
+                    <playlist name="norah" link="http://open.spotify.com/user/grabbas/playlist/0aRVRQF9kSTDsHxpGrTZa6"></playlist>
+                    <playlist name="brady" link="http://open.spotify.com/user/grabbas/playlist/1WD5Vicc9xkGWNIJxJbKUU"></playlist>
+                    <playlist name="simon" link="http://open.spotify.com/user/grabbas/playlist/0Q837X7Okqk6Ybbj1Nered"></playlist>
+                    <playlist name="protest" link="http://open.spotify.com/user/grabbas/playlist/6gG1acgi7ANQB6qAsP6JLy"></playlist>
+                    <playlist name="randy" link="http://open.spotify.com/user/grabbas/playlist/72JlGtiC8x9abCYTDIZW8H"></playlist>
+                    <playlist name="recent" link="http://open.spotify.com/user/grabbas/playlist/5kBmntSOI1xgzRC2dXTMAv"></playlist>
+                    <playlist name="thompson" link="http://open.spotify.com/user/grabbas/playlist/2srsx92tpdgX6VZJ96q83P"></playlist>
+                    <playlist name="stones" link="http://open.spotify.com/user/grabbas/playlist/2i1Ke5fneT98RcGpq9vgax"></playlist>
+                    <playlist name="ry" link="http://open.spotify.com/user/grabbas/playlist/6kaiCnFvz6Um7nQGNKH1oJ"></playlist>
+                    <playlist name="soul" link="http://open.spotify.com/user/grabbas/playlist/69HA7z2wSZEJ1qgQOtAy5S"></playlist>
+                    <playlist name="van" link="http://open.spotify.com/user/grabbas/playlist/6pG6Q4ibxTzW1LaBb26aYB"></playlist>
+                    <playlist name="willie" link="http://open.spotify.com/user/grabbas/playlist/01BBRKHQ66JkkuQwcSrJjF"></playlist>
+                    <playlist name="joni" link="http://open.spotify.com/user/grabbas/playlist/2OqfjYeiZ1rtQH26o68gC3"></playlist>
+                    <playlist name="young" link="http://open.spotify.com/user/grabbas/playlist/2FOuoECPwBjmy8b9M7fQ7o"></playlist>
+                    <playlist name="london" link="http://open.spotify.com/user/grabbas/playlist/0MmGNWj60XzcTtk9uO4Ggc"></playlist>
+                    <playlist name="waters" link="http://open.spotify.com/user/grabbas/playlist/6Gmec5UnMTSAgNyppimCrP"></playlist>
+                    <playlist name="van" link="http://open.spotify.com/user/grabbas/playlist/6pG6Q4ibxTzW1LaBb26aYB"></playlist>
+                    <playlist name="empty" link="http://open.spotify.com/user/grabbas/playlist/4TdBstcStLezIg2v1GQFcb"></playlist>
+                    <playlist name="alabama" link="http://open.spotify.com/user/grabbas/playlist/4eihS66MISpy576BeulT0o"></playlist>
+                    <playlist name="adele" link="http://open.spotify.com/user/grabbas/playlist/3rXRJNLoXiprei7McncQ3u"></playlist>
+                    <playlist name="rock" link="http://open.spotify.com/user/grabbas/playlist/6KHoOpxsJcr7qcFkNkAfD4"></playlist>
+                    <playlist name="sixties" link="http://open.spotify.com/user/grabbas/playlist/3PukGEHOiiEzg5gY6Ypete"></playlist>
+                    <playlist name="ska" link="http://open.spotify.com/user/grabbas/playlist/6cT06jr6cx44wk2kLYczQs"></playlist>
+                    <playlist name="lehrer" link="http://open.spotify.com/user/grabbas/playlist/2xJEu8XJlMH8UvSQf69sBg"></playlist>
+                    <playlist name="ballads" link="http://open.spotify.com/user/grabbas/playlist/1NzqxaHqY4LzUYkNflTq7q"></playlist>
+                    <playlist name="classical" link="http://open.spotify.com/user/grabbas/playlist/3L2jwLXkWy8AT6RGuQTBkv"></playlist>
+                    <playlist name="iver" link="http://open.spotify.com/user/grabbas/playlist/44vtR9Np9QAZQJQhJYTk3r"></playlist>
+                    <playlist name="women" link="http://open.spotify.com/user/grabbas/playlist/0y1xQvg7wYi6z3aXOxjZ4V"></playlist>
+                </spotify>
+            </musicserver>
+            <sensor id="1" name="Jeenode" type="Jeenode">
+                <temperature></temperature>
+                <lightlevel></lightlevel>
+                <motion></motion>
+                <humidity></humidity>
+                <battery></battery>
+            </sensor>
+            <sensor id="3" name="Airwick" type="Jeenode">
+                <temperature></temperature>
+                <lightlevel></lightlevel>
+                <motion></motion>
+                <plant></plant>
+                <battery></battery>
+            </sensor>
+            <window id="1" name="front">
+                <blind id="1" type="coulisse" name="front"></blind>
+                <switch id="1" name="Darwin" type="LWRF"></switch>
+            </window>
+            <window id="2" name="side">
+                <blind id="2" type="coulisse" name="side"></blind>
+            </window>
+            <window id="3" name="back">
+                <blind id="3" type="coulisse" name="back"></blind>
+            </window>  
+            <camera id="2" type="Wanscam" name="Bond" host="ipcam:99"></camera>     
+        </room>
+        <room id="2" name="Kitchen">
+            <appliance id="3" name="Dishwasher" code="1077486631" type="IAM"></appliance>
+        </room>
+    </floor>
+    <floor id="3" name="Second floor">
+        <room id="3" name="Master">
+            <light id="1" name="Periodic" type="LWRF"></light>
+            <light id="2" name="World" type="LWRF"></light>
+        </room>
+        <room id="4" name="Guest">
+            <sensor id="2" name="Alabama" type="Jeenode">
+                <temperature></temperature>
+                <lightlevel></lightlevel>
+                <motion></motion>
+                <battery></battery>
+            </sensor>
+            <radiator></radiator>
+            <windowswitch></windowswitch>
+            <thermostat></thermostat>
+        </room>
+        <room id="9" name="Landing"></room>
+    </floor>
+    <robot id="1" name="keith"></robot>
+    <heating default_temperature="16" temperature_sensor="1" humidity_sensor="1"></heating>
+    <phone id="1" type="android" name="phone"></phone>
+    <tablet id="1" type="android"></tablet>
+    <email user="lawrie.griffiths" password="password" 
+        recipient="lawrie.griffiths@ntlworld.com"></email>
+    <cosm api_key="5e8sM5Ls6RJhqilxUPtdq3LEF8ySAKxIbkVMS2RudjZiTT0g" 
+        feed="86697" power="0" energy="1"></cosm>
+    <speech voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" 
+        remote="true" local="true" server="musicserver"></speech>
+    <config listen_port="50000" rfm12_port="COM15" lwrf_port="COM8" 
+        iam_port="COM20" iam_min_value="3" iam_min_off_period="120000"
+        occupied_interval="300000" ping_timeout="5000" background_delay="10000"></config>
+    <plugins>
+        <plugin class="net.geekgrandad.plugin.WanscamControl" type="Wanscam">
+            <interface name="CameraControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.GoogleMail" type="gmail">
+            <interface name="EmailControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.DummyHeating">
+            <interface name="HeatingControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.SpotifyControl" type="Spotify">
+            <interface name="MusicControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.LocalSpeech">
+            <interface name="SpeechControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.DummyAlarm">
+            <interface name="AlarmControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.CosmUpdate">
+            <interface name="DatalogControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.IAMControl" type="IAM">
+            <interface name="ApplianceControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.LWRFControl" type="LWRF">
+            <interface name="LightControl"></interface>
+            <interface name="SocketControl"></interface>
+            <interface name="SwitchControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.JeenodeControl" type="Jeenode">
+            <interface name="SensorControl"></interface>
+            <interface name="PowerControl"></interface>
+            <interface name="PlantControl"></interface>
+            <interface name="InfraredControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.GoogleCalendar">
+            <interface name="CalendarControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.HTTPRespond">
+            <interface name="HTTPControl"></interface>
+        </plugin>
+    </plugins>
+</house>
