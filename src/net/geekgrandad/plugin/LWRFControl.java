@@ -15,14 +15,6 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 	private static final byte LW_ON = 1;
 	private static final byte LW_MOOD = 2;
 	
-	private static byte[] id = {(byte) 0x6f,(byte) 0xeb,(byte) 0xbe, (byte) 0xed, (byte) 0xb7, (byte) 0x7b};
-
-	// Start of byte codes for switching LightwaveRF sockets on or off
-	private static final int SOCKET_BASE = 224;
-
-	// Start of byte codes for switching lights on or off
-	private static final int LIGHT_BASE = 234;
-	
 	private Reporter reporter;
 	private Config config;
 	private RFControl rfc434;
@@ -41,7 +33,7 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 	public void switchSocket(int socket, boolean on) throws IOException {
 		socketOn[socket] = on;
 		reporter.print("Switching socket " + (socket + 1) + " " + (on ? "on" : "off"));
-		sendLWRF((byte) (SOCKET_BASE + socket * 2 + (on ? 0 : 1)));	
+		lwCmd((byte) 0,(byte) (byte) (config.socketChannels[socket]-1),(on ? LW_ON : LW_OFF), config.socketCodes[socket]);		
 	}
 
 	@Override
@@ -53,8 +45,7 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 	public void switchLight(int light, boolean on) throws IOException {
 		lightOn[light] = on;
 		reporter.print("Switching light " + (light + 1) + " " + (on ? "on" : "off"));
-		lwCmd((byte) 0,(byte) (4+light),(on ? LW_ON : LW_OFF), id);
-		//sendLWRF((byte) ((LIGHT_BASE + light * 2) + (on ? 0 : 1)));		
+		lwCmd((byte) 0,(byte) (byte) (config.lightChannels[light]-1),(on ? LW_ON : LW_OFF), config.lightCodes[light]);		
 	}
 
 	@Override
@@ -63,12 +54,7 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 			level = 0;
 		lightValue[light] = level;
 		lightOn[light] = true;
-		lwCmd((byte) level,(byte) (4+light),LW_ON, id);
-		//sendLevel((byte) light, (byte) (level * 32 / 100));	
-	}
-	
-	private void sendLevel(int light, int level) throws IOException {
-		sendLWRF((byte) ((light << 5) | level));
+		lwCmd((byte) level,(byte) (byte) (config.lightChannels[light]-1),LW_ON, config.lightCodes[light]);
 	}
 
 	@Override
@@ -93,20 +79,32 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 					}
 					
 					Message m = new Message(msg);
-					reporter.print("LWRF Channel: " + m.getChannel());
-					reporter.print("LWRF Command: " + m.getCommand());
+					byte channel = m.getChannel();
+					byte command = m.getCommand();
+					byte[] id = m.getId();
+					reporter.print("LWRF Channel: " + channel);
+					reporter.print("LWRF Command: " + command);	
+					reporter.print("LWRF Level: " + m.getLevel());
+					reporter.print("LWRF Id = " + m.getHexId());
 					
-					/*int b = rfc434.readByte();
-					reporter.print("Read LightwaveRF: " + b);
-
-					if (b < Config.MAX_SOCKETS * 2) {
-						socketOn[b / 2] = (b % 2 == 0); // Even on, odd off
-					} else if (b < (Config.MAX_SOCKETS + Config.MAX_SWITCHES) * 2) {
-						windowOpen[(b - (Config.MAX_SOCKETS * 2)) / 2] = (b % 2 == 0);
-					} else if (b < (Config.MAX_SOCKETS + Config.MAX_SWITCHES + Config.MAX_LIGHTS) * 2) {
-						lightOn[(b - (Config.MAX_SOCKETS + Config.MAX_SWITCHES) * 2) / 2] = (b % 2 == 0);
-					}*/
+					int light = findLight(channel);
 					
+					if (light >= 0) {
+						reporter.print("LWRF Found light " + (light+1));
+						lightOn[light] = (command == LW_ON ? true  : false);
+					} else {
+						int socket = findSocket(channel);
+						
+						if (socket >= 0) {
+							reporter.print("LWRF Found socket " + (socket+1));
+							socketOn[socket] = (command == LW_ON ? true  : false);							
+						} else {
+							int swit = findSwitch(id);
+							
+							reporter.print("LWRF Found switch " + (swit+1));
+							windowOpen[swit] = (command == LW_ON ? true  : false);
+						}
+					}
 					
 				} catch (IOException e) {
 					reporter.error("IOException in ReadLWRFInput");
@@ -170,6 +168,34 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 	  reporter.print("LWRF Sending: " + sb);
 	}
 	
+	int findLight(int channel) {
+		for(int i=0;i<config.lightChannels.length;i++) {
+			if (config.lightChannels[i] == channel) return i;
+		}
+		return -1;
+	}
+	
+	int findSocket(int channel) {
+		for(int i=0;i<config.socketChannels.length;i++) {
+			if (config.socketChannels[i] == channel) return i;
+		}
+		return -1;
+	}
+	
+	int findSwitch(byte[] id) {
+		for(int i=0;i<config.switchCodes.length;i++) {
+			if (compareId(config.switchCodes[i],id)) return i;
+		}
+		return -1;		
+	}
+	
+	boolean compareId(byte [] id1, byte[] id2) {
+		for(int i=0;i<6;i++) {
+			if (id1[i] != id2[i]) return false;
+		}
+		return true;
+	}
+	
 	class Message {
 	  private byte level, command, channel;
 	  private byte[] id;
@@ -192,7 +218,7 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 		int level2 = findNibble(msg[1]); 
 		id = new byte[6];
 		level = (byte) ((level1 << 4) + level2);
-		channel = findNibble(msg[2]);
+		channel = (byte) (findNibble(msg[2]) + 1);
 		command = findNibble(msg[3]);
 		  
 		for(int i=0;i<6;i++) {
@@ -214,6 +240,14 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 	  
 	  public byte[] getId() {
 		  return id;
+	  }
+	  
+	  public String getHexId() {
+		  StringBuilder sb = new StringBuilder();
+		  for(int i=0;i<6;i++) {
+			  sb.append(String.format("%02X ", id[i]));
+		  }
+		  return sb.toString();
 	  }
 		
 	  private byte findNibble(byte b) {

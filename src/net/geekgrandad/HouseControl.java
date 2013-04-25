@@ -991,6 +991,12 @@ public class HouseControl implements Reporter, Alerter, Provider {
 		print("Switching lights for room " + room);
 		for(int light: config.roomLights[room-1]) {
 			lightControl[light-1].switchLight(light-1,on);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	

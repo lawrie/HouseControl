@@ -69,6 +69,15 @@ public class Config {
   
   public String[] cameraHostNames = new String[MAX_CAMERAS];
   
+  public byte[][] lightCodes = new byte[MAX_LIGHTS][];
+  public int[] lightChannels = new int[MAX_LIGHTS];
+  
+  public byte[][] socketCodes = new byte[MAX_SOCKETS][];
+  public int[] socketChannels = new int[MAX_SOCKETS];
+  
+  public byte[][] switchCodes = new byte[MAX_SWITCHES][];
+  public int[] switchChannels = new int[MAX_SWITCHES];
+  
   private int[] rooms = new int[MAX_ROOMS];
   
   private String pluginClass, pluginType;
@@ -232,6 +241,15 @@ public class Config {
   private String interfaceName;
   private ArrayList<String> interfaces = new ArrayList<String>();
   
+  private String lightCode;
+  private int lightChannel;
+  
+  private String socketCode;
+  private int socketChannel;
+  
+  private String switchCode;
+  private int switchChannel;
+  
   public Config(String configFile) {
 	  readConfig(configFile);
   }
@@ -320,6 +338,10 @@ public class Config {
             	lightName = attribute.getValue();
               } else if (attribute.getName().toString().equals(TYPE)) {
             	lightType = attribute.getValue();
+              } else if (attribute.getName().toString().equals(CODE)) {
+            	lightCode = attribute.getValue();
+              } else if (attribute.getName().toString().equals(CHANNEL)) {
+            	lightChannel = Integer.parseInt(attribute.getValue());
               }
             }
           } else if (event.asStartElement().getName().getLocalPart().equals(SOCKET)) {
@@ -336,6 +358,10 @@ public class Config {
             	socketName = attribute.getValue();
               } else if (attribute.getName().toString().equals(TYPE)) {
             	socketType = attribute.getValue();
+              } else if (attribute.getName().toString().equals(CODE)) {
+            	socketCode = attribute.getValue();
+              } else if (attribute.getName().toString().equals(CHANNEL)) {
+            	socketChannel = Integer.parseInt(attribute.getValue());
               }
             }
           } else if (event.asStartElement().getName().getLocalPart().equals(SWITCH)) {
@@ -352,7 +378,11 @@ public class Config {
               	  switchName = attribute.getValue();
                 } else if (attribute.getName().toString().equals(TYPE)) {
                 	switchType = attribute.getValue();
-                 }
+                } else if (attribute.getName().toString().equals(CODE)) {
+                  switchCode = attribute.getValue();
+                } else if (attribute.getName().toString().equals(CHANNEL)) {
+              	  switchChannel = Integer.parseInt(attribute.getValue());
+                }
               }
             } else if (event.asStartElement().getName().getLocalPart().equals(PHONE)) {
               debug("Start phone");
@@ -688,14 +718,20 @@ public class Config {
           if (endElement.getName().getLocalPart() == (SOCKET)) {
           	  socketNames[socketId-1] = socketName;
           	  socketTypes[socketId-1] = socketType;
+          	  socketChannels[socketId-1] = socketChannel;
+          	  socketCodes[socketId-1] = hexStringToByteArray(socketCode);
               debug("End socket id = " + socketId + ", name = " + socketNames[socketId-1]);
           } else if (endElement.getName().getLocalPart() == (LIGHT)) {
           	  lightNames[lightId-1] = lightName;
           	  lightTypes[lightId-1] = lightType;
+          	  lightChannels[lightId-1] = lightChannel;
+          	  lightCodes[lightId-1] = hexStringToByteArray(lightCode);
           	  debug("End light id  = " + lightId + ", name = " + lightNames[lightId-1]);
           } else if (endElement.getName().getLocalPart() == (SWITCH)) {
           	  switchNames[switchId-1] = switchName;
           	  switchTypes[switchId-1] = switchType;
+          	  switchChannels[switchId-1] = switchChannel;
+          	  switchCodes[switchId-1] = hexStringToByteArray(switchCode);
           	  debug("End switch id  = " + switchId + ", name = " + switchNames[switchId-1]);
           } else if (endElement.getName().getLocalPart() == (EMONTX)) {
         	  debug("End emontx");
@@ -842,7 +878,7 @@ public class Config {
 	    	System.out.print("  " + roomNames[i] + ": ");
 	    	for(int j = 0;j<roomSockets[i].length;j++) {
 	    		int n = roomSockets[i][j];
-	    		System.out.print(n + "(" + socketNames[n-1] + "," + socketTypes[n-1] +  ") ");
+	    		System.out.print(n + "(" + socketNames[n-1] + "," + socketTypes[n-1] + "," + socketChannels[n-1] + "," + getHexId(socketCodes[n-1] ) +  ") ");
 	    	}
 	    	System.out.println();
     	}
@@ -854,7 +890,7 @@ public class Config {
 	    	System.out.print("  " + roomNames[i] + ": ");
 	    	for(int j = 0;j<roomLights[i].length;j++) {
 	    		int n = roomLights[i][j];
-	    		System.out.print(n + "(" + lightNames[n-1] + "," + lightTypes[n-1] + ") ");
+	    		System.out.print(n + "(" + lightNames[n-1] + "," + lightTypes[n-1] + "," + lightChannels[n-1] + "," + getHexId(lightCodes[n-1] ) + ") ");
 	    	}
 	    	System.out.println();
     	}
@@ -910,7 +946,7 @@ public class Config {
 	    	System.out.print("  " + roomNames[i] + ": ");
 	    	for(int j = 0;j<roomSwitches[i].length;j++) {
 	    		int n = roomSwitches[i][j];
-	    		System.out.print(n + "(" + switchNames[n-1] + "," + switchTypes[n-1] + ") ");
+	    		System.out.print(n + "(" + switchNames[n-1] + "," + switchTypes[n-1] + "," + switchChannels[n-1] + "," + getHexId(switchCodes[n-1] ) +") ");
 	    	}
 	    	System.out.println();
     	}
@@ -974,6 +1010,25 @@ public class Config {
   
   public static void main(String[] args) {
 	  new Config("conf/house.xml");
+  }
+  
+  public byte[] hexStringToByteArray(String s) {
+    int len = s.length();
+    byte[] data = new byte[len / 2];
+    for (int i = 0; i < len; i += 2) {
+        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                             + Character.digit(s.charAt(i+1), 16));
+    }
+    return data;
+  }
+  
+  public String getHexId(byte[] code) {
+	  if (code == null) return "null";
+	  StringBuilder sb = new StringBuilder();
+	  for(int i=0;i<6;i++) {
+		  sb.append(String.format("%02X ", code[i]));
+	  }
+	  return sb.toString();
   }
   
   public HashMap<String,String> getPlaylists() {

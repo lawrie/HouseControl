@@ -2,7 +2,7 @@
     <floor id="1" name="Ground floor">
         <room id="7" name="Hall">
             <camera id="1" name="Snooper" type="rpi" host="192.168.0.8:8081"></camera>
-            <socket id="3" name="Snoopy" type="LWRF"></socket>
+            <socket id="3" name="Snoopy" type="LWRF" code="6febbeedb77b" channel="3"></socket>
         </room>
         <room id="5" name="Dining">
             <emontx id="10">
@@ -17,12 +17,12 @@
     </floor>
     <floor id="2" name="First floor">
         <room id="1" name="Living">
-            <light id="3" name="Pollock" type="LWRF"></light>
-            <light id="4" name="Picasso" type="LWRF"></light>
-            <socket id="1" name="Fan" type="LWRF"></socket>
-            <socket id="2" name="Spy" type="LWRF"></socket>
-            <socket id="4" name="Frame" type="LWRF"></socket>
-            <socket id="5" name="Dock" type="LWRF"></socket>
+            <light id="3" name="Pollock" type="LWRF" code="6febbeedb77b" channel="7"></light>
+            <light id="4" name="Picasso" type="LWRF" code="6febbeedb77b" channel="8"></light>
+            <socket id="1" name="Fan" type="LWRF" code="6febbeedb77b" channel="1"></socket>
+            <socket id="2" name="Spy" type="LWRF" code="6febbeedb77b" channel="2"></socket>
+            <socket id="4" name="Frame" type="LWRF" code="6febbeedb77b" channel="9"></socket>
+            <socket id="5" name="Dock" type="LWRF" code="6febbeedb77b" channel="10"></socket>
             <appliance id="4" name="tv" code="2037787242" type="IAM"></appliance>
             <appliance id="5" name="rpi" code="1880848504" type="IAM"></appliance>
             <tv id="1" type="LG"></tv>
@@ -99,10 +99,11 @@
             </sensor>
             <window id="1" name="front">
                 <blind id="1" type="coulisse" name="front"></blind>
-                <switch id="1" name="Darwin" type="LWRF"></switch>
+                <switch id="1" name="Darwin" type="LWRF" code="6FEBDBEBEBEE" channel="1"></switch>
             </window>
             <window id="2" name="side">
                 <blind id="2" type="coulisse" name="side"></blind>
+                <switch id="2" name="Schrodinger" type="LWRF" code="6FEBDBDEDB7D" channel="1"></switch>
             </window>
             <window id="3" name="back">
                 <blind id="3" type="coulisse" name="back"></blind>
@@ -115,8 +116,8 @@
     </floor>
     <floor id="3" name="Second floor">
         <room id="3" name="Master">
-            <light id="1" name="Periodic" type="LWRF"></light>
-            <light id="2" name="World" type="LWRF"></light>
+            <light id="1" name="Periodic" type="LWRF" code="6febbeedb77b" channel="5"></light>
+            <light id="2" name="World" type="LWRF" code="6febbeedb77b" channel="6"></light>
         </room>
         <room id="4" name="Guest">
             <sensor id="2" name="Alabama" type="Jeenode">
