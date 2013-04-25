@@ -248,24 +248,29 @@ public class HouseControl implements Reporter, Alerter, Provider {
 		@Override
 		public void run() {
 			for (;;) {
-				int alarmTime = alarmControl.getAlarmTime();
-				if (alarmTime != 0 && alarmTime < System.currentTimeMillis()) {
-					// Save the current volume
-					int vol = volume;
-					// Stop the music
-					musicControl[0].pauseMusic(1);
-					// Set the volume to max
-					musicControl[0].setVolume(1, 100);
-					// Sound the alarm
-					alarmControl.soundAlarm();
-					// Set the volume back
-					musicControl[0].setVolume(1, vol);
-					// Restart the music
-					musicControl[0].playMusic(1);
+				if (alarmControl != null) {
+					int alarmTime = alarmControl.getAlarmTime();
+					if (alarmTime != 0 && alarmTime < System.currentTimeMillis()) {
+						// Save the current volume
+						int vol = volume;
+						// Stop the music
+						musicControl[0].pauseMusic(1);
+						// Set the volume to max
+						musicControl[0].setVolume(1, 100);
+						// Sound the alarm
+						alarmControl.soundAlarm();
+						// Set the volume back
+						musicControl[0].setVolume(1, vol);
+						// Restart the music
+						musicControl[0].playMusic(1);
+					}
 				}
-				volume = musicControl[0].getVolume(1);
-				phoneConnected = isReachableByPing(config.phoneName);
-				print("Music on: " + musicOn);
+				if (musicControl[0] != null) {
+					volume = musicControl[0].getVolume(1);
+					print("Music on: " + musicOn);
+				}
+				if (config.phoneName != null) phoneConnected = isReachableByPing(config.phoneName);
+				
 				try {
 					Thread.sleep((config.backgroundDelay));
 				} catch (InterruptedException e) {
