@@ -250,6 +250,8 @@ public class Config {
   private String switchCode;
   private int switchChannel;
   
+  public ArrayList<Device> devices = new ArrayList<Device>();
+  
   public Config(String configFile) {
 	  readConfig(configFile);
   }
@@ -720,18 +722,21 @@ public class Config {
           	  socketTypes[socketId-1] = socketType;
           	  socketChannels[socketId-1] = socketChannel;
           	  socketCodes[socketId-1] = hexStringToByteArray(socketCode);
+          	  devices.add(new Device(socketType, socketName, socketCode, socketId, socketChannel, Device.SOCKET));
               debug("End socket id = " + socketId + ", name = " + socketNames[socketId-1]);
           } else if (endElement.getName().getLocalPart() == (LIGHT)) {
           	  lightNames[lightId-1] = lightName;
           	  lightTypes[lightId-1] = lightType;
           	  lightChannels[lightId-1] = lightChannel;
           	  lightCodes[lightId-1] = hexStringToByteArray(lightCode);
+          	  devices.add(new Device(lightType, lightName, lightCode, lightId, lightChannel, Device.LIGHT));
           	  debug("End light id  = " + lightId + ", name = " + lightNames[lightId-1]);
           } else if (endElement.getName().getLocalPart() == (SWITCH)) {
           	  switchNames[switchId-1] = switchName;
           	  switchTypes[switchId-1] = switchType;
           	  switchChannels[switchId-1] = switchChannel;
           	  switchCodes[switchId-1] = hexStringToByteArray(switchCode);
+          	  devices.add(new Device(switchType, switchName, switchCode, switchId, switchChannel, Device.SWITCH));
           	  debug("End switch id  = " + switchId + ", name = " + switchNames[switchId-1]);
           } else if (endElement.getName().getLocalPart() == (EMONTX)) {
         	  debug("End emontx");
@@ -791,6 +796,7 @@ public class Config {
           	  applianceNames[applianceId-1] = applianceName;
           	  applianceTypes[applianceId-1] = applianceType;
           	  iamCodes[applianceId-1] = iamCode;
+          	devices.add(new Device(applianceType, applianceName, "" + iamCode, applianceId, 0, Device.APPLIANCE));
           	  debug("End appliance id  = " + applianceId + ", name = " + applianceNames[cameraId-1]);
           } else if (endElement.getName().getLocalPart() == (CAMERA)) {
           	  cameraNames[cameraId-1] = cameraName;
@@ -1022,6 +1028,17 @@ public class Config {
     return data;
   }
   
+  private static final char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+  
+  public String byteArrayToHexString(byte [] array) {
+	  StringBuilder sb = new StringBuilder();
+	  for(byte b: array) {
+          sb.append(hexDigits[(b >> 4) & 0xf]);
+          sb.append(hexDigits[b & 0xf]);
+	  }
+	  return sb.toString();
+  }
+  
   public String getHexId(byte[] code) {
 	  if (code == null) return "null";
 	  StringBuilder sb = new StringBuilder();
@@ -1045,5 +1062,15 @@ public class Config {
   
   private void debug(String msg) {
 	  if (debug) System.out.println(msg);
+  }
+  
+  public Device findDevice(String technology, String code, int channel) {
+	  //System.out.println("Looking for " + technology +  "," + code + "," + channel);
+	  for(Device d : devices) {
+		  //System.out.println("Checking: " + d.getTechnology() + "," + d.getCode() + "," + d.getChannel());
+		  if (technology.equalsIgnoreCase(d.getTechnology()) && 
+			  code.equalsIgnoreCase(d.getCode()) && channel == d.getChannel()) return d;
+	  }
+	  return null;
   }
 } 

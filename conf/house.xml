@@ -99,11 +99,11 @@
             </sensor>
             <window id="1" name="front">
                 <blind id="1" type="coulisse" name="front"></blind>
-                <switch id="1" name="Darwin" type="LWRF" code="6FEBDBEBEBEE" channel="1"></switch>
+                <switch id="1" name="Darwin" type="LWRF" code="6FEBDBEBEBEE" channel="10"></switch>
             </window>
             <window id="2" name="side">
                 <blind id="2" type="coulisse" name="side"></blind>
-                <switch id="2" name="Schrodinger" type="LWRF" code="6FEBDBDEDB7D" channel="1"></switch>
+                <switch id="2" name="Schrodinger" type="LWRF" code="6febb7d7d7dd" channel="10"></switch>
             </window>
             <window id="3" name="back">
                 <blind id="3" type="coulisse" name="back"></blind>

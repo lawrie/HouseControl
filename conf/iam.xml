@@ -1,0 +1,15 @@
+<house>
+    <floor id="1" name="Ground">
+        <room name="Living" id="1">
+            <appliance id="1" name="TV" type="IAM" code="1884046140"></appliance>
+        </room>
+    </floor>
+    <config listen_port="50000" iam_port="COM20" iam_min_value="3" 
+        iam_min_off_period="120000" background_delay="10000">
+    </config>
+    <plugins>
+       <plugin class="net.geekgrandad.plugin.IAMControl" type="LWRF">
+            <interface name="ApplianceControl"></interface>
+        </plugin>
+    </plugins>
+</house>

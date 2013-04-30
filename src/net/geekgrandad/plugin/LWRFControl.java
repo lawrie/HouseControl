@@ -3,6 +3,7 @@ package net.geekgrandad.plugin;
 import java.io.IOException;
 
 import net.geekgrandad.config.Config;
+import net.geekgrandad.config.Device;
 import net.geekgrandad.interfaces.LightControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
@@ -87,23 +88,29 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 					reporter.print("LWRF Level: " + m.getLevel());
 					reporter.print("LWRF Id = " + m.getHexId());
 					
-					int light = findLight(channel);
+					String code = config.byteArrayToHexString(m.getId());
 					
-					if (light >= 0) {
-						reporter.print("LWRF Found light " + (light+1));
-						lightOn[light] = (command == LW_ON ? true  : false);
-					} else {
-						int socket = findSocket(channel);
+					Device d = config.findDevice("LWRF", code , channel);
+					
+					if (d != null) {
+					
+						int n = d.getId();
+						int t = d.getType();
 						
-						if (socket >= 0) {
-							reporter.print("LWRF Found socket " + (socket+1));
-							socketOn[socket] = (command == LW_ON ? true  : false);							
+						if (t == Device.LIGHT) {
+							reporter.print("LWRF Found light " + n);
+							lightOn[n-1] = (command == LW_ON ? true  : false);
+						} else if (t == Device.SOCKET) {
+							reporter.print("LWRF Found socket " + n);
+							socketOn[n-1] = (command == LW_ON ? true  : false);							
+						} else if (t == Device.SWITCH){							
+							reporter.print("LWRF Found switch " + n);
+							windowOpen[n-1] = (command == LW_ON ? true  : false);
 						} else {
-							int swit = findSwitch(id);
-							
-							reporter.print("LWRF Found switch " + (swit+1));
-							windowOpen[swit] = (command == LW_ON ? true  : false);
+							reporter.print("LWRF: Unrecognised device type");
 						}
+					} else {
+						reporter.print("LWRF: Unrecognised device");
 					}
 					
 				} catch (IOException e) {
