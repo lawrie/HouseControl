@@ -797,7 +797,7 @@ public class Config {
           	  applianceTypes[applianceId-1] = applianceType;
           	  iamCodes[applianceId-1] = iamCode;
           	devices.add(new Device(applianceType, applianceName, "" + iamCode, applianceId, 0, Device.APPLIANCE));
-          	  debug("End appliance id  = " + applianceId + ", name = " + applianceNames[cameraId-1]);
+          	  debug("End appliance id  = " + applianceId + ", name = " + applianceNames[applianceId-1]);
           } else if (endElement.getName().getLocalPart() == (CAMERA)) {
           	  cameraNames[cameraId-1] = cameraName;
           	  cameraTypes[cameraId-1] = cameraType;

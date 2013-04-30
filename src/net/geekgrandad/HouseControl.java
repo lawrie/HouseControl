@@ -248,7 +248,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 		@Override
 		public void run() {
 			for (;;) {
-				if (alarmControl != null) {
+				if (alarmControl != null && musicControl[0] != null) {
 					int alarmTime = alarmControl.getAlarmTime();
 					if (alarmTime != 0 && alarmTime < System.currentTimeMillis()) {
 						// Save the current volume
@@ -324,12 +324,13 @@ public class HouseControl implements Reporter, Alerter, Provider {
 
 	// Send a playlist request to the music computer
 	private String play(String playlist) {
-		return musicControl[0].play(1, playlist);
+		if (musicControl[0] == null) return ERROR;
+		else return musicControl[0].play(1, playlist);
 	}
 
 	// Speak a message on this computer
 	private void sayLocal(String msg) {
-		speechControl.say(msg);
+		if (speechControl != null) speechControl.say(msg);
 	}
 
 	// Speak a message on the music server or locally, if music server not

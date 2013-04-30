@@ -8,7 +8,7 @@
         iam_min_off_period="120000" background_delay="10000">
     </config>
     <plugins>
-       <plugin class="net.geekgrandad.plugin.IAMControl" type="LWRF">
+       <plugin class="net.geekgrandad.plugin.IAMControl" type="IAM">
             <interface name="ApplianceControl"></interface>
         </plugin>
     </plugins>

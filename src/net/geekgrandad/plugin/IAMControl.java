@@ -52,7 +52,7 @@ public class IAMControl implements ApplianceControl {
 			inThreadIAM.setDaemon(true);
 			inThreadIAM.start();
 
-			// Tell tranceiver the devices to use
+			// Tell transceiver the devices to use
 			try {
 				// Only receive data from known devices
 				sendRFCIAM('k');
