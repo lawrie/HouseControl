@@ -28,4 +28,6 @@ public interface MusicControl extends Controller {
 	
 	public void say(int id, String msg);
 	
+	public void selectService(String name);
+	
 }

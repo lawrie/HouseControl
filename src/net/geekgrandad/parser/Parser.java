@@ -31,6 +31,9 @@ public class Parser {
 	public static final int MUSIC_ACTION = 19;
 	public static final int ROBOT_ACTION = 20;
 	public static final int DIGIT = 21;
+	public static final int SERVICE = 22;
+	public static final int COLOR = 23;
+	public static final int DEFAULT = 24;
 	
 	public static String[] areas = { "floor", "room" };
 
@@ -92,10 +95,76 @@ public class Parser {
 	public static final int ENERGY = 6;
 	public static final int SOUND = 7;
 	public static final int SOIL_MOISTURE = 8;
+	
+	public static final String[] services = {
+		"spotify", "itunes", "guide", "channel",
+		"shows", "broadcast", "home", "catchup",
+		"ondemand", "volume", "xbmc", "source",
+		"iplayer", "4oD", "youtube",
+		"tvxl", "movies", "music",
+		"games", "rentals", "subtitles", "info",
+		"itvplayer", "demand5", "settings", "help",
+		"system", "parental", "sports", "search",
+		"thumbs", "series", "wishlist", "planned",
+		"browse", "apps", "purchase", "messages",
+		"pin","payperview","lifestyle", "news", 
+		"featured"
+	};
+	
+	public static final int SPOTIFY = 0;
+	public static final int ITUNES = 1;
+	public static final int GUIDE = 2;
+	public static final int CHANNEL = 3;
+	public static final int SHOWS = 4;
+	public static final int BROADCAST = 5;
+	public static final int HOME = 6;
+	public static final int CATCHUP = 7;
+	public static final int ONDEMAND = 8;
+	public static final int VOLUME = 9;
+	public static final int XBMC = 10;
+	public static final int SOURCE = 11;
+	public static final int IPLAYER = 12;
+	public static final int OD4 = 13;
+	public static final int YOUTUBE = 14;
+	public static final int TVXL = 15;
+	public static final int MOVIES = 16;
+	public static final int MUSIC = 17;
+	public static final int GAMES = 18;
+	public static final int RENTALS = 19;
+	public static final int SUBTITLES = 20;
+	public static final int INFO = 21;
+	public static final int ITVPLAYER = 22;
+	public static final int DEMAND5 = 23;
+	public static final int SETTINGS = 24;
+	public static final int HELP = 25;
+	public static final int SYSTEM = 26;
+	public static final int PARENTAL = 27;
+	public static final int SPORTS = 28;
+	public static final int SEARCH = 29;
+	public static final int THUMBS = 30;
+	public static final int SERIES = 31;
+	public static final int WISHLIST = 32;
+	public static final int PLANNED = 33;
+	public static final int BROWSE = 34;
+	public static final int APPS = 35;
+	public static final int PURCHASE = 36;
+	public static final int MESSAGES = 37;
+	public static final int PIN = 38;
+	public static final int PAY_PER_VIEW = 39;
+	public static final int LIFESTYLE = 40;
+	public static final int NEWS = 41;
+	public static final int FEATURED = 42;
+	
+	public static final String[] source = { "stb", "dvd", "blueray" };
+	
+	public static final int STB = 0;
+	public static final int DVD = 1;
+	public static final int BLUERAY = 2;
+	
 
-	public static String[] actions = { 
+	public static final String[] actions = { 
 		"on", "off", "status", "value", "set", 
-		"mood", "email", "clear", "signal" };
+		"mood", "email", "clear", "signal", "back", "delete" };
 
 	public static final int ON = 0;
 	public static final int OFF = 1;
@@ -106,11 +175,15 @@ public class Parser {
 	public static final int EMAIL = 6;
 	public static final int CLEAR = 7;
 	public static final int SIGNAL = 8;
+	public static final int BACK = 9;
+	public static final int DELETE = 10;
 
-	public static String[] robotActions = {"fetch", "clean"};
+	public static String[] robotActions = {"fetch", "clean", "grab", "release"};
 	
 	public static final int FETCH = 0;
 	public static final int CLEAN = 1;
+	public static final int GRAB = 2;
+	public static final int RELEASE = 3;
 
 	public static String[] panActions = { "left", "right", "up", "down" };
 
@@ -119,26 +192,22 @@ public class Parser {
 	public static final int UP = 2;
 	public static final int DOWN = 3;
 
-	public static String[] vtActions = { "guide", "home", "shows", "tv", "ok", "channel", "send" };
+	public static String[] vtActions = { "ok", "send", "type", "lastch" };
 
-	public static final int GUIDE = 0;
-	public static final int HOME = 1;
-	public static final int SHOWS = 2;
-	public static final int SHOWTV = 3;
-	public static final int OK = 4;
-	public static final int CHANNEL = 5;
-	public static final int SEND = 6;
+	public static final int OK = 0;
+	public static final int SEND = 1;
+	public static final int TYPE = 2;
+	public static final int LAST_CH = 3;
 
-	public static String[] avActions = { "volup", "voldown", "dvd", "stb", "bd", "mute" };
+	public static String[] avActions = { "volup", "voldown", "mute" };
 
 	public static final int VOLUP = 0;
 	public static final int VOLDOWN = 1;
-	public static final int DVD = 2;
-	public static final int STB = 3;
-	public static final int BD = 5;
-	public static final int MUTE = 6;
+	public static final int MUTE = 2;
 
-	public static String[] musicActions = { "stop", "skip", "shutdown", "speak", "silent", "play", "say", "playlist", "volume" };
+	public static String[] musicActions = { "stop", "skip", "shutdown", "speak", "silent", 
+		                                    "play", "say", "playlist", "pause", "ff",
+		                                    "fb", "skipb", "slow", "record" };
  
 	public static final int STOP = 0;
 	public static final int SKIP = 1;
@@ -148,7 +217,12 @@ public class Parser {
 	public static final int PLAY = 5;
 	public static final int SAY = 6;
 	public static final int PLAYLIST = 7;
-	public static final int VOLUME = 8;
+	public static final int PAUSE = 8;
+	public static final int FF = 9;
+	public static final int FB = 10;
+	public static final int SKIPB = 11;
+	public static final int SLOW = 12;
+	public static final int RECORD = 13;
 	
 	public static String[] digits = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
 	
@@ -162,6 +236,19 @@ public class Parser {
 	public static final int SEVEN = 7;
 	public static final int EIGHT = 8;
 	public static final int NINE = 9;
+	
+	public static String[] colors = {"red", "green", "yellow", "blue"};
+	
+	public static final int RED = 0;
+	public static final int GREEN = 1;
+	public static final int YELLOW = 2;
+	public static final int BLUE = 3;
+	
+	public static String[] defaults = {"location", "device", "service"};
+	
+	public static final int DEFAULT_LOCATION = 0;
+	public static final int DEFAULT_DEVICE = 1;
+	public static final int DEFAULT_SERVICE = 2;
 	
 	private Reporter reporter;
 	private Config config;
@@ -369,8 +456,14 @@ public class Parser {
 			type = ACTION;
 		else if (find(token, areas) >= 0)
 			type = AREA;
+		else if (find(token, services) >= 0)
+			type = SERVICE;
 		else if (find(token, digits) >= 0)
 			type = DIGIT;
+		else if (find(token, colors) >= 0)
+			type = COLOR;
+		else if (find(token, defaults) >= 0)
+			type = DEFAULT;
 		else if (find(token, vtActions) >= 0)
 			type = VT_ACTION;
 		else if (find(token, panActions) >= 0)

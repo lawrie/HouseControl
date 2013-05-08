@@ -1,0 +1,14 @@
+<house>
+    <floor id="1" name="Ground">
+        <room name="Living" id="1">
+           <tv id="1" type="LG"></tv>
+        </room>
+    </floor>
+    <config listen_port="50000" rfm12_port="COM15" background_delay="10000">
+    </config>
+    <plugins>
+        <plugin class="net.geekgrandad.plugin.JeenodeControl" type="Jeenode">
+            <interface name="InfraredControl"></interface>
+        </plugin>
+    </plugins>
+</house>

@@ -87,6 +87,11 @@ public class HouseControl implements Reporter, Alerter, Provider {
     private Token[] tokens;
     
     private Parser parser;
+    
+    private int defaultRoom = 1;
+    private String defaultDeviceType = null;
+    private int defaultDeviceNumber = -1;
+    private String defaultService = null;
 
 	// Run the main thread
 	public void run() {
@@ -373,7 +378,15 @@ public class HouseControl implements Reporter, Alerter, Provider {
 			tokens[2] = tokens[1];
 			tokens[1] = new Token("1", Parser.NUMBER, -1);
 			numTokens += 1;
-		} else if (tokens[0].getType() == Parser.VT_ACTION) {
+		} else if (tokens[0].getType() == Parser.VT_ACTION || tokens[0].getType() == Parser.PAN_ACTION) {
+			// Assume vt 1
+			expandTokens(2);
+			if (tokens.length > 3) tokens[3] = tokens[1];
+			tokens[2] = tokens[0];
+			tokens[1] = new Token("1", Parser.NUMBER, -1);
+			tokens[0] = new Token(Parser.devices[Parser.VT],Parser.DEVICE, -1);
+			numTokens += 2;
+		} else if (tokens[0].getType() == Parser.SERVICE || tokens[0].getType() == Parser.DIGIT || tokens[0].getType() == Parser.COLOR) {
 			// Assume vt 1
 			expandTokens(2);
 			if (tokens.length > 3) tokens[3] = tokens[1];
@@ -407,12 +420,12 @@ public class HouseControl implements Reporter, Alerter, Provider {
 			tokens[0] = new Token(Parser.devices[Parser.MUSIC_SERVER], Parser.DEVICE, -1);
 			numTokens += 2;
 		} else if (tokens[0].getType() == Parser.DEVICE_SET) {
-			// assume room 1
+			// assume default room
 			expandTokens(2);
 			if (tokens.length > 4) tokens[4] = tokens[2];
 			if (tokens.length > 3)tokens[3] = tokens[1];
 			tokens[2] = tokens[0];
-			tokens[1] = new Token("1", Parser.NUMBER, -1);
+			tokens[1] = new Token("" + defaultRoom, Parser.NUMBER, -1);
 			tokens[0] = new Token(Parser.areas[Parser.ROOM], Parser.AREA, -1);
 			numTokens += 2;			
 		}
@@ -422,6 +435,18 @@ public class HouseControl implements Reporter, Alerter, Provider {
 		default:
 			error("Command not recognised: " + source);
 			return ERROR;
+		case Parser.DEFAULT:
+			print("Default command");
+			switch (parser.find(tokens[0].getValue(), Parser.defaults)) {
+			case Parser.DEFAULT_LOCATION:
+				int n = Integer.parseInt(tokens[1].getValue());
+				print("Setting default room to " + n);
+				defaultRoom = n;
+				return SUCCESS;
+			default:
+				error("Default command not supported");
+				return ERROR;
+			}
 		case Parser.SOCKET_NAME:
 			int sock = parser.find(tokens[0].getValue(),config.socketNames);
 			if (numTokens == 1) {		
@@ -563,10 +588,10 @@ public class HouseControl implements Reporter, Alerter, Provider {
 					case Parser.OFF:
 						switch (device) {
 						case Parser.TV:
-							infraredControl.sendCommand(TV, AV.ON);
+							sendCommand(TV, AV.ON);
 							return SUCCESS;
 						case Parser.VT:
-							infraredControl.sendCommand(TIVO, 0x8c);
+							sendCommand(TIVO, 0x8c);
 							return SUCCESS;
 						case Parser.AV:
 							// TODO
@@ -671,67 +696,674 @@ public class HouseControl implements Reporter, Alerter, Provider {
 							error("Device does not support clear");
 							return ERROR;
 						}
+					case Parser.DELETE:
+						if (device == Parser.VT) {
+							sendCommand(TIVO, AV.DELETE);
+							return SUCCESS;
+						} else {
+							error("Device does not support DELETE");
+							return ERROR;
+						}
+					case Parser.BACK:
+						if (device == Parser.VT) {
+							sendCommand(TIVO, AV.BACK);
+							return SUCCESS;
+						} else {
+							error("Device does not support BACK");
+							return ERROR;
+						}						
 					default:
 						error("Unsupported action");
 						return ERROR;
 					}
 				} else if (device == Parser.VT && numTokens > 2 && tokens[2].getType() == Parser.DIGIT) {
-					infraredControl.sendCommand(TIVO, 0x80 + parser.find(tokens[2].getValue(),Parser.digits));
+					sendCommand(TIVO, 0x80 + parser.find(tokens[2].getValue(),Parser.digits));
 					return SUCCESS;
-				} else if (device == Parser.VT && numTokens > 2 && tokens[2].getType() == Parser.VT_ACTION) {
-					switch(parser.find(tokens[2].getValue(),Parser.vtActions)) {
+				} else if (device == Parser.VT && numTokens > 2 && tokens[2].getType() == Parser.COLOR) {
+					switch(parser.find(tokens[2].getValue(),Parser.colors)) {
+					case Parser.BLUE:
+						sendCommand(TIVO, AV.BLUE);
+						return SUCCESS;
+					case Parser.RED:
+						sendCommand(TIVO, AV.RED);
+						return SUCCESS;
+					case Parser.YELLOW:
+						sendCommand(TIVO, AV.YELLOW);
+						return SUCCESS;
+					case Parser.GREEN:
+						sendCommand(TIVO, AV.GREEN);
+						return SUCCESS;
+					}
+				} else if (numTokens > 2 && tokens[2].getType() == Parser.SERVICE) {
+					switch(parser.find(tokens[2].getValue(),Parser.services)) {
 					case Parser.GUIDE:
-						infraredControl.sendCommand(TIVO, AV.GUIDE);
+						sendCommand(TIVO, AV.GUIDE);
 						return SUCCESS;
 					case Parser.HOME:
-						infraredControl.sendCommand(TIVO, AV.HOME);
+						sendCommand(TIVO, AV.HOME);
 						return SUCCESS;
 					case Parser.SHOWS:
-						infraredControl.sendCommand(TIVO, 0x95);
+						sendCommand(TIVO, AV.SHOWS);
 						return SUCCESS;
-					case Parser.OK:
-						infraredControl.sendCommand(TIVO, AV.MENU_OK);
-						return SUCCESS;
+					case Parser.VOLUME:
+						if (numTokens == 3) {
+							return "" + volume;
+						} else  if (tokens[3].getType() == Parser.PAN_ACTION) {
+							switch(parser.find(tokens[3].getValue(),Parser.panActions)) {
+							case Parser.UP:
+								sendCommand(RECEIVER, AV.VOLUME_UP);
+								return SUCCESS;
+							case Parser.DOWN:
+								sendCommand(RECEIVER, AV.VOLUME_DOWN);
+								return SUCCESS;
+							default:
+								error("Invalid volume command");
+								return ERROR;
+							}
+						} else {
+							error("Invalid volume command");
+							return ERROR;
+						}
 					case Parser.CHANNEL:
 						if (device == Parser.VT) {
-							infraredControl.setChannel(tokens[3].getValue());
-							return SUCCESS;
+							if (tokens[3].getType() == Parser.PAN_ACTION) {
+								switch(parser.find(tokens[3].getValue(),Parser.panActions)) {
+								case Parser.UP:
+									sendCommand(TIVO, AV.CHANNEL_UP);
+									return SUCCESS;
+								case Parser.DOWN:
+									sendCommand(TIVO, AV.CHANNEL_DOWN);
+									return SUCCESS;
+								default:
+									error("Invalid channel command");
+									return ERROR;
+								}
+							} else if (tokens[3].getType() == Parser.NUMBER) {
+								infraredControl.setChannel(tokens[3].getValue());
+								return SUCCESS;
+							} else {
+								error("Invalid channel command");
+								return ERROR;
+							}
 						} else {
 							error("Device does not support channel");
 							return ERROR;
 						}
-					case Parser.SEND:
-						if (device == Parser.VT) {
-							int code = Integer.parseInt(tokens[3].getValue(), 16);
-							infraredControl.sendCommand(TIVO, code);
+					case Parser.SPOTIFY:
+						play(tokens[3].getValue());
+						return SUCCESS;
+					case Parser.BROADCAST:
+						sendCommand(TIVO, AV.TV);
+						return SUCCESS;
+					case Parser.SUBTITLES:
+						sendCommand(TIVO, AV.SUBTITLES);
+						return SUCCESS;
+					case Parser.INFO:
+						sendCommand(TIVO, AV.INFO);
+						return SUCCESS;
+					case Parser.IPLAYER:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_RIGHT);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.ITVPLAYER:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_RIGHT);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.OD4:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_RIGHT);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.DEMAND5:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.SETTINGS:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.PARENTAL:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.PURCHASE:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.MESSAGES:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.HELP:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.ONDEMAND:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_RIGHT);
+						return SUCCESS;
+					case Parser.CATCHUP:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_RIGHT);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.TVXL:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_RIGHT);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.MOVIES:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+					    sendCommand(TIVO, AV.MENU_RIGHT);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;					
+					case Parser.MUSIC:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_RIGHT);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();						
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;	
+					case Parser.SPORTS:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_RIGHT);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();	
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;	
+					case Parser.GAMES:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;	
+					case Parser.LIFESTYLE:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.NEWS:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.APPS:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;	
+					case Parser.FEATURED:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.SYSTEM:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.RENTALS:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_RIGHT);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;							
+					case Parser.YOUTUBE:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_RIGHT);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();						
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.PAY_PER_VIEW:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_DOWN);
+						delay();
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.SERIES:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.DIGIT_1);
+						return SUCCESS;	
+					case Parser.PLANNED:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.DIGIT_2);
+						return SUCCESS;
+					case Parser.WISHLIST:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.DIGIT_3);
+						return SUCCESS;
+					case Parser.BROWSE:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.DIGIT_5);
+						return SUCCESS;	
+					case Parser.SOURCE:
+						switch(parser.find(tokens[3].getValue(),Parser.source)) {
+						case Parser.STB:
+							sendCommand(RECEIVER, AV.SOURCE_STB);
 							return SUCCESS;
-						} else {
-							error("Device does not support send");
+						case Parser.DVD:
+							sendCommand(RECEIVER, AV.SOURCE_DVD);
+							return SUCCESS;
+						case Parser.BLUERAY:
+							sendCommand(RECEIVER, AV.SOURCE_BLUERAY);
+							return SUCCESS;	
+						default:
+							error("Unknown source");
 							return ERROR;
 						}
+					case Parser.SEARCH:
+						sendCommand(TIVO, AV.HOME);
+						delay();
+						sendCommand(TIVO, AV.DIGIT_4);
+						return SUCCESS;
+					case Parser.THUMBS:
+						if (tokens[3].getType() == Parser.PAN_ACTION) {
+							switch(parser.find(tokens[3].getValue(),Parser.panActions)) {
+							case Parser.UP:
+								sendCommand(TIVO, AV.THUMBS_UP);
+								return SUCCESS;
+							case Parser.DOWN:
+								sendCommand(TIVO, AV.THUMBS_DOWN);
+								return SUCCESS;
+							default:
+								error("Invalid thumbs command");
+								return ERROR;
+							}
+						} else {
+							error("Invalid thumbs command");
+							return ERROR;
+						}
+					case Parser.PIN:
+						sendCommand(TIVO,AV.DIGIT_1);
+						delay(1000);
+						sendCommand(TIVO,AV.DIGIT_2);
+						delay(1000);
+						sendCommand(TIVO,AV.DIGIT_3);
+						delay(1000);
+						sendCommand(TIVO,AV.DIGIT_4);
+						return SUCCESS;
 					default:
-						error("Unsupported TV command");
+						error("Unsupported service");
+						return ERROR;
+					}
+				} else if (device == Parser.VT && numTokens > 2 && tokens[2].getType() == Parser.VT_ACTION) {
+					switch(parser.find(tokens[2].getValue(),Parser.vtActions)) {
+					case Parser.OK:
+						sendCommand(TIVO, AV.MENU_OK);
+						return SUCCESS;
+					case Parser.LAST_CH:
+						sendCommand(TIVO, AV.LAST_CHANNEL);
+						return SUCCESS;
+					case Parser.SEND:
+						int code = Integer.parseInt(tokens[3].getValue(), 16);
+						sendCommand(TIVO, code);
+						return SUCCESS;
+					case Parser.TYPE:
+						type(tokens[3].getValue());
+						return SUCCESS;
+					default:
+						error("Unsupported TiVo command");
 						return ERROR;
 					}
 				} else if (device == Parser.AV && numTokens > 2 && tokens[2].getType() == Parser.AV_ACTION) {
 					switch(parser.find(tokens[2].getValue(), Parser.avActions)) {	
 					case Parser.MUTE:
-						infraredControl.sendCommand(RECEIVER, AV.MUTE);
+						sendCommand(RECEIVER, AV.MUTE);
 						return SUCCESS;
 					case Parser.VOLUP:
-						infraredControl.sendCommand(RECEIVER, AV.VOLUME_UP);
+						sendCommand(RECEIVER, AV.VOLUME_UP);
 						return SUCCESS;
 					case Parser.VOLDOWN:
-						infraredControl.sendCommand(RECEIVER, AV.VOLUME_DOWN);
-						return SUCCESS;
-					case Parser.DVD:
-						infraredControl.sendCommand(RECEIVER, AV.SOURCE_DVD);
-						return SUCCESS;
-					case Parser.BD:
-						infraredControl.sendCommand(RECEIVER, AV.SOURCE_BLUERAY);
-						return SUCCESS;
-					case Parser.STB:
-						infraredControl.sendCommand(RECEIVER, AV.SOURCE_STB);
+						sendCommand(RECEIVER, AV.VOLUME_DOWN);
 						return SUCCESS;
 					default:
 						error("Unsupported AV action");
@@ -740,19 +1372,49 @@ public class HouseControl implements Reporter, Alerter, Provider {
 				} else if (device == Parser.VT && numTokens > 2 && tokens[2].getType() == Parser.PAN_ACTION) {
 					switch(parser.find(tokens[2].getValue(), Parser.panActions)) {
 					case Parser.UP:
-						infraredControl.sendCommand(TIVO, AV.MENU_UP);
+						sendCommand(TIVO, AV.MENU_UP);
 						return SUCCESS;
 					case Parser.DOWN:
-						infraredControl.sendCommand(TIVO, AV.MENU_DOWN);
+						sendCommand(TIVO, AV.MENU_DOWN);
 						return SUCCESS;
 					case Parser.LEFT:
-						infraredControl.sendCommand(TIVO, AV.MENU_LEFT);
+						sendCommand(TIVO, AV.MENU_LEFT);
 						return SUCCESS;
 					case Parser.RIGHT:
-						infraredControl.sendCommand(TIVO, AV.MENU_RIGHT);
+						sendCommand(TIVO, AV.MENU_RIGHT);
 						return SUCCESS;
 					default:
 						error("Invalid pan action");
+						return ERROR;
+					}
+				} else if (device == Parser.VT && numTokens > 2 && tokens[2].getType() == Parser.MUSIC_ACTION) {
+					switch(parser.find(tokens[2].getValue(), Parser.musicActions)) {
+					case Parser.PLAY:
+						sendCommand(TIVO, AV.PLAY);
+						return SUCCESS;
+					case Parser.PAUSE:
+						sendCommand(TIVO, AV.PAUSE);
+						return SUCCESS;
+					case Parser.STOP:
+						sendCommand(TIVO, AV.STOP);
+						return SUCCESS;
+					case Parser.FF:
+						sendCommand(TIVO, AV.FAST_FORWARD);
+						return SUCCESS;
+					case Parser.FB:
+						sendCommand(TIVO, AV.FAST_BACKWARDS);
+						return SUCCESS;
+					case Parser.SKIP:
+						sendCommand(TIVO, AV.SKIP_FORWARDS);
+						return SUCCESS;	
+					case Parser.SKIPB:
+						sendCommand(TIVO, AV.SKIP_BACKWARDS);
+						return SUCCESS;	
+					case Parser.SLOW:
+						sendCommand(TIVO, AV.SLOW);
+						return SUCCESS;	
+					default:
+						error("Invalid TIVO music command");
 						return ERROR;
 					}
 				} else if (device == Parser.MUSIC_SERVER && numTokens > 2 && tokens[2].getType() == Parser.MUSIC_ACTION) {
@@ -782,8 +1444,6 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						return SUCCESS;
 					case Parser.PLAYLIST:
 						return musicControl[n].getPlaylist(n);
-					case Parser.VOLUME:
-						return "" + volume;
 					default:
 						error("Invalic music server command");
 						return ERROR;
@@ -1069,5 +1729,76 @@ public class HouseControl implements Reporter, Alerter, Provider {
 	@Override
 	public DatalogControl getDatalogControl() {
 		return datalogControl;
+	}
+	
+	private void delay(int millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+		}
+	}
+	
+	private void delay() {
+		delay(2000);
+	}
+	
+	void type(char c) throws IOException {
+		int repeats = 0;
+		int digit = -1;
+		
+		if (c >= 'a' && c <= 'c') {
+			digit = 2;
+			repeats = (c - 'a');
+		} else if (c >= 'd' && c <= 'f') {
+			digit = 3;
+			repeats = c - 'd';
+		} else if (c >= 'g' && c <= 'i') {
+			digit = 4;
+			repeats = c - 'g';
+		} else if (c >= 'j' && c <= 'l') {
+			digit = 5;
+			repeats = c - 'j';
+		} else if (c >= 'm' && c <= 'o') {
+			digit = 6;
+			repeats = c - 'm';
+		} else if (c >= 'p' && c <= 's') {
+			digit = 7;
+			repeats = c - 'p';
+		} else if (c >= 't' && c <= 'v') {
+			digit = 8;
+			repeats = c - 't';
+		} else if (c >= 'w' && c <= 'z') {
+			digit = 9;
+			repeats = c - 'w';
+		} else if (c == ' ') {
+			digit = 0;
+			repeats = 0;
+		} else if (c >= '0' && c <= '9' ) {
+			digit = c - '0';
+			if (digit == 0) repeats = 1;
+			else if (digit == 1) repeats = 0;
+			else if (digit == 7 || digit == 9) repeats = 4;
+			else repeats = 3;
+		}
+		
+		if (infraredControl != null && digit >= 0) {
+			for(int i=0;i<=repeats;i++) {
+				sendCommand(TIVO, 0x80 + digit);
+				delay(100);
+			}
+		}
+	}
+	
+	// Type in Virgin TV search box
+	private void type(String s) throws IOException {
+		for(int i=0;i<s.length();i++) {
+			type(s.charAt(i));
+			delay(1500);
+		}
+	}
+	
+	// Send an IR command
+	private void sendCommand(int id, int cmd)throws IOException {
+		if (infraredControl != null) infraredControl.sendCommand(id, cmd);
 	}
 }

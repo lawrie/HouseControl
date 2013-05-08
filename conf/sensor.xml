@@ -1,0 +1,19 @@
+<house>
+    <floor id="1" name="Ground">
+        <room name="Living" id="1">
+           <sensor id="1" name="mysensor" type="Jeenode">
+                <temperature></temperature>
+                <lightlevel></lightlevel>
+                <motion></motion>
+                <battery></battery>
+            </sensor>
+        </room>
+    </floor>
+    <config listen_port="50000" rfm12_port="COM15" background_delay="10000">
+    </config>
+    <plugins>
+        <plugin class="net.geekgrandad.plugin.JeenodeControl" type="Jeenode">
+            <interface name="SensorControl"></interface>
+        </plugin>
+    </plugins>
+</house>

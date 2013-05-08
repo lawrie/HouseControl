@@ -146,4 +146,10 @@ public class SpotifyControl implements MusicControl {
 	public void shutDown(int id) {
 		sendMusicCmd(CMD_SHUT_DOWN, false);
 	}
+
+	@Override
+	public void selectService(String name) {
+		// TODO Auto-generated method stub
+		
+	}
 }

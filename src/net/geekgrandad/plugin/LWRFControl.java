@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import net.geekgrandad.config.Config;
 import net.geekgrandad.config.Device;
+import net.geekgrandad.interfaces.Alerter;
 import net.geekgrandad.interfaces.LightControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
@@ -17,6 +18,7 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 	private static final byte LW_MOOD = 2;
 	
 	private Reporter reporter;
+	private Alerter alerter;
 	private Config config;
 	private RFControl rfc434;
 	private Thread inThread434 = new Thread(new ReadLWRFInput());
@@ -24,6 +26,7 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 	private boolean[] lightOn = new boolean[Config.MAX_LIGHTS];
 	private int[] lightValue = new int[Config.MAX_LIGHTS];
 	private boolean[] windowOpen = new boolean[Config.MAX_SWITCHES];
+	private long lastSwitch = System.currentTimeMillis();
 	
 	@Override
 	public boolean getSwitchStatus(int id) {
@@ -106,6 +109,9 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 						} else if (t == Device.SWITCH){							
 							reporter.print("LWRF Found switch " + n);
 							windowOpen[n-1] = (command == LW_ON ? true  : false);
+							long now = System.currentTimeMillis();
+							if (now - lastSwitch  > 2000) alerter.say(config.switchNames[n-1] + " window " + (command == LW_ON ? "open" : "closed"));
+							lastSwitch = now;
 						} else {
 							reporter.print("LWRF: Unrecognised device type");
 						}
@@ -124,6 +130,7 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 	public void setProvider(Provider provider) {
 		config = provider.getConfig();
 		reporter = provider.getReporter();
+		alerter = provider.getAlerter();
 		
 		// Connect to the LightwaveRF network, if transceiver port defined
 		if (config.lwrfPort != null && config.lwrfPort.length() > 0) {
