@@ -188,7 +188,6 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 	}
 
 	// Change the Virgin TiVo TV channel
-	@Override
 	public void setChannel(String channel) throws IOException {
 		for (int i = 0; i < 3; i++) {
 			int code = (128 + channel.charAt(i) - '0');

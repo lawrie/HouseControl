@@ -12,6 +12,8 @@ public class Device {
 	public static final int LIGHT = 1;
 	public static final int SWITCH = 2;
 	public static final int APPLIANCE = 3;
+	public static final int MUSIC_SERVER = 4;
+	public static final int MEDIA= 5;
 	
 	public Device(String technology, String name, String code, int id, int channel, int type) {
 		this.name = name;

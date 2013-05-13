@@ -8,11 +8,11 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import net.geekgrandad.config.Config;
-import net.geekgrandad.interfaces.MusicControl;
+import net.geekgrandad.interfaces.MediaControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
 
-public class SpotifyControl implements MusicControl {
+public class SpotifyControl implements MediaControl {
 	
 	// Music server commands
 	private static final String CMD_SET_VOLUME = "setvol";
@@ -21,8 +21,6 @@ public class SpotifyControl implements MusicControl {
 	private static final String CMD_SKIP_TRACK = "skip";
 	private static final String CMD_SHUT_DOWN = "shutdown";
 	
-	private static final String ERROR = "Error";
-	
     private Reporter reporter;
 	private Config config;
 	private boolean musicOn = true;
@@ -30,32 +28,14 @@ public class SpotifyControl implements MusicControl {
 	private String currentPlaylist = " ";
 
 	@Override
-	public String play(int id, String playlist) {
-		String list = config.getPlaylists().get(playlist);
-		if (list != null) {
-			currentPlaylist = playlist;
-			return sendMusicCmd("play " + list + "?autoplay=true", false);
-		} else {
-			reporter.error("No such playlist: " + playlist);
-			return ERROR;
-		}
-	}
-
-	@Override
-	public String playWave(int id, String waveFile) {
-		// TODO
-		return null;
-	}
-
-	@Override
 	public void setVolume(int id, int volume) {
-		sendMusicCmd(CMD_SET_VOLUME + " " + volume, false);
+		sendMusicCmd(id, CMD_SET_VOLUME + " " + volume, false);
 	}
 
 	@Override
 	public int getVolume(int id) {
 		try {
-			int r = Integer.parseInt(sendMusicCmd(CMD_GET_VOLUME, true));
+			int r = Integer.parseInt(sendMusicCmd(id, CMD_GET_VOLUME, true));
 			musicOn = true;
 			return r;
 		} catch (Exception e) {
@@ -66,45 +46,19 @@ public class SpotifyControl implements MusicControl {
 
 	@Override
 	public String getArtist(int id) {
-		// TODO Auto-generated method stub
+		reporter.error("Spotify: getArtist not supported");
 		return null;
 	}
 
 	@Override
 	public String getTrack(int id) {
-		// TODO Auto-generated method stub
+		reporter.error("Spotify: getTrack not supported");
 		return null;
 	}
-
-	@Override
-	public String getPlaylist(int id) {
-		return currentPlaylist;
-	}
-
-	@Override
-	public boolean musicStatus(int id) {
-		return musicOn;
-	}
-
-	@Override
-	public void pauseMusic(int id) {
-		sendMusicCmd(CMD_PAUSE_MUSIC, false);
-
-	}
-
-	@Override
-	public void playMusic(int id) {
-		sendMusicCmd(CMD_PAUSE_MUSIC, false);
-	}
-
-	@Override
-	public void skipTrack(int id) {
-		sendMusicCmd(CMD_SKIP_TRACK, false);
-	}
-
+	
 	@Override
 	public void say(int id, String msg) {
-		sendMusicCmd("say " + msg, false);
+		sendMusicCmd(id, "say " + msg, false);
 	}
 
 	@Override
@@ -113,19 +67,19 @@ public class SpotifyControl implements MusicControl {
 		reporter = provider.getReporter();
 	}
 	
-	private synchronized String sendMusicCmd(String cmd, boolean force) {
+	private synchronized String sendMusicCmd(int id, String cmd, boolean force) {
 		if (!force && !musicOn)
 			return "Error";
 		try {
-			Socket sock = new Socket(config.musicServerHost, config.listenPort);
-			sock.setSoTimeout(config.musicSocketTimeout);
+			Socket sock = new Socket(config.mediaHosts[id-1], config.listenPort);
+			sock.setSoTimeout(config.mediaSocketTimeout);
 			PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					sock.getInputStream()));
 			out.println(cmd);
-			reporter.print("Sending " + cmd + " to music server");
+			reporter.print("Sending " + cmd + " to media server: " + config.mediaHosts[id-1]);
 			String ret = in.readLine();
-			reporter.print("Music server: " + ret);
+			reporter.print("Media server: " + ret);
 			musicOn = true;
 			out.close();
 			in.close();
@@ -143,13 +97,201 @@ public class SpotifyControl implements MusicControl {
 	}
 
 	@Override
-	public void shutDown(int id) {
-		sendMusicCmd(CMD_SHUT_DOWN, false);
+	public void start(int id, String playlist, boolean repeat) throws IOException {
+		String list = config.getPlaylists().get(playlist);
+		if (list != null) {
+			currentPlaylist = playlist;
+			sendMusicCmd(id, "play " + list + "?autoplay=true", false);
+		} else {
+			reporter.error("No such playlist: " + playlist);
+		}	
 	}
 
 	@Override
-	public void selectService(String name) {
-		// TODO Auto-generated method stub
+	public void open(int id, String file, boolean repeat) throws IOException {
+		reporter.error("Spotify: open not supported");	
+	}
+
+	@Override
+	public void type(int id, String s) throws IOException {
+		reporter.error("Spotify: type not supported");	
+	}
+
+	@Override
+	public void select(int id, String service) throws IOException {
+		reporter.error("Spotify: select not supported");	
+	}
+
+	@Override
+	public void pause(int id) throws IOException {
+		sendMusicCmd(id, CMD_PAUSE_MUSIC, false);
+	}
+
+	@Override
+	public void stop(int id) throws IOException {
+		sendMusicCmd(id, CMD_PAUSE_MUSIC, false);	
+	}
+
+	@Override
+	public void play(int id) throws IOException {
+		sendMusicCmd(id, CMD_PAUSE_MUSIC, false);	
+	}
+
+	@Override
+	public void record(int id) throws IOException {
+		reporter.error("Spotify: record not supported");
+	}
+
+	@Override
+	public void ff(int id) throws IOException {
+		reporter.error("Spotify: ff not supported");	
+	}
+
+	@Override
+	public void fb(int id) throws IOException {
+		reporter.error("Spotify: fb not supported");		
+	}
+
+	@Override
+	public void skip(int id) throws IOException {
+		sendMusicCmd(id, CMD_SKIP_TRACK, false);	
+	}
+
+	@Override
+	public void skipb(int id) throws IOException {
+		reporter.error("Spotify: skipb not supported");	
+	}
+
+	@Override
+	public void slow(int id) throws IOException {
+		reporter.error("Spotify: slow not supported");	
+	}
+
+	@Override
+	public void delete(int id) throws IOException {
+		reporter.error("Spotify: delete not supported");	
+	}
+
+	@Override
+	public void up(int id) throws IOException {
+		reporter.error("Spotify: up not supported");
+	}
+
+	@Override
+	public void down(int id) throws IOException {
+		reporter.error("Spotify: up not supported");	
+	}
+
+	@Override
+	public void left(int id) throws IOException {
+		reporter.error("Spotify: left not supported");
+	}
+
+	@Override
+	public void right(int id) throws IOException {
+		reporter.error("Spotify: right not supported");	
+	}
+
+	@Override
+	public void ok(int id) throws IOException {
+		reporter.error("Spotify: ok not supported");
+	}
+
+	@Override
+	public void back(int id) throws IOException {
+		reporter.error("Spotify: back not supported");	
+	}
+
+	@Override
+	public void lastChannel(int id) throws IOException {
+		reporter.error("Spotify: lastChannel not supported");	
+	}
+
+	@Override
+	public void option(int id, String option) throws IOException {
+		reporter.error("Spotify: option not supported");
+	}
+
+	@Override
+	public void volumeUp(int id) throws IOException {
+		reporter.error("Spotify: volumeUp not supported");
+	}
+
+	@Override
+	public void volumeDown(int id) throws IOException {
+		reporter.error("Spotify: volumeDown not supported");		
+	}
+
+	@Override
+	public void mute(int id) throws IOException {
+		reporter.error("Spotify: mute not supported");
+	}
+
+	@Override
+	public void setChannel(int id, int channel) throws IOException {
+		reporter.error("Spotify: setChannel not supported");	
+	}
+
+	@Override
+	public int getChannel(int id) throws IOException {
+		reporter.error("Spotify: getChannel not supported");
+		return 0;
+	}
+
+	@Override
+	public void channelUp(int id) throws IOException {
+		reporter.error("Spotify: channelUp not supported");	
+	}
+
+	@Override
+	public void channelDown(int id) throws IOException {
+		reporter.error("Spotify: channelDown not supported");
+	}
+
+	@Override
+	public void thumbsUp(int id) throws IOException {
+		reporter.error("Spotify: thumbsUp not supported");
 		
+	}
+
+	@Override
+	public void thumbsDown(int id) throws IOException {
+		reporter.error("Spotify: thumbsDown not supported");
+	}
+
+	@Override
+	public void digit(int id, int n) throws IOException {
+		reporter.error("Spotify: digit not supported");
+	}
+
+	@Override
+	public void color(int id, int n) throws IOException {
+		reporter.error("Spotify: color not supported");		
+	}
+
+	@Override
+	public void turnOn(int id) throws IOException {
+		reporter.error("Spotify: turnOn not supported");
+	}
+
+	@Override
+	public void turnOff(int id) throws IOException {
+		sendMusicCmd(id, CMD_SHUT_DOWN, false);	
+	}
+
+	@Override
+	public void pin(int id) throws IOException {
+		reporter.error("Spotify: pin not supported");		
+	}
+
+	@Override
+	public void setSource(int id, int source) throws IOException {
+		reporter.error("Spotify: setSource not supported");		
+	}
+
+	@Override
+	public String getAlbum(int id) throws IOException {
+		reporter.error("Spotify: getAlbum not supported");
+		return "Unknown";
 	}
 }

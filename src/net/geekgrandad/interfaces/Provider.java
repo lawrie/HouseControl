@@ -16,8 +16,8 @@ public interface Provider {
 	
 	public CameraControl getCameraControl(int n);
 	
-	public MusicControl getMusicControl(int n);
-	
 	public DatalogControl getDatalogControl();
+	
+	public InfraredControl getInfraredControl();
 
 }

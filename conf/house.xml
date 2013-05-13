@@ -23,10 +23,10 @@
             <socket id="2" name="Spy" type="LWRF" code="6febbeedb77b" channel="2"></socket>
             <socket id="4" name="Frame" type="LWRF" code="6febbeedb77b" channel="9"></socket>
             <socket id="5" name="Dock" type="LWRF" code="6febbeedb77b" channel="10"></socket>
-            <appliance id="4" name="tv" code="2037787242" type="IAM"></appliance>
+            <appliance id="4" name="bedmedia" code="2037787242" type="IAM"></appliance>
             <appliance id="5" name="rpi" code="1880848504" type="IAM"></appliance>
-            <tv id="1" type="LG"></tv>
-            <stb id="1" type="vt">
+            <media id="1" channel="1" name="tv" type="TIVO"></media>
+            <media id="2" channel="2" name="vt" type="TIVO">
             	<channel id="101" name="bbc1"></channel>
             	<channel id="102" name="bbc2"></channel>
             	<channel id="103" name="itv"></channel>
@@ -35,9 +35,11 @@
             	<channel id="106" name="bbc3"></channel>
             	<channel id="107" name="bbc4"></channel>
             	<channel id="108" name="bbc1 hd"></channel>
-            </stb>
-            <receiver id="1" type="LG"></receiver>
-            <musicserver id="1" name="musicserver" host="musicserver" socket_timeout="5000">
+            </media>
+            <media id="3" channel="3" name="av" type="TIVO"></media>
+            <media id="4" name="xb" host="192.168.0.79" type="XBMC">
+            </media>
+            <media id="5" name="spot" host="musicserver" socket_timeout="5000" type="Spotify">
                 <spotify>
       				<playlist name="hiatt" link="http://open.spotify.com/user/grabbas/playlist/7kqeUug8LFcc1G5x85Vs3u"></playlist>
       				<playlist name="bluegrass" link="http://open.spotify.com/user/grabbas/playlist/1rNcNwvAEhkr8SpMMr544H"></playlist>
@@ -82,7 +84,7 @@
                     <playlist name="iver" link="http://open.spotify.com/user/grabbas/playlist/44vtR9Np9QAZQJQhJYTk3r"></playlist>
                     <playlist name="women" link="http://open.spotify.com/user/grabbas/playlist/0y1xQvg7wYi6z3aXOxjZ4V"></playlist>
                 </spotify>
-            </musicserver>
+            </media>
             <sensor id="1" name="Jeenode" type="Jeenode">
                 <temperature></temperature>
                 <lightlevel></lightlevel>
@@ -146,6 +148,9 @@
         iam_port="COM20" iam_min_value="3" iam_min_off_period="120000"
         occupied_interval="300000" ping_timeout="5000" background_delay="10000"></config>
     <plugins>
+        <plugin class="net.geekgrandad.plugin.TivoControl" type="TIVO">
+            <interface name="MediaControl"></interface>
+        </plugin>
         <plugin class="net.geekgrandad.plugin.WanscamControl" type="Wanscam">
             <interface name="CameraControl"></interface>
         </plugin>
@@ -156,7 +161,10 @@
             <interface name="HeatingControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.SpotifyControl" type="Spotify">
-            <interface name="MusicControl"></interface>
+            <interface name="MediaControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.XBMCControl" type="XBMC">
+            <interface name="MediaControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.LocalSpeech">
             <interface name="SpeechControl"></interface>
@@ -175,17 +183,17 @@
             <interface name="SocketControl"></interface>
             <interface name="SwitchControl"></interface>
         </plugin>
-        <plugin class="net.geekgrandad.plugin.JeenodeControl" type="Jeenode">
-            <interface name="SensorControl"></interface>
-            <interface name="PowerControl"></interface>
-            <interface name="PlantControl"></interface>
-            <interface name="InfraredControl"></interface>
-        </plugin>
         <plugin class="net.geekgrandad.plugin.GoogleCalendar">
             <interface name="CalendarControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.HTTPRespond">
             <interface name="HTTPControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.JeenodeControl" type="Jeenode">
+            <interface name="SensorControl"></interface>
+            <interface name="PowerControl"></interface>
+            <interface name="PlantControl"></interface>
+            <interface name="InfraredControl"></interface>
         </plugin>
     </plugins>
 </house>

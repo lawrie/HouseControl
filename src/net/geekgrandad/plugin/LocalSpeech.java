@@ -7,7 +7,6 @@ import javax.speech.synthesis.Synthesizer;
 import javax.speech.synthesis.SynthesizerModeDesc;
 
 import net.geekgrandad.config.Config;
-import net.geekgrandad.interfaces.MusicControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
 import net.geekgrandad.interfaces.SpeechControl;
@@ -54,10 +53,5 @@ public class LocalSpeech implements SpeechControl {
 		} catch (Exception e) {
 			reporter.error("Failed to create speak synthesizer");
 		}
-	}
-
-	@Override
-	public void setMusicServer(MusicControl musicServer) {
-		// Not used	
 	}
 }

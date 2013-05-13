@@ -34,6 +34,7 @@ public class Parser {
 	public static final int SERVICE = 22;
 	public static final int COLOR = 23;
 	public static final int DEFAULT = 24;
+	public static final int MEDIA_NAME = 25;
 	
 	public static String[] areas = { "floor", "room" };
 
@@ -41,7 +42,7 @@ public class Parser {
 	public static final int ROOM = 1;
 	
 	public static String[] devices = { "light", "socket", "appliance", "switch", "camera",
-		"sensor", "tv", "vt", "av", "phone", "musicserver", "radiator",
+		"sensor", "phone", "media", "radiator",
 		"robot", "alarm", "blind", "heating" };
 
 	public static final int LIGHT = 0;
@@ -50,20 +51,17 @@ public class Parser {
 	public static final int SWITCH = 3;
 	public static final int CAMERA = 4;
 	public static final int SENSOR = 5;
-	public static final int TV = 6;
-	public static final int VT = 7;
-	public static final int AV = 8;
-	public static final int PHONE = 9;
-	public static final int MUSIC_SERVER = 10;
-	public static final int RADIATOR = 11;
-	public static final int ROBOT = 12;
-	public static final int ALARM = 13;
-	public static final int BLIND = 14;
-	public static final int HEATING = 15;
+	public static final int PHONE = 6;
+	public static final int MEDIA = 7;
+	public static final int RADIATOR = 8;
+	public static final int ROBOT = 9;
+	public static final int ALARM = 10;
+	public static final int BLIND = 11;
+	public static final int HEATING = 12;
 	
 	public static String[] deviceSets = { "lights", "sockets", "appliances", "switches",
-		"cameras", "sensors", "tvs", "vts", "avs", "phones",
-		"musicservers", "radiators", "robots", "alarms", "blinds" };
+		"cameras", "sensors", "phones",
+		"radiators", "robots", "alarms", "blinds" };
 
 	public static final int LIGHTS = 0;
 	public static final int SOCKETS = 1;
@@ -71,15 +69,11 @@ public class Parser {
 	public static final int SWITCHES = 3;
 	public static final int CAMERAS = 4;
 	public static final int SENSORS = 5;
-	public static final int TVS = 6;
-	public static final int VTS = 7;
-	public static final int AVS = 8;
-	public static final int PHONES = 9;
-	public static final int MUSIC_SERVERS = 10;
-	public static final int RADIATORS = 11;
-	public static final int ROBOTS = 12;
-	public static final int ALARMS = 13;
-	public static final int BLINDS = 14;
+	public static final int PHONES = 6;
+	public static final int RADIATORS = 7;
+	public static final int ROBOTS = 8;
+	public static final int ALARMS = 9;
+	public static final int BLINDS = 10;
 	
 	public static String[] quantities = { 
 		"temperature", "humidity", "lightlevel", "battery",
@@ -108,7 +102,7 @@ public class Parser {
 		"thumbs", "series", "wishlist", "planned",
 		"browse", "apps", "purchase", "messages",
 		"pin","payperview","lifestyle", "news", 
-		"featured"
+		"featured", "navix", "weather"
 	};
 	
 	public static final int SPOTIFY = 0;
@@ -154,6 +148,8 @@ public class Parser {
 	public static final int LIFESTYLE = 40;
 	public static final int NEWS = 41;
 	public static final int FEATURED = 42;
+	public static final int NAVI_X = 43;
+	public static final int WEATHER = 44;
 	
 	public static final String[] source = { "stb", "dvd", "blueray" };
 	
@@ -161,7 +157,6 @@ public class Parser {
 	public static final int DVD = 1;
 	public static final int BLUERAY = 2;
 	
-
 	public static final String[] actions = { 
 		"on", "off", "status", "value", "set", 
 		"mood", "email", "clear", "signal", "back", "delete" };
@@ -207,7 +202,8 @@ public class Parser {
 
 	public static String[] musicActions = { "stop", "skip", "shutdown", "speak", "silent", 
 		                                    "play", "say", "playlist", "pause", "ff",
-		                                    "fb", "skipb", "slow", "record" };
+		                                    "fb", "skipb", "slow", "record", "start",
+		                                    "track", "artist", "album"};
  
 	public static final int STOP = 0;
 	public static final int SKIP = 1;
@@ -223,6 +219,10 @@ public class Parser {
 	public static final int SKIPB = 11;
 	public static final int SLOW = 12;
 	public static final int RECORD = 13;
+	public static final int START = 14;
+	public static final int TRACK = 15;
+	public static final int ARTIST = 16;
+	public static final int ALBUM = 17;
 	
 	public static String[] digits = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
 	
@@ -486,6 +486,8 @@ public class Parser {
 			type = CAMERA_NAME;
 		else if (find(token, config.switchNames) >= 0)
 			type = SWITCH_NAME;
+		else if (find(token, config.mediaNames) >= 0)
+			type = MEDIA_NAME;
 
 		return type;
 	}

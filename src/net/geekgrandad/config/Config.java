@@ -19,7 +19,7 @@ import javax.xml.stream.events.XMLEvent;
 public class Config {
 	
   private boolean debug = false;
-	
+		
   public static final int MAX_FLOORS = 3;
   public static final int MAX_ROOMS = 9;
   public static final int MAX_SENSORS = 11;
@@ -32,11 +32,8 @@ public class Config {
   public static final int MAX_DOORS = 0;
   public static final int MAX_BATTERIES = 11;
   public static final int MAX_PLANTS = 1;
-  public static final int MAX_TVS = 1;
-  public static final int MAX_STBS = 1;
-  public static final int MAX_RECEIVERS = 1;
+  public static final int MAX_MEDIA = 5;
   public static final int MAX_PHONES = 1;
-  public static final int MAX_MUSIC_SERVERS = 1;
   public static final int MAX_TABLETS = 1;
   
   public int[][] roomSockets = new int[MAX_ROOMS][];
@@ -54,9 +51,7 @@ public class Config {
   private int[] windows = new int[MAX_WINDOWS];
   private int[] appliances = new int[MAX_APPLIANCES];
   private int[] sensors = new int[MAX_SENSORS];
-  private int[] tvs = new int[MAX_TVS];
-  private int[] stbs = new int[MAX_STBS];
-  private int[] receivers = new int[MAX_RECEIVERS];
+  private int[] media = new int[MAX_MEDIA];
   private int[] cameras = new int[MAX_CAMERAS];
   private int[] switches = new int[MAX_SWITCHES];
   
@@ -66,6 +61,8 @@ public class Config {
   public String[] cameraTypes = new String[MAX_CAMERAS];
   public String[] switchTypes = new String[MAX_SWITCHES];
   public String[] sensorTypes = new String[MAX_SENSORS];
+  public String[] mediaTypes = new String[MAX_MEDIA];
+  public String[] mediaHosts = new String[MAX_MEDIA];
   
   public String[] cameraHostNames = new String[MAX_CAMERAS];
   
@@ -130,15 +127,11 @@ public class Config {
   private static final String MOTION = "motion";
   private static final String HUMIDITY = "humidity";
   private static final String PHONE = "phone";
-  private static final String MUSIC_SERVER = "musicserver";
   private static final String SPOTIFY = "spotify";
   private static final String PLAYLIST = "playlist";
   private static final String CHANNEL = "channel";
   private static final String CAMERA = "camera";
   private static final String EMONTX = "emontx";
-  private static final String TV = "tv";
-  private static final String STB = "stb";
-  private static final String RECEIVER = "receiver";
   private static final String BLIND = "blind";
   private static final String RADIATOR = "radiator";
   private static final String PLANT = "plant";
@@ -153,8 +146,9 @@ public class Config {
   private static final String CONFIG = "config";
   private static final String HEATING = "heating";
   private static final String ROBOT = "robot";
+  private static final String MEDIA = "media";
+  
   private static final String CAMERA_CONTROL = "camera_control";
-  private static final String MUSIC_CONTROL = "music_control";
   private static final String SPEECH_CONTROL = "speech_control";
   private static final String EMAIL_CONTROL = "email_control";
   private static final String APPLIANCE_CONTROL = "appliance_control";
@@ -175,12 +169,9 @@ public class Config {
   public String[] switchNames = new String[MAX_SWITCHES];
   public String[] applianceNames = new String[MAX_APPLIANCES];
   public String[] windowNames = new String[MAX_WINDOWS];
-  public String[] tvNames = new String[MAX_TVS];
-  public String[] stbNames = new String[MAX_STBS];
-  public String[] receiverNames = new String[MAX_RECEIVERS];
+  public String[] mediaNames = new String[MAX_MEDIA];
   public String[] cameraNames = new String[MAX_CAMERAS];
   public String[] phoneNames = new String[MAX_PHONES];
-  public String[] musicServerNames = new String[MAX_MUSIC_SERVERS];
   public String[] tabletNames = new String[MAX_TABLETS];
   
   public HashMap<Integer,String> channelNames = new HashMap<Integer,String>();
@@ -189,18 +180,20 @@ public class Config {
   public HashMap<String,String> classType = new HashMap<String,String>();
   public HashMap<String,List<String>> classInterfaces = new HashMap<String,List<String>>();
   
-  private int floorId, roomId, sensorId, lightId, socketId, windowId, tvId, cameraId, applianceId;
-  private int phoneId, musicServerId, channelId, stbId, receiverId, tabletId, switchId,emontxId;
+  private int floorId, roomId, sensorId, lightId, socketId, windowId, cameraId, applianceId, mediaId;
+  private int phoneId, channelId, tabletId, switchId,emontxId;
   
-  private String floorName, roomName, sensorName, lightName, socketName, windowName, tvName, cameraName, applianceName;
-  private String channelName, stbName, receiverName, tabletName, switchName;
+  private String floorName, roomName, sensorName, lightName, socketName, windowName, cameraName, applianceName;
+  private String channelName, tabletName, switchName, mediaName;
   
-  public String phoneName, musicServerName, musicServerHost;
+  public String phoneName;
+  
+  private String mediaHost;
   
   private String playlist, link;
   
-  private int numLights, numSockets, numWindows, numCameras, numAppliances, numTVs, numSTBs, 
-              numReceivers, numSensors, numSwitches;
+  private int numLights, numSockets, numWindows, numCameras, numAppliances, 
+              numMedia, numSensors, numSwitches;
   private int numFloors = 0;
   private int numRooms = 0;
   
@@ -225,19 +218,19 @@ public class Config {
   public int plantSensorId;
   
   public int iamMinValue, iamMinOffPeriod;
-  public int musicSocketTimeout;
+  public int mediaSocketTimeout;
   
   public int occupiedInterval, pingTimeout, backgroundDelay;
   
   public int robotId;
   public String robotName;
   
-  public String cameraControlClass, musicControlClass, speechControlClass, emailControlClass;
+  public String cameraControlClass, speechControlClass, emailControlClass;
   public String applianceControlClass, datalogControlClass, heatingControlClass,alarmControlClass;
   public String calendarControlClass, lightControlClass, sensorControlClass;;
   public String cameraHost;
   
-  private String socketType, lightType, switchType, sensorType, applianceType, cameraType;
+  private String socketType, lightType, switchType, sensorType, applianceType, cameraType, mediaType;
   private String interfaceName;
   private ArrayList<String> interfaces = new ArrayList<String>();
   
@@ -292,11 +285,9 @@ public class Config {
               numSockets=0;
               numWindows=0;
               numCameras=0;
-              numTVs = 0;
               numAppliances = 0;
               numSensors = 0;
-              numSTBs = 0;
-              numReceivers = 0;
+              numMedia = 0;
               numSwitches = 0;
               
               // We read the attributes from this tag and process the is and name attributes
@@ -439,21 +430,6 @@ public class Config {
                   interfaces.add(interfaceName);
                 } 
               }
-          } else if (event.asStartElement().getName().getLocalPart().equals(MUSIC_SERVER)) {
-              debug("Start music server");
-              
-              // We read the attributes from this tag and process the is and name attributes
-              Iterator<Attribute> attributes = startElement.getAttributes();
-              while (attributes.hasNext()) {
-                Attribute attribute = attributes.next();
-                if (attribute.getName().toString().equals(NAME)) {
-                  musicServerName = attribute.getValue();
-                } else if (attribute.getName().toString().equals(HOST)) {
-                  musicServerHost = attribute.getValue();
-                } else if (attribute.getName().toString().equals(SOCKET_TIMEOUT)) {
-                  musicSocketTimeout = Integer.parseInt(attribute.getValue());
-                }
-              }
           } else if (event.asStartElement().getName().getLocalPart().equals(TABLET)) {
               debug("Start tablet");
               
@@ -481,7 +457,7 @@ public class Config {
                   windowName = attribute.getValue();
                 }
               }
-          } else if (event.asStartElement().getName().getLocalPart().equals(TV)) {
+          } else if (event.asStartElement().getName().getLocalPart().equals(MEDIA)) {
             debug("Start TV");
             
             // We read the attributes from this tag and process the is and name attributes
@@ -489,26 +465,18 @@ public class Config {
             while (attributes.hasNext()) {
               Attribute attribute = attributes.next();
               if (attribute.getName().toString().equals(ID)) {
-            	tvId = Integer.parseInt(attribute.getValue());
-            	tvs[numTVs++] = tvId;
+            	mediaId = Integer.parseInt(attribute.getValue());
+            	media[numMedia++] = mediaId;
               } else if (attribute.getName().toString().equals(NAME)) {
-            	tvName = attribute.getValue();
+            	mediaName = attribute.getValue();
+              } else if (attribute.getName().toString().equals(HOST)) {
+            	mediaHost = attribute.getValue();
+              } else if (attribute.getName().toString().equals(TYPE)) {
+            	mediaType = attribute.getValue();
+              } else if (attribute.getName().toString().equals(SOCKET_TIMEOUT)) {
+                mediaSocketTimeout = Integer.parseInt(attribute.getValue());
               }
             }
-          }  else if (event.asStartElement().getName().getLocalPart().equals(RECEIVER)) {
-              debug("Start Receiver");
-              
-              // We read the attributes from this tag and process the is and name attributes
-              Iterator<Attribute> attributes = startElement.getAttributes();
-              while (attributes.hasNext()) {
-                Attribute attribute = attributes.next();
-                if (attribute.getName().toString().equals(ID)) {
-              	  receiverId = Integer.parseInt(attribute.getValue());
-              	  receivers[numReceivers++] = receiverId;
-                } else if (attribute.getName().toString().equals(NAME)) {
-                  receiverName = attribute.getValue();
-                }
-              }
         } else if (event.asStartElement().getName().getLocalPart().equals(CHANNEL)) {
           debug("Start Channel");
           
@@ -535,21 +503,7 @@ public class Config {
             	  link = attribute.getValue();
               }
             }
-      } else if (event.asStartElement().getName().getLocalPart().equals(STB)) {
-          debug("Start STB");
-          
-          // We read the attributes from this tag and process the is and name attributes
-          Iterator<Attribute> attributes = startElement.getAttributes();
-          while (attributes.hasNext()) {
-            Attribute attribute = attributes.next();
-            if (attribute.getName().toString().equals(ID)) {
-          	  stbId = Integer.parseInt(attribute.getValue());
-          	  stbs[numSTBs++] = stbId;
-            } else if (attribute.getName().toString().equals(NAME)) {
-              stbName = attribute.getValue();
-            }
-          }
-        } else if (event.asStartElement().getName().getLocalPart().equals(LIGHTLEVEL)) {
+      } else if (event.asStartElement().getName().getLocalPart().equals(LIGHTLEVEL)) {
             debug("Start light level");
         } else if (event.asStartElement().getName().getLocalPart().equals(TEMPERATURE)) {
             debug("Start temperature");
@@ -561,7 +515,7 @@ public class Config {
             debug("Start plant");
             plantSensorId = sensorId;
             
-        } else if (event.asStartElement().getName().getLocalPart().equals(APPLIANCE)) {
+      } else if (event.asStartElement().getName().getLocalPart().equals(APPLIANCE)) {
           debug("Start appliance");
           
           // We read the attributes from this tag and process the id and name attributes
@@ -747,11 +701,12 @@ public class Config {
           } else if (endElement.getName().getLocalPart() == (PHONE)) {
           	  phoneNames[phoneId-1] = phoneName;
           	  debug("End phone");
-          } else if (endElement.getName().getLocalPart() == (MUSIC_SERVER)) {
-        	  debug("End music server");
-          } else if (endElement.getName().getLocalPart() == (TV)) {
-          	  tvNames[tvId-1] = tvName;
-          	  debug("End TV");
+          } else if (endElement.getName().getLocalPart() == (MEDIA)) {
+          	  mediaNames[mediaId-1] = mediaName;
+          	  mediaTypes[mediaId-1] = mediaType;
+          	  mediaHosts[mediaId-1] = mediaHost;
+          	  devices.add(new Device(mediaType, mediaName, "", mediaId, -1, Device.MEDIA));
+          	  debug("End Media");
           } else if (endElement.getName().getLocalPart() == (LIGHTLEVEL)) {
         	  debug("End light level");
           } else if (endElement.getName().getLocalPart() == (TEMPERATURE)) {
@@ -786,12 +741,6 @@ public class Config {
           } else if (endElement.getName().getLocalPart() == (PLAYLIST)) {
         	  playlists.put(playlist, link);
         	  debug("End playist = " + playlist + ", link = " + link);
-          } else if (endElement.getName().getLocalPart() == (STB)) {
-          	  stbNames[stbId-1] = stbName;
-          	  debug("End STB");
-          } else if (endElement.getName().getLocalPart() == (RECEIVER)) {
-          	  receiverNames[receiverId-1] = receiverName;
-          	  debug("End receiver");
           } else if (endElement.getName().getLocalPart() == (APPLIANCE)) {
           	  applianceNames[applianceId-1] = applianceName;
           	  applianceTypes[applianceId-1] = applianceType;
@@ -982,9 +931,6 @@ public class Config {
     System.out.println("IAM port: " + iamPort);
     
     System.out.println("\nPhone name: " + phoneName);
-    System.out.println("\nMusic server name: " + musicServerName);
-    System.out.println("Music server host: " + musicServerHost);
-    System.out.println("Music server socket timeout: " + musicSocketTimeout);
     
     System.out.println("\nDefault temperature: " + defaultTemperature);
     System.out.println("Temperature sensor: " + temperatureSensor);
@@ -1005,12 +951,19 @@ public class Config {
     for(String s: typeClass.keySet()) {
     	System.out.println(s + " : " + typeClass.get(s));
     }
+    
     for(String c: classInterfaces.keySet()) {
     	System.out.print(c + ":");
     	for(String s: classInterfaces.get(c)) {
     		System.out.print(s + " ");
     	}
     	System.out.println();
+    }
+    
+    System.out.println("\nDevices: ");
+    for(Device d: devices) {
+    	System.out.println("  Name: " + d.getName() + " technology: " + 
+                           d.getTechnology() + " type: " + d.getType() + " id: " + d.getId());
     }
   }
   
