@@ -102,7 +102,10 @@ public class Parser {
 		"thumbs", "series", "wishlist", "planned",
 		"browse", "apps", "purchase", "messages",
 		"pin","payperview","lifestyle", "news", 
-		"featured", "navix", "weather"
+		"featured", "navix", "weather", "ted",
+		"context", "pictures", "filemanager",
+		"video", "skyondemand", "playlists",
+		"dilbert"
 	};
 	
 	public static final int SPOTIFY = 0;
@@ -150,6 +153,14 @@ public class Parser {
 	public static final int FEATURED = 42;
 	public static final int NAVI_X = 43;
 	public static final int WEATHER = 44;
+	public static final int TED = 45;
+	public static final int CONTEXT = 46;
+	public static final int PICTURES = 47;
+	public static final int FILE_MANAGER = 48;
+	public static final int VIDEO = 49;
+	public static final int SKY_ON_DEMAND = 50;
+	public static final int PLAYLISTS = 51;
+	public static final int DILBERT = 52;
 	
 	public static final String[] source = { "stb", "dvd", "blueray" };
 	
@@ -159,7 +170,8 @@ public class Parser {
 	
 	public static final String[] actions = { 
 		"on", "off", "status", "value", "set", 
-		"mood", "email", "clear", "signal", "back", "delete" };
+		"mood", "email", "clear", "signal", 
+		"back", "delete", "reboot", "shutdown" };
 
 	public static final int ON = 0;
 	public static final int OFF = 1;
@@ -172,6 +184,8 @@ public class Parser {
 	public static final int SIGNAL = 8;
 	public static final int BACK = 9;
 	public static final int DELETE = 10;
+	public static final int REBOOT = 11;
+	public static final int SHUT_DOWN = 12;
 
 	public static String[] robotActions = {"fetch", "clean", "grab", "release"};
 	
@@ -187,42 +201,45 @@ public class Parser {
 	public static final int UP = 2;
 	public static final int DOWN = 3;
 
-	public static String[] vtActions = { "ok", "send", "type", "lastch" };
+	public static String[] vtActions = { "ok", "send", "type", "lastch", "pageup", "pagedown" };
 
 	public static final int OK = 0;
 	public static final int SEND = 1;
 	public static final int TYPE = 2;
 	public static final int LAST_CH = 3;
-
+	public static final int PAGE_UP = 4;
+	public static final int PAGE_DOWN = 5;
+	
 	public static String[] avActions = { "volup", "voldown", "mute" };
 
 	public static final int VOLUP = 0;
 	public static final int VOLDOWN = 1;
 	public static final int MUTE = 2;
 
-	public static String[] musicActions = { "stop", "skip", "shutdown", "speak", "silent", 
+	public static String[] musicActions = { "stop", "skip", "speak", "silent", 
 		                                    "play", "say", "playlist", "pause", "ff",
 		                                    "fb", "skipb", "slow", "record", "start",
-		                                    "track", "artist", "album"};
+		                                    "track", "artist", "album", "open", "player"};
  
 	public static final int STOP = 0;
 	public static final int SKIP = 1;
-	public static final int SHUT_DOWN = 2;
-	public static final int SPEAK = 3;
-	public static final int SILENT = 4;
-	public static final int PLAY = 5;
-	public static final int SAY = 6;
-	public static final int PLAYLIST = 7;
-	public static final int PAUSE = 8;
-	public static final int FF = 9;
-	public static final int FB = 10;
-	public static final int SKIPB = 11;
-	public static final int SLOW = 12;
-	public static final int RECORD = 13;
-	public static final int START = 14;
-	public static final int TRACK = 15;
-	public static final int ARTIST = 16;
-	public static final int ALBUM = 17;
+	public static final int SPEAK = 2;
+	public static final int SILENT = 3;
+	public static final int PLAY = 4;
+	public static final int SAY = 5;
+	public static final int PLAYLIST = 6;
+	public static final int PAUSE = 7;
+	public static final int FF = 8;
+	public static final int FB = 9;
+	public static final int SKIPB = 10;
+	public static final int SLOW = 11;
+	public static final int RECORD = 12;
+	public static final int START = 13;
+	public static final int TRACK = 14;
+	public static final int ARTIST = 15;
+	public static final int ALBUM = 16;
+	public static final int OPEN = 17;
+	public static final int PLAYER = 18;
 	
 	public static String[] digits = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
 	

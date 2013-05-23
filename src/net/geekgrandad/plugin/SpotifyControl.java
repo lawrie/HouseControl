@@ -20,12 +20,14 @@ public class SpotifyControl implements MediaControl {
 	private static final String CMD_PAUSE_MUSIC = "stop";
 	private static final String CMD_SKIP_TRACK = "skip";
 	private static final String CMD_SHUT_DOWN = "shutdown";
+	private static final String CMD_REBOOT = "reboot";
 	
     private Reporter reporter;
 	private Config config;
 	private boolean musicOn = true;
 	private int volume = 0;
 	private String currentPlaylist = " ";
+	boolean playing = true;
 
 	@Override
 	public void setVolume(int id, int volume) {
@@ -98,9 +100,11 @@ public class SpotifyControl implements MediaControl {
 
 	@Override
 	public void start(int id, String playlist, boolean repeat) throws IOException {
+		reporter.print("Playing " + playlist);
 		String list = config.getPlaylists().get(playlist);
 		if (list != null) {
 			currentPlaylist = playlist;
+			playing = true;
 			sendMusicCmd(id, "play " + list + "?autoplay=true", false);
 		} else {
 			reporter.error("No such playlist: " + playlist);
@@ -124,16 +128,19 @@ public class SpotifyControl implements MediaControl {
 
 	@Override
 	public void pause(int id) throws IOException {
+		playing = !playing;
 		sendMusicCmd(id, CMD_PAUSE_MUSIC, false);
 	}
 
 	@Override
 	public void stop(int id) throws IOException {
+		playing = !playing;
 		sendMusicCmd(id, CMD_PAUSE_MUSIC, false);	
 	}
 
 	@Override
 	public void play(int id) throws IOException {
+		playing = !playing;
 		sendMusicCmd(id, CMD_PAUSE_MUSIC, false);	
 	}
 
@@ -293,5 +300,45 @@ public class SpotifyControl implements MediaControl {
 	public String getAlbum(int id) throws IOException {
 		reporter.error("Spotify: getAlbum not supported");
 		return "Unknown";
+	}
+
+	@Override
+	public String getPlaylist(int id) throws IOException {
+		return currentPlaylist;
+	}
+
+	@Override
+	public void pageUp(int id) throws IOException {
+		reporter.error("SPOTIFY: pageup not supported");
+	}
+
+	@Override
+	public void pageDown(int id) throws IOException {
+		reporter.error("SPOTIFY: page down not supported");	
+	}
+
+	@Override
+	public boolean isPlaying(int id) throws IOException {
+		return playing;
+	}
+
+	@Override
+	public void reboot(int id) throws IOException {
+		sendMusicCmd(id, CMD_REBOOT, false);
+	}
+
+	@Override
+	public void setPlayer(int id, int playerId) throws IOException {
+		reporter.error("SPOTIFY: player not supported");	
+	}
+
+	@Override
+	public void setRepeat(int id, boolean repeat) throws IOException {
+		reporter.error("SPOTIFY: shuffle not supported");
+	}
+
+	@Override
+	public void setShuffle(int id, boolean shuffle) throws IOException {
+		reporter.error("SPOTIFY: shuffle not supported");
 	}
 }

@@ -88,5 +88,21 @@ public interface MediaControl extends Controller {
 	
 	public String getAlbum(int id) throws IOException;
 	
-	public void say(int id, String text);
+	public String getPlaylist(int id) throws IOException;
+	
+	public void say(int id, String text) throws IOException;
+	
+	public void pageUp(int id) throws IOException; 
+	
+	public void pageDown(int id) throws IOException;
+	
+	public boolean isPlaying(int id) throws IOException;
+	
+	public void reboot(int id) throws IOException;
+	
+	public void setPlayer(int id, int playerId) throws IOException;
+	
+	public void setRepeat(int id, boolean repeat) throws IOException;
+	
+	public void setShuffle(int id, boolean shuffle) throws IOException;
 }

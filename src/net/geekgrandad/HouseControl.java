@@ -6,8 +6,10 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 
 import net.geekgrandad.config.Config;
+import net.geekgrandad.config.Step;
 import net.geekgrandad.interfaces.AV;
 import net.geekgrandad.interfaces.AlarmControl;
 import net.geekgrandad.interfaces.Alerter;
@@ -88,6 +90,12 @@ public class HouseControl implements Reporter, Alerter, Provider {
     private String defaultDeviceType = null;
     private int defaultDeviceNumber = -1;
     private String defaultService = null;
+    
+    private int defaultTVDevice = 2;
+    private int defaultMusicDevice = 5;
+    private int defaultAVDevice = 3;
+    
+    private HashMap<String,Step[]> macros = new HashMap<String,Step[]>();
 
 	// Run the main thread
 	public void run() {
@@ -259,42 +267,37 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						int vol = volume;
 						// Stop the music
 						try {
-							mediaControl[4].pause(5);
+							mediaControl[defaultMusicDevice-1].pause(defaultMusicDevice);
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							musicOn = false;
 						}
 						// Set the volume to max
 						try {
-							mediaControl[4].setVolume(5, 100);
+							mediaControl[defaultMusicDevice-1].setVolume(defaultMusicDevice, 100);
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							musicOn = false;
 						}
 						// Sound the alarm
 						alarmControl.soundAlarm();
 						// Set the volume back
 						try {
-							mediaControl[4].setVolume(5, vol);
+							mediaControl[defaultMusicDevice-1].setVolume(defaultMusicDevice, vol);
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							musicOn = false;
 						}
 						// Restart the music
 						try {
-							mediaControl[4].play(5);
+							mediaControl[defaultMusicDevice-1].play(defaultMusicDevice);
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							musicOn = false;
 						}
 					}
 				}
-				if (mediaControl[4] != null) {
+				if (mediaControl[defaultMusicDevice-1] != null) {
 					try {
-						volume = mediaControl[4].getVolume(5);
+						volume = mediaControl[defaultMusicDevice-1].getVolume(defaultMusicDevice);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						musicOn = false;
 					}
 					print("Music on: " + musicOn);
 				}
@@ -351,20 +354,6 @@ public class HouseControl implements Reporter, Alerter, Provider {
 		return null;
 	}
 
-	// Send a playlist request to the music computer
-	private String play(String playlist) {
-		if (mediaControl[4] == null) return ERROR;
-		else {
-			try {
-				mediaControl[5].start(5, playlist, true);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return SUCCESS;
-		}
-	}
-
 	// Speak a message on this computer
 	private void sayLocal(String msg) {
 		if (speechControl != null) speechControl.say(msg);
@@ -377,7 +366,11 @@ public class HouseControl implements Reporter, Alerter, Provider {
 		if (!noisy)
 			return;
 		if (musicOn)
-			mediaControl[4].say(5, msg);
+			try {
+				mediaControl[4].say(5, msg);
+			} catch (IOException e) {
+				error("IOException in say");
+			}
 		else
 			sayLocal(msg);
 	}
@@ -396,13 +389,19 @@ public class HouseControl implements Reporter, Alerter, Provider {
 		// Deal with various abbreviations
 		if (numTokens == 1 && tokens[0].getType() == Parser.QUANTITY) {
 			// Single token quantity command
-			// set the second (non-apace) token to 1
-			expandTokens(1);
+			// Add sensor 1
+			expandTokens(2);
+			tokens[2] = tokens[0];
 			tokens[1].setValue("1");
 			tokens[1].setType(Parser.NUMBER);
-			numTokens = 2;
-			debug("Added number");
-			debug("Type = " + tokens[0].getType());
+			tokens[0] = new Token(Parser.devices[Parser.SENSOR],Parser.DEVICE, -1);
+			numTokens = 3;
+		} else if (numTokens == 2 && tokens[0].getType() == Parser.QUANTITY && tokens[1].getType() == Parser.NUMBER) {
+			// Replace quantity n with sensor sensor n quantity
+			expandTokens(1);
+			tokens[2] = tokens[0];
+			tokens[0] = new Token(Parser.devices[Parser.SENSOR],Parser.DEVICE, -1);
+			numTokens = 3;
 		} else if (numTokens >= 2 && tokens[0].getType() == Parser.DEVICE && tokens[1].getType() != Parser.NUMBER) {
 			// Assume device number one
 			expandTokens(1);
@@ -450,6 +449,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 			// Replace name with media n
 			int n = parser.find(tokens[0].getValue(),config.mediaNames);
 			expandTokens(1);
+			if (tokens.length > 4) tokens[4] = tokens[3];
 			if (tokens.length > 3) tokens[3] = tokens[2];
 			tokens[2] = tokens[1];
 			tokens[1] = new Token("" + (n + 1), Parser.NUMBER, -1);
@@ -460,7 +460,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 			expandTokens(2);
 			if (tokens.length > 3) tokens[3] = tokens[1];
 			tokens[2] = tokens[0];
-			tokens[1] = new Token("2", Parser.NUMBER, -1);
+			tokens[1] = new Token("" + defaultTVDevice, Parser.NUMBER, -1);
 			tokens[0] = new Token(Parser.devices[Parser.MEDIA],Parser.DEVICE, -1);
 			numTokens += 2;
 		} else if (tokens[0].getType() == Parser.SERVICE || tokens[0].getType() == Parser.DIGIT || tokens[0].getType() == Parser.COLOR) {
@@ -468,7 +468,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 			expandTokens(2);
 			if (tokens.length > 3) tokens[3] = tokens[1];
 			tokens[2] = tokens[0];
-			tokens[1] = new Token("2", Parser.NUMBER, -1);
+			tokens[1] = new Token("" + defaultTVDevice, Parser.NUMBER, -1);
 			tokens[0] = new Token(Parser.devices[Parser.MEDIA],Parser.DEVICE, -1);
 			numTokens += 2;
 		} else if (tokens[0].getType() == Parser.ROBOT_ACTION) {
@@ -484,7 +484,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 			expandTokens(2);
 			if (tokens.length > 3) tokens[3] = tokens[1];
 			tokens[2] = tokens[0];
-			tokens[1] = new Token("3", Parser.NUMBER, -1);
+			tokens[1] = new Token("" + defaultAVDevice, Parser.NUMBER, -1);
 			tokens[0] = new Token(Parser.devices[Parser.MEDIA], Parser.DEVICE, -1);
 			numTokens += 2;
 		} else if (tokens[0].getType() == Parser.MUSIC_ACTION) {
@@ -493,7 +493,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 			expandTokens(2);
 			if (tokens.length > 3)tokens[3] = tokens[1];
 			tokens[2] = tokens[0];
-			tokens[1] = new Token("5", Parser.NUMBER, -1);
+			tokens[1] = new Token("" +  + defaultMusicDevice, Parser.NUMBER, -1);
 			tokens[0] = new Token(Parser.devices[Parser.MEDIA], Parser.DEVICE, -1);
 			numTokens += 2;
 		} else if (tokens[0].getType() == Parser.DEVICE_SET) {
@@ -520,48 +520,14 @@ public class HouseControl implements Reporter, Alerter, Provider {
 			return ERROR;
 		case Parser.DEFAULT:
 			print("Default command");
-			switch (parser.find(tokens[0].getValue(), Parser.defaults)) {
+			switch (parser.find(tokens[1].getValue(), Parser.defaults)) {
 			case Parser.DEFAULT_LOCATION:
-				int n = Integer.parseInt(tokens[1].getValue());
+				int n = Integer.parseInt(tokens[2].getValue());
 				print("Setting default room to " + n);
 				defaultRoom = n;
 				return SUCCESS;
 			default:
 				error("Default command not supported");
-				return ERROR;
-			}
-		case Parser.QUANTITY:	
-			switch (tokens[1].getType()) {
-			case Parser.NUMBER:
-				int n = Integer.parseInt(tokens[1].getValue()) -1;
-				
-				if (n < 0 || n >= Config.MAX_SENSORS || sensorControl[n] == null) {
-					error("Invalid device number: " + (n+1));
-					return ERROR;
-				}
-				
-				switch(parser.find(tokens[0].getValue(),Parser.quantities)) {
-				case Parser.TEMPERATURE:
-					return "" + sensorControl[n].getTemperature(n+1);
-				case Parser.HUMIDITY:
-				case Parser.SOIL_MOISTURE:
-					return "" + sensorControl[n].getHumidity(n+1);
-				case Parser.OCCUPIED:
-					return switchString(sensorControl[n].getMotion(n+1));
-				case Parser.LIGHT_LEVEL:
-					return "" + sensorControl[n].getLightLevel(n+1);
-				case Parser.BATTERY:
-					return switchString(!sensorControl[n].getBatteryLow(n+1));
-				case Parser.POWER:
-					return "" + powerControl.getPower();
-				case Parser.ENERGY:
-					return "" + powerControl.getEnergy();
-				default:
-					error("Quantity not supported");
-					return ERROR;
-				}
-			default:
-				error("Invalid quantity command");
 				return ERROR;
 			}
 		case Parser.DEVICE:
@@ -597,14 +563,8 @@ public class HouseControl implements Reporter, Alerter, Provider {
 								return ERROR;
 							}
 							
-							if (n == 0) {
-								print("Turning TV on");
-								if(act == Parser.ON) mediaControl[n].turnOn(n+1);
-								else mediaControl[n].turnOff(n+1);
-							} else {
-								print("Switching media device " + (n+1));
-								infraredControl.sendCommand(n+1, 0x8c);
-							}
+							if(act == Parser.ON) mediaControl[n].turnOn(n+1);
+							else mediaControl[n].turnOff(n+1);
 							return SUCCESS;
 						case Parser.LIGHT:
 							lightControl[n].switchLight(n,(act == Parser.ON));
@@ -619,7 +579,6 @@ public class HouseControl implements Reporter, Alerter, Provider {
 							heatingControl.setHeating(act == Parser.ON);
 							return SUCCESS;
 						case Parser.CAMERA:
-							// TODO
 						case Parser.SWITCH:
 						case Parser.SENSOR:
 						case Parser.PHONE:
@@ -711,7 +670,15 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						} else {
 							error("Device does not support BACK");
 							return ERROR;
-						}						
+						}	
+					case Parser.REBOOT:
+						if (device == Parser.MEDIA) {
+							mediaControl[n].reboot(n+1);
+							return SUCCESS;
+						} else {
+							error("Device does not support reboot");
+							return ERROR;
+						}
 					default:
 						error("Unsupported action");
 						return ERROR;
@@ -747,7 +714,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 					switch(parser.find(service,Parser.services)) {
 					case Parser.VOLUME:
 						if (numTokens == 3) {
-							return "" + volume;
+							return "" + mediaControl[n].getVolume(n+1);
 						} else  if (tokens[3].getType() == Parser.PAN_ACTION) {
 							switch(parser.find(tokens[3].getValue(),Parser.panActions)) {
 							case Parser.UP:
@@ -789,9 +756,6 @@ public class HouseControl implements Reporter, Alerter, Provider {
 							error("Device does not support channel");
 							return ERROR;
 						}
-					case Parser.SPOTIFY:
-						play(tokens[3].getValue());
-						return SUCCESS;
 					case Parser.SUBTITLES:
 						mediaControl[n].option(n+1, service);
 						return SUCCESS;
@@ -831,6 +795,14 @@ public class HouseControl implements Reporter, Alerter, Provider {
 					case Parser.SEARCH:
 					case Parser.WEATHER:
 					case Parser.NAVI_X:
+					case Parser.TED:
+					case Parser.CONTEXT:
+					case Parser.PICTURES:
+					case Parser.FILE_MANAGER:
+					case Parser.VIDEO:
+					case Parser.SKY_ON_DEMAND:
+					case Parser.PLAYLISTS:
+					case Parser.DILBERT:
 						mediaControl[n].select(n+1, service);
 						return SUCCESS;
 					case Parser.SOURCE:
@@ -870,7 +842,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						mediaControl[n].pin(n+1);
 						return SUCCESS;
 					default:
-						error("Unsupported service");
+						error("Unsupported service: " + service);
 						return ERROR;
 					}
 				} else if (device == Parser.MEDIA && numTokens > 2 && tokens[2].getType() == Parser.VT_ACTION) {
@@ -892,6 +864,12 @@ public class HouseControl implements Reporter, Alerter, Provider {
 					case Parser.TYPE:
 						mediaControl[n].type(n+1, tokens[3].getValue());
 						return SUCCESS;
+					case Parser.PAGE_UP:
+						mediaControl[n].pageUp(n+1);
+						return SUCCESS;
+					case Parser.PAGE_DOWN:
+						mediaControl[n].pageDown(n+1);
+						return SUCCESS;						
 					default:
 						error("Unsupported TiVo command");
 						return ERROR;
@@ -944,49 +922,123 @@ public class HouseControl implements Reporter, Alerter, Provider {
 					}
 					switch(parser.find(tokens[2].getValue(), Parser.musicActions)) {
 					case Parser.PLAY:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						mediaControl[n].play(n+1);
 						return SUCCESS;
 					case Parser.START:
+						if (tokens.length > 4) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						mediaControl[n].start(n+1, tokens[3].getValue(), true);
 						return SUCCESS;
+					case Parser.PLAYER:
+						if (tokens.length > 4) {
+							error("Too many parameters");
+							return ERROR;
+						}
+						mediaControl[n].setPlayer(n+1, Integer.parseInt(tokens[3].getValue()));
+						return SUCCESS;
+					case Parser.OPEN:
+						if (tokens.length > 5) {
+							error("Too many parameters");
+							return ERROR;
+						}
+						mediaControl[n].open(n+1, tokens[3].getValue() + " " + tokens[4].getValue() + " " , true);
+						return SUCCESS;
 					case Parser.PAUSE:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						print("Calling media " + n + " pause");
 						mediaControl[n].pause(n+1);
 						return SUCCESS;
 					case Parser.STOP:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						mediaControl[n].stop(n+1);
 						return SUCCESS;
 					case Parser.FF:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						mediaControl[n].ff(n+1);
 						return SUCCESS;
 					case Parser.FB:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						mediaControl[n].fb(n+1);
 						return SUCCESS;
 					case Parser.SKIP:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						mediaControl[n].skip(n+1);
 						return SUCCESS;	
 					case Parser.SKIPB:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						mediaControl[n].skipb(n+1);
 						return SUCCESS;	
 					case Parser.SLOW:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						mediaControl[n].slow(n+1);
 						return SUCCESS;	
 					case Parser.PLAYLIST:
-						return mediaControl[n].getTrack(n+1);
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
+						return mediaControl[n].getPlaylist(n+1);
 					case Parser.TRACK:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						return mediaControl[n].getTrack(n+1);						
 					case Parser.ARTIST:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						return mediaControl[n].getArtist(n+1);
 					case Parser.ALBUM:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						return mediaControl[n].getAlbum(n+1);
 					case Parser.SPEAK:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						noisy = true;
 						return SUCCESS;
 					case Parser.SILENT:
+						if (tokens.length > 3) {
+							error("Too many parameters");
+							return ERROR;
+						}
 						noisy = false;
 						return SUCCESS;
 					case Parser.SAY:
-						mediaControl[n].say(n+1, tokens[3].getValue());
+						say(cmd.substring(cmd.indexOf("say") + 4));
 						return SUCCESS;
 					default:
 						error("Invalid media command");
@@ -1201,12 +1253,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 		print("Switching lights for room " + room);
 		for(int light: config.roomLights[room-1]) {
 			lightControl[light-1].switchLight(light-1,on);
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			delay(1000);
 		}
 	}
 	
@@ -1273,5 +1320,24 @@ public class HouseControl implements Reporter, Alerter, Provider {
 	@Override
 	public InfraredControl getInfraredControl() {
 		return infraredControl;
+	}
+	
+	private void delay(int millis) {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// ignore
+		}
+	}
+	
+	public void executeStep(String cmd, int delay) throws IOException {
+		execute(cmd);
+		if (delay > 0) delay(delay);
+	}
+	
+	public void executeMacro(Step[] macro) throws IOException {
+		for(Step s: macro) {
+			executeStep(s.getCmd(), s.getDelay());
+		}
 	}
 }

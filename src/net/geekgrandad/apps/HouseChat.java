@@ -19,6 +19,8 @@ public class HouseChat extends JFrame implements KeyListener {
 	private int row=0;
 	private Socket sock;
 	private StringBuilder sb = new StringBuilder();
+	private String lastLine= null;
+	private int lastPos = 0;
 	
 	public HouseChat() {
 		getContentPane().add(text,BorderLayout.CENTER);
@@ -35,17 +37,25 @@ public class HouseChat extends JFrame implements KeyListener {
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// Do nothing	
+		// Do nothing
 	}
 	
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// Do nothing	
+		int code = e.getKeyCode();
+		//System.out.println("Code = " + code);	
+		if (code == KeyEvent.VK_UP && lastLine != null) {
+			//System.out.println("Up arrow");
+			text.setCaretPosition(lastPos);
+			sb.append(lastLine);
+			text.append(lastLine);
+		}
 	}
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
 		char key = e.getKeyChar();
+
 		if (key == '\n') {
 			if (++row >= 18) {
 				text.setText("");
@@ -74,13 +84,13 @@ public class HouseChat extends JFrame implements KeyListener {
 				} catch (IOException e2) {
 				}
 			}
-			
+			lastLine = sb.toString();
 			sb = new StringBuilder();
 		} else if (key == 8) {
 			sb.setLength(sb.length() - 1);
 		} else if (Character.isLetterOrDigit(key) || key == ' ') {
 	        sb.append(key);
-		}
-		
+		} 	 
+		lastPos = text.getCaretPosition();
 	}
 }

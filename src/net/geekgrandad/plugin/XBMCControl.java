@@ -15,6 +15,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,6 +31,7 @@ public class XBMCControl implements MediaControl {
 	private HttpClient client = new DefaultHttpClient();
 	private int volume = 0; // TODO: needs array
 	private String playlist = " ";
+	private int playerId = 0;
 
 	@Override
 	public void setProvider(Provider provider) {
@@ -81,12 +83,14 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public void open(int id, String file, boolean repeat) {
-		reporter.error("XBMC: open not yet implemented");
+		int sp = file.indexOf(" ");
+		String albumId = file.substring(sp+1);
+		String prop = file.substring(0, sp);
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\": {\"" + prop + "id\":" + albumId + "} }, \"id\": 1}");
 	}
-
 	@Override
 	public void type(int id, String s) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Input.SendText\", \"params\": {\"text\": " + s +"\"}, \"id\": 1}");	
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Input.SendText\", \"params\": {\"text\":\"" + s +"\"}, \"id\": 1}");	
 	}
 	
 	public void activate(int id, String window) {
@@ -96,7 +100,8 @@ public class XBMCControl implements MediaControl {
 	@Override
 	public void select(int id, String service) {
 		if (service.equals("home")) home(id);
-		if (service.equals("info")) activate(id,"infodialog");
+		else if (service.equals("context")) contextMenu(id);
+		else if (service.equals("info")) activate(id,"infodialog");
 		else if (service.equals("system")) activate(id, "systeminfo");
 		else if (isWindow(service)) activate(id, service);
 		else execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Addons.ExecuteAddon\", \"params\": {\"addonid\": \"" + findPlugin(service) + "\"}, \"id\": 1}");	
@@ -104,17 +109,17 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public void pause(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 0 }, \"id\": 1}");	
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\":" + playerId + "}, \"id\": 1}");	
 	}
 
 	@Override
 	public void stop(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Stop\", \"params\": { \"playerid\": 0 }, \"id\": 1}");	
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Stop\", \"params\": { \"playerid\":" + playerId + "}, \"id\": 1}");	
 	}
 
 	@Override
 	public void play(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 0 }, \"id\": 1}");	
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": " + playerId + "}, \"id\": 1}");	
 	}
 
 	@Override
@@ -124,22 +129,22 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public void ff(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetSpeed\", \"params\": { \"playerid\": 0, \"speed\":2 }, \"id\": 1}");	
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetSpeed\", \"params\": { \"playerid\":" + playerId + ", \"speed\":2 }, \"id\": 1}");	
 	}
 
 	@Override
 	public void fb(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetSpeed\", \"params\": { \"playerid\": 0, \"speed\":-2 }, \"id\": 1}");	
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetSpeed\", \"params\": { \"playerid\":" +playerId + ", \"speed\":-2 }, \"id\": 1}");	
 	}
 
 	@Override
 	public void skip(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Move\", \"params\": { \"playerid\": 0, \"direction\":\"right\" }, \"id\": 1}");		
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Move\", \"params\": { \"playerid\": " + playerId + ", \"direction\":\"right\" }, \"id\": 1}");		
 	}
 
 	@Override
 	public void skipb(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Move\", \"params\": { \"playerid\": 0, \"direction\":\"left\" }, \"id\": 1}");
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Move\", \"params\": { \"playerid\": " + playerId + ", \"direction\":\"left\" }, \"id\": 1}");
 	}
 
 	@Override
@@ -189,7 +194,9 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public void option(int id, String option) {
-		reporter.error("XBMC: option not yet implemented");	
+		if (option.equalsIgnoreCase("codec")) showCodec(id);
+		else if (option.equalsIgnoreCase("OSD")) showOSD(id);
+		else reporter.error("XBMC: option not supported: " + option);	
 	}
 
 	@Override
@@ -206,12 +213,20 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public void mute(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetMute\", \"id\": 1}");	
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetMute\", \"params\": {\"mute\":\"toggle\"}, \"id\": 1}");	
 	}
 
 	@Override
 	public int getVolume(int id) {
-		return volume;
+		String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Application.GetProperties\", \"params\": { \"properties\": [\"volume\"]}, \"id\": 1}");
+		try {
+			JSONObject obj = new JSONObject(s);
+			JSONObject result = (JSONObject) obj.get("result");
+			return (result.getInt("volume"));		
+		} catch (JSONException e) {
+			reporter.error("JSON error in getTrack");
+			return 0;
+		}
 	}
 
 	@Override
@@ -226,7 +241,7 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public String getTrack(int id) {
-		String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetItem\", \"params\": { \"properties\": [\"title\",\"album\",\"artist\"], \"playerid\": 0}, \"id\": 1}");
+		String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetItem\", \"params\": { \"properties\": [\"title\",\"album\",\"artist\"], \"playerid\":" + playerId + "}, \"id\": 1}");
 		JSONObject obj;
 		try {
 			obj = new JSONObject(s);
@@ -296,14 +311,19 @@ public class XBMCControl implements MediaControl {
 	
 	private String findPlugin(String name) {
 		if (name.equals("iplayer")) return "plugin.video.iplayer";
-		else if (name.equals("weather")) return "weather.wunderground";
 		else if (name.equals("navix")) return "script.navi-x";
+		else if (name.equals("ted")) return "plugin.video.ted.talks";
+		else if (name.equals("4od")) return "plugin.video.4od";
+		else if (name.equals("aljazeera")) return "plugin.video.aljazeera";
+		else if (name.equals("podcasts")) return "plugin.video.itunes_podcasts";
+		else if (name.equals("youtube")) return "plugin.video.youtube";
+		else if (name.equals("dilbert")) return "plugin.image.dilbert";
 		return null;
 	}
 
 	@Override
 	public String getArtist(int id) throws IOException {
-		String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetItem\", \"params\": { \"properties\": [\"title\",\"album\",\"artist\"], \"playerid\": 0}, \"id\": 1}");
+		String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetItem\", \"params\": { \"properties\": [\"title\",\"album\",\"artist\"], \"playerid\":" + playerId + "}, \"id\": 1}");
 		JSONObject obj;
 		try {
 			obj = new JSONObject(s);
@@ -317,7 +337,7 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public String getAlbum(int id) throws IOException {
-		String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetItem\", \"params\": { \"properties\": [\"title\",\"album\",\"artist\"], \"playerid\": 0}, \"id\": 1}");
+		String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetItem\", \"params\": { \"properties\": [\"title\",\"album\",\"artist\"], \"playerid\":" + playerId + "}, \"id\": 1}");
 		JSONObject obj;
 		try {
 			obj = new JSONObject(s);
@@ -339,6 +359,90 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public void say(int id, String text) {
-		reporter.error("XBMC: say not supported");		
+		alert(id,"Just saying", text);
+	}
+
+	@Override
+	public String getPlaylist(int id) throws IOException {
+		String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"PlayList.GetItems\", \"params\": {\"playlistid\":0}, \"id\": 1}");
+		JSONObject obj;
+		String res = "";
+		try {
+			obj = new JSONObject(s);
+			JSONObject result = (JSONObject) obj.get("result");
+			JSONArray items = ((JSONArray) result.get("items"));	
+			for(int i=0;i<items.length();i++) {
+				JSONObject item =  items.getJSONObject(i);
+				res = res + item.getString("label") + ";";
+			}
+			return res;
+		} catch (JSONException e) {
+			reporter.error("JSON error in getPlaylist");
+			return "Error";
+		}
+	}
+	
+	public boolean isPlaying(int id) {
+		String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetActivePlayers\",\"id\": 1}");
+		try {
+			JSONObject obj = new JSONObject(s);
+			JSONArray result = (JSONArray) obj.get("result");
+			return (result.length() > 0);
+		} catch (JSONException e) {
+			reporter.error("JSON error in getPlaylist");
+			return false;
+		}
+	}
+
+	@Override
+	public void pageUp(int id) throws IOException {
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Input.ExecuteAction\",\"params\": {\"action\": \"pageup\"}, \"id\": 1}");	
+	}
+
+	@Override
+	public void pageDown(int id) throws IOException {
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Input.ExecuteAction\",\"params\": {\"action\": \"pageup\"}, \"id\": 1}");		
+	}
+	
+	public void contextMenu(int id) {
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Input.ContextMenu\",\"id\": 1}");
+	}
+	
+	public void showOSD(int id) {
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Input.ShowOSD\",\"id\": 1}");
+	}
+	
+	public void showCodec(int id) {
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Input.ShowCodec\",\"id\": 1}");
+	}
+	
+	public void alert(int id, String title, String msg) {
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"GUI.ShowNotification\",\"params\": {\"title\": \"" + title + "\", " + "\"message\": \"" + msg + "\"}, \"id\": 1}");
+	}
+
+	@Override
+	public void reboot(int id) throws IOException {
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"System.Reboot\", \"id\": 1}");
+	}
+
+	@Override
+	public void setPlayer(int id, int playerId) throws IOException {
+		this.playerId = playerId;
+		
+	}
+
+	@Override
+	public void setRepeat(int id, boolean repeat) throws IOException {
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetRepeat\", \"params\": {\"repeat\":\"all\", \"playerid\":" + playerId + "}, \"id\": 1}");	
+		
+	}
+
+	@Override
+	public void setShuffle(int id, boolean shuffle) throws IOException {
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetShuffle\", \"params\": {\"shuffle\":\"toggle\", \"playerid\":" + playerId + "}, \"id\": 1}");	
+	}
+	
+	public void setFullScreen(int id) throws IOException {
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"GUI.SetFullscreen\", \"params\": {\"fullscreen\":\"toggle\"}, \"id\": 1}");
 	}
 }

@@ -12,6 +12,7 @@ import net.geekgrandad.interfaces.Alerter;
 import net.geekgrandad.interfaces.ApplianceControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
+import net.geekgrandad.rf.RFIAMControl;
 
 public class IAMControl implements ApplianceControl {
 	private Config config;

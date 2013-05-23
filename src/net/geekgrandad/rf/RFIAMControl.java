@@ -1,4 +1,4 @@
-package net.geekgrandad.plugin;
+package net.geekgrandad.rf;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 
@@ -7,17 +7,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
-public class RFControl {
+public class RFIAMControl {
   private String portName;
   private SerialPort serialPort;
   private static final int TIME_OUT = 2000;
-  private static final int DATA_RATE = 57600;
+  private static final int DATA_RATE = 115200;
   /** Buffered input stream from the port */
 
   private OutputStream output;
   private InputStream input;
 
-  public RFControl(String port) throws IOException{
+  public RFIAMControl(String port) throws IOException  {
 	portName = port;
     initialize();
   }
@@ -38,7 +38,7 @@ public class RFControl {
     }
 
     if (portId == null) {
-      throw new IOException("Could not find COM port");
+      throw new IOException("Could not find IAM COM port");
     }
 
     try {
@@ -56,8 +56,9 @@ public class RFControl {
 
     } catch (Exception e) {
       System.err.println(e.toString());
-      throw new IOException("Could not open 434 COM port");
+      throw new IOException("Could not open IAM COM port");
     }
+
   }
 
   public void sendCmd(byte cmd) throws IOException {
@@ -68,8 +69,10 @@ public class RFControl {
   public int readByte() throws IOException {
     for (;;) {
       int i = input.read();
-      if (i >= 0)
-        return (i & 0xFF);
+      if (i >= 0) {
+        int b = i & 0xFF;
+        return (b);
+      }
     }
   }
 }

@@ -32,7 +32,7 @@ public class Config {
   public static final int MAX_DOORS = 0;
   public static final int MAX_BATTERIES = 11;
   public static final int MAX_PLANTS = 1;
-  public static final int MAX_MEDIA = 5;
+  public static final int MAX_MEDIA = 6;
   public static final int MAX_PHONES = 1;
   public static final int MAX_TABLETS = 1;
   

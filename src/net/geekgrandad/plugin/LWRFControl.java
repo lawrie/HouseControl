@@ -10,6 +10,7 @@ import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
 import net.geekgrandad.interfaces.SocketControl;
 import net.geekgrandad.interfaces.SwitchControl;
+import net.geekgrandad.rf.RFControl;
 
 public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 	
@@ -135,7 +136,7 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 		// Connect to the LightwaveRF network, if transceiver port defined
 		if (config.lwrfPort != null && config.lwrfPort.length() > 0) {
 			try {
-				rfc434 = new RFControl(config.lwrfPort);
+				rfc434 = new RFControl(config.lwrfPort, 57600, 2000, "LWRF");
 			} catch (IOException e1) {
 				reporter.error(e1.getMessage());
 			}

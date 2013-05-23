@@ -107,7 +107,7 @@ public class TivoControl implements MediaControl {
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
-			sendCommand(0, AV.MENU_RIGHT);
+			sendCommand(0, AV.MENU_OK);
 			delay();
 			sendCommand(0, AV.MENU_OK);
 			delay();
@@ -117,9 +117,15 @@ public class TivoControl implements MediaControl {
 			delay();
 			sendCommand(0, AV.MENU_OK);
 		} else if (service.equals("broadcast")) {
-			sendCommand(0, AV.TV);
+			sendCommand(0, AV.BROADCAST);
 		} else if (service.equals("guide")) {
+			// Guide key emulation does not seem to work reliably
 			sendCommand(0, AV.GUIDE);
+			//delay();
+			//sendCommand(0, AV.MENU_OK);
+			//delay();
+			//sendCommand(0, AV.MENU_OK);
+			delay();
 		} else if (service.equals("home")) {
 			sendCommand(0, AV.HOME);
 		} else if (service.equals("shows")) {
@@ -129,7 +135,7 @@ public class TivoControl implements MediaControl {
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
-			sendCommand(0, AV.MENU_RIGHT);
+			sendCommand(0, AV.MENU_OK);
 			delay();
 			sendCommand(0, AV.MENU_OK);
 			delay();
@@ -145,7 +151,7 @@ public class TivoControl implements MediaControl {
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
-			sendCommand(0, AV.MENU_RIGHT);
+			sendCommand(0, AV.MENU_OK);
 			delay();
 			sendCommand(0, AV.MENU_OK);
 			delay();
@@ -283,13 +289,13 @@ public class TivoControl implements MediaControl {
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
-			sendCommand(0, AV.MENU_RIGHT);
+			sendCommand(0, AV.MENU_OK);
 		} else if (service.equals("catchup")) {
 			sendCommand(0, AV.HOME);
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
-			sendCommand(0, AV.MENU_RIGHT);
+			sendCommand(0, AV.MENU_OK);
 			delay();
 			sendCommand(0, AV.MENU_OK);
 		} else if (service.equals("tvxl")) {
@@ -297,7 +303,7 @@ public class TivoControl implements MediaControl {
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
-			sendCommand(0, AV.MENU_RIGHT);
+			sendCommand(0, AV.MENU_OK);
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
@@ -307,7 +313,7 @@ public class TivoControl implements MediaControl {
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
-		    sendCommand(0, AV.MENU_RIGHT);
+			sendCommand(0, AV.MENU_OK);
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
@@ -323,9 +329,55 @@ public class TivoControl implements MediaControl {
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
-			sendCommand(0, AV.MENU_RIGHT);
+			sendCommand(0, AV.MENU_OK);
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();						
+			sendCommand(0, AV.MENU_OK);
+		}  else if (service.equals("playlists")) {
+			sendCommand(0, AV.HOME);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_OK);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();						
+			sendCommand(0, AV.MENU_OK);
+			delay();
+			sendCommand(0, AV.MENU_OK);
+		}  else if (service.equals("skyondemand")) {
+			sendCommand(0, AV.HOME);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_OK);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();
+			sendCommand(0, AV.MENU_DOWN);
+			delay();					
+			sendCommand(0, AV.MENU_OK);
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
@@ -341,7 +393,7 @@ public class TivoControl implements MediaControl {
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
-			sendCommand(0, AV.MENU_RIGHT);
+			sendCommand(0, AV.MENU_OK);
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
@@ -489,7 +541,7 @@ public class TivoControl implements MediaControl {
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
-			sendCommand(0, AV.MENU_RIGHT);
+			sendCommand(0, AV.MENU_OK);
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
@@ -515,7 +567,7 @@ public class TivoControl implements MediaControl {
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
-			sendCommand(0, AV.MENU_RIGHT);
+			sendCommand(0, AV.MENU_OK);
 			delay();
 			sendCommand(0, AV.MENU_DOWN);
 			delay();
@@ -746,12 +798,16 @@ public class TivoControl implements MediaControl {
 
 	@Override
 	public void turnOn(int id) throws IOException {
-		sendCommand(0,AV.ON);
+		if (id == 2) sendCommand(id, 0x8c);
+		else if (id == 3) sendCommand(0,AV.RECEIVER_ON);
+		else sendCommand(0,AV.ON);
 	}
 
 	@Override
 	public void turnOff(int id) throws IOException {
-		sendCommand(0,AV.OFF);
+		if (id == 2) sendCommand(id, 0x8c);
+		else if (id == 3) sendCommand(0,AV.RECEIVER_ON);
+		else sendCommand(0,AV.OFF);
 	}
 
 	@Override
@@ -798,5 +854,52 @@ public class TivoControl implements MediaControl {
 	public void volumeDown(int id) throws IOException {
 		sendCommand(0,AV.VOLUME_DOWN);
 		volume--;
+	}
+
+	@Override
+	public String getPlaylist(int id) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void pageUp(int id) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pageDown(int id) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isPlaying(int id) throws IOException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void reboot(int id) throws IOException {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void setPlayer(int id, int playerId) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setRepeat(int id, boolean repeat) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setShuffle(int id, boolean shuffle) throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 }

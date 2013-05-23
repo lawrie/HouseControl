@@ -85,6 +85,7 @@
                     <playlist name="women" link="http://open.spotify.com/user/grabbas/playlist/0y1xQvg7wYi6z3aXOxjZ4V"></playlist>
                 </spotify>
             </media>
+            <media id="6" name="kodak" type="Kodak"></media>
             <sensor id="1" name="Jeenode" type="Jeenode">
                 <temperature></temperature>
                 <lightlevel></lightlevel>
@@ -164,6 +165,9 @@
             <interface name="MediaControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.XBMCControl" type="XBMC">
+            <interface name="MediaControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.KodakControl" type="Kodak">
             <interface name="MediaControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.LocalSpeech">

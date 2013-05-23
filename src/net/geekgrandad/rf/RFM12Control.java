@@ -1,4 +1,4 @@
-package net.geekgrandad.plugin;
+package net.geekgrandad.rf;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 
@@ -7,17 +7,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
-public class RFIAMControl {
+public class RFM12Control {
   private String portName;
   private SerialPort serialPort;
   private static final int TIME_OUT = 2000;
-  private static final int DATA_RATE = 115200;
-  /** Buffered input stream from the port */
+  private static final int DATA_RATE = 57600;
 
   private OutputStream output;
   private InputStream input;
 
-  public RFIAMControl(String port) throws IOException  {
+  public RFM12Control(String port) throws IOException {
 	portName = port;
     initialize();
   }
@@ -30,7 +29,6 @@ public class RFIAMControl {
     while (portEnum.hasMoreElements()) {
       CommPortIdentifier currPortId = (CommPortIdentifier) portEnum
           .nextElement();
-      //System.out.println("Port: " + currPortId.getName());
       if (currPortId.getName().equals(portName)) {
         portId = currPortId;
         break;
@@ -38,13 +36,12 @@ public class RFIAMControl {
     }
 
     if (portId == null) {
-      throw new IOException("Could not find IAM COM port");
+      throw new IOException("Could not find RFM12 COM port");
     }
 
     try {
       // open serial port, and use class name for the appName.
-      serialPort = (SerialPort) portId
-          .open(this.getClass().getName(), TIME_OUT);
+      serialPort = (SerialPort) portId.open(this.getClass().getName(), TIME_OUT);
 
       // set port parameters
       serialPort.setSerialPortParams(DATA_RATE, SerialPort.DATABITS_8,
@@ -56,9 +53,8 @@ public class RFIAMControl {
 
     } catch (Exception e) {
       System.err.println(e.toString());
-      throw new IOException("Could not open IAM COM port");
+      throw new IOException("Could not open RFM12 COM port");
     }
-
   }
 
   public void sendCmd(byte cmd) throws IOException {
@@ -70,8 +66,7 @@ public class RFIAMControl {
     for (;;) {
       int i = input.read();
       if (i >= 0) {
-        int b = i & 0xFF;
-        return (b);
+        return (i & 0xFF);
       }
     }
   }

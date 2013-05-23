@@ -11,6 +11,7 @@ import net.geekgrandad.interfaces.PowerControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
 import net.geekgrandad.interfaces.SensorControl;
+import net.geekgrandad.rf.RFM12Control;
 
 /**
  * Class to connect to the Jeenode network, read data from sensors and send data to IR devices
