@@ -12,12 +12,12 @@ import net.geekgrandad.interfaces.Alerter;
 import net.geekgrandad.interfaces.ApplianceControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
-import net.geekgrandad.rf.RFIAMControl;
+import net.geekgrandad.rf.RFControl;
 
 public class IAMControl implements ApplianceControl {
 	private Config config;
 	private Reporter reporter;
-	private RFIAMControl rfcIAM;
+	private RFControl rfcIAM;
 	private Alerter alerter;
 	
 	private boolean[] iamStarted = new boolean[Config.MAX_APPLIANCES];
@@ -42,7 +42,7 @@ public class IAMControl implements ApplianceControl {
 		// Connect to the IAM network, if transceiver port defined
 		if (config.iamPort != null && config.iamPort.length() > 0) {
 			try {
-				rfcIAM = new RFIAMControl(config.iamPort);
+				rfcIAM = new RFControl(config.iamPort,115200, 200, "IAM");
 			} catch (IOException e1) {
 				reporter.error(e1.getMessage());
 			}

@@ -11,7 +11,7 @@ import net.geekgrandad.interfaces.PowerControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
 import net.geekgrandad.interfaces.SensorControl;
-import net.geekgrandad.rf.RFM12Control;
+import net.geekgrandad.rf.RFControl;
 
 /**
  * Class to connect to the Jeenode network, read data from sensors and send data to IR devices
@@ -22,7 +22,7 @@ import net.geekgrandad.rf.RFM12Control;
 public class JeenodeControl implements SensorControl, PowerControl, PlantControl, InfraredControl {
 	private Reporter reporter;
 	private Config config;
-	private RFM12Control rfc;
+	private RFControl rfc;
 	private int sensor;
 	private float power = 0;
 	private long lastPower = 0;
@@ -175,7 +175,7 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 		// Connect to the Jeenode network, if transceiver port defined
 		if (config.rfm12Port != null && config.rfm12Port.length() > 0) {
 			try {
-				rfc = new RFM12Control(config.rfm12Port);
+				rfc = new RFControl(config.rfm12Port,57600,2000,"RFM12");
 			} catch (IOException e1) {
 				reporter.error(e1.getMessage());
 			}
