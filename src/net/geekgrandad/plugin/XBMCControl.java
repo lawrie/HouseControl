@@ -428,13 +428,11 @@ public class XBMCControl implements MediaControl {
 	@Override
 	public void setPlayer(int id, int playerId) throws IOException {
 		this.playerId = playerId;
-		
 	}
 
 	@Override
 	public void setRepeat(int id, boolean repeat) throws IOException {
 		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetRepeat\", \"params\": {\"repeat\":\"all\", \"playerid\":" + playerId + "}, \"id\": 1}");	
-		
 	}
 
 	@Override

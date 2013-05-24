@@ -28,7 +28,7 @@ public class ORMusicControl {
 	private InputStream is;
 	private OutputStream os;
 	private Robot robot;
-	Synthesizer synth;
+	private Synthesizer synth;
 	
 	public void run() {	
 		try {

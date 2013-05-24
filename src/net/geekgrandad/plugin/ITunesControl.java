@@ -2,314 +2,305 @@ package net.geekgrandad.plugin;
 
 import java.io.IOException;
 
-import net.geekgrandad.interfaces.InfraredControl;
 import net.geekgrandad.interfaces.MediaControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
 
-public class KodakControl implements MediaControl {
+import com.dt.iTunesController.ITPlayerState;
+import com.dt.iTunesController.ITPlaylist;
+import com.dt.iTunesController.ITPlaylistCollection;
+import com.dt.iTunesController.ITSource;
+import com.dt.iTunesController.ITSourceCollection;
+import com.dt.iTunesController.ITTrack;
+import com.dt.iTunesController.iTunes;
+
+public class ITunesControl implements MediaControl {
+	private iTunes itc = new iTunes();
 	private Reporter reporter;
-	InfraredControl infraredControl;
-	Provider provider;
 	
-	private static final int RIGHT = 1;
-	private static final int LEFT = 2;
-	private static final int UP = 3;
-	private static final int DOWN = 4;
-	private static final int PAUSE = 5;
-	private static final int OK = 6;
-	private static final int STOP = 7;
-	private static final int FF = 8;
-	private static final int BACK = 9;
-	private static final int FB = 10;
-	private static final int MUTE = 11;
-	private static final int PLUS = 12;
-	private static final int MINUS = 13;
-	private static final int MENU = 14;
-	private static final int HOME = 15;
-	private static final int ON = 16;
-	private static final int MUSIC = 17;
-	//private static final int ZOOM = 18;
-	//private static final int TICK = 19;
-	//private static final int ROTATE = 20;
-	//private static final int FILES = 21;
-	
+	public static void main(String[] args) {
+		iTunes itc = new iTunes();
+		ITTrack itt = itc.getCurrentTrack();
+		System.out.println("Currently playing:");
+		System.out.println("Name:    " + itt.getName());
+		System.out.println("By:      " + itt.getArtist());
+		System.out.println("Album:   " + itt.getAlbum());
+	}
+
 	@Override
 	public void setProvider(Provider provider) {
-		reporter = provider.getReporter();
-		infraredControl = provider.getInfraredControl();
-		this.provider = provider;
+		this.reporter = provider.getReporter();		
 	}
 
 	@Override
 	public void start(int id, String playlist, boolean repeat)
 			throws IOException {
-		reporter.error("KODAK: start not supported");
+		ITSourceCollection sources = itc.getSources();
+		reporter.print("iTunes: number of sources: " + sources.getCount());
+		reporter.print("iTunes: sources: " + sources);
+		ITSource source = sources.getItem(1);
+		reporter.print("iTunes: source: " + source);
+		ITPlaylistCollection lists = source.getPlaylists();
+		ITPlaylist list = lists.ItemByName(playlist);
+		list.playFirstTrack();
 	}
 
 	@Override
 	public void open(int id, String file, boolean repeat) throws IOException {
-		reporter.error("KODAK: open not supported");	
+		itc.playFile(file);
 	}
 
 	@Override
 	public void type(int id, String s) throws IOException {
-		reporter.error("KODAK: type not supported");	
+		reporter.error("ITunes: type not supported");
+		
 	}
 
 	@Override
 	public void select(int id, String service) throws IOException {
-		if (service.equals("home")) sendCommand(HOME);
-		else if (service.equals("menu")) sendCommand(MENU);
-		else if (service.equals("music")) sendCommand(MUSIC);
-		else reporter.error("KODAK: service not supported: " + service);
+		reporter.error("ITunes: select not supported");	
 	}
 
 	@Override
 	public void pause(int id) throws IOException {
-		sendCommand(PAUSE);		
+		itc.pause();	
 	}
 
 	@Override
 	public void stop(int id) throws IOException {
-		sendCommand(STOP);	
+		itc.playPause();	
 	}
 
 	@Override
 	public void play(int id) throws IOException {
-		sendCommand(PAUSE);	
+		itc.play();		
 	}
 
 	@Override
 	public void record(int id) throws IOException {
-		reporter.error("KODAK: record not supported");	
+		reporter.error("ITunes: record not supported");	
 	}
 
 	@Override
 	public void ff(int id) throws IOException {
-		sendCommand(FF);
+		itc.fastForward();	
 	}
 
 	@Override
 	public void fb(int id) throws IOException {
-		sendCommand(FB);		
+		reporter.error("ITunes: fb not supported");	
 	}
 
 	@Override
 	public void skip(int id) throws IOException {
-		sendCommand(RIGHT);	
+		itc.nextTrack();		
 	}
 
 	@Override
 	public void skipb(int id) throws IOException {
-		sendCommand(LEFT);
+		itc.previousTrack();	
 	}
 
 	@Override
 	public void slow(int id) throws IOException {
-		reporter.error("KODAK: slow not supported");		
+		reporter.error("iTunes: slow not supported");	
 	}
 
 	@Override
 	public void delete(int id) throws IOException {
-		reporter.error("KODAK: up not supported");
+		reporter.error("iTunes: delete not supported");	
 	}
 
 	@Override
 	public void up(int id) throws IOException {
-		sendCommand(UP);
+		reporter.error("iTunes: up not supported");
 	}
 
 	@Override
 	public void down(int id) throws IOException {
-		sendCommand(DOWN);		
+		reporter.error("iTunes: down not supported");		
 	}
 
 	@Override
 	public void left(int id) throws IOException {
-		sendCommand(LEFT);	
+		reporter.error("iTunes: left not supported");	
 	}
 
 	@Override
 	public void right(int id) throws IOException {
-		sendCommand(RIGHT);
+		reporter.error("iTunes: right not supported");
 	}
 
 	@Override
 	public void ok(int id) throws IOException {
-		sendCommand(OK);		
+		reporter.error("iTunes: ok not supported");		
 	}
 
 	@Override
 	public void back(int id) throws IOException {
-		sendCommand(BACK);	
+		reporter.error("iTunes: back not supported");	
 	}
 
 	@Override
 	public void lastChannel(int id) throws IOException {
-		reporter.error("KODAK: lastch not supported");		
+		reporter.error("iTunes: lastChannel not supported");	
 	}
 
 	@Override
 	public void option(int id, String option) throws IOException {
-		reporter.error("KODAK: option not supported");	
+		reporter.error("ITunes: option not supported");
 	}
 
 	@Override
 	public void volumeUp(int id) throws IOException {
-		sendCommand(PLUS);		
+		int vol = itc.getSoundVolume();
+		itc.setSoundVolume(vol+1);	
 	}
 
 	@Override
 	public void volumeDown(int id) throws IOException {
-		sendCommand(MINUS);	
+		int vol = itc.getSoundVolume();
+		itc.setSoundVolume(vol-1);		
 	}
 
 	@Override
 	public void mute(int id) throws IOException {
-		sendCommand(MUTE);	
+		itc.setMute(true);
 	}
 
 	@Override
 	public int getVolume(int id) throws IOException {
-		return 0;
+		return itc.getSoundVolume();
 	}
 
 	@Override
 	public void setVolume(int id, int volume) throws IOException {
-		reporter.error("KODAK: set volume not supported");	
+		itc.setSoundVolume(volume);		
 	}
 
 	@Override
 	public void setChannel(int id, int channel) throws IOException {
-		reporter.error("KODAK: set channel not supported");	
+		reporter.error("iTunes: channels not supported");		
 	}
 
 	@Override
 	public String getTrack(int id) throws IOException {
-		reporter.error("KODAK: get track not supported");
-		return "";
+		ITTrack itt = itc.getCurrentTrack();
+		return itt.getName();
 	}
 
 	@Override
 	public int getChannel(int id) throws IOException {
-		reporter.error("KODAK: channels not supported");
+		reporter.error("iTunes: channels not supported");
 		return 0;
 	}
 
 	@Override
 	public void channelUp(int id) throws IOException {
-		reporter.error("KODAK: channels not supported");	
-	}
-
-	@Override
-	public void channelDown(int id) throws IOException {
-		reporter.error("KODAK: channels not supported");
-	}
-
-	@Override
-	public void thumbsUp(int id) throws IOException {
-		reporter.error("KODAK: rating not supported");		
-	}
-
-	@Override
-	public void thumbsDown(int id) throws IOException {
-		reporter.error("KODAK: rating not supported");
+		reporter.error("iTunes: channels not supported");
 		
 	}
 
 	@Override
+	public void channelDown(int id) throws IOException {
+		reporter.error("iTunes: channels not supported");	
+	}
+
+	@Override
+	public void thumbsUp(int id) throws IOException {
+		reporter.error("iTunes: ratings not supported");
+	}
+
+	@Override
+	public void thumbsDown(int id) throws IOException {
+		reporter.error("iTunes: ratings not supported");		
+	}
+
+	@Override
 	public void digit(int id, int n) throws IOException {
-		reporter.error("KODAK: digits not supported");
+		reporter.error("iTunes: digit not supported");	
 	}
 
 	@Override
 	public void color(int id, int n) throws IOException {
-		reporter.error("KODAK: colors not supported");
+		reporter.error("iTunes: color not supported");	
 	}
 
 	@Override
 	public void turnOn(int id) throws IOException {
-		sendCommand(ON);
+		reporter.error("iTunes: turnOn not supported");		
 	}
 
 	@Override
 	public void turnOff(int id) throws IOException {
-		sendCommand(ON);		
+		itc.quit();	
 	}
 
 	@Override
 	public void pin(int id) throws IOException {
-		reporter.error("KODAK: pin not supported");	
+		reporter.error("iTunes: pin not supported");
 	}
 
 	@Override
 	public void setSource(int id, int source) throws IOException {
-		reporter.error("KODAK: set source not supported");	
+		reporter.error("iTunes: setSource not supported");		
 	}
 
 	@Override
 	public String getArtist(int id) throws IOException {
-		reporter.error("KODAK: get artist not supported");
-		return "";
+		ITTrack itt = itc.getCurrentTrack();
+		return itt.getArtist();
 	}
 
 	@Override
 	public String getAlbum(int id) throws IOException {
-		reporter.error("KODAK: get album not supported");
-		return "";
+		ITTrack itt = itc.getCurrentTrack();
+		return itt.getAlbum();
 	}
 
 	@Override
 	public String getPlaylist(int id) throws IOException {
-		reporter.error("KODAK: playlist not supported");
-		return "";
+		ITPlaylist p = itc.getCurrentPlaylist();	
+		return p.getName();
 	}
 
 	@Override
 	public void say(int id, String text) throws IOException {
-		reporter.error("KODAK: say not supported");
+		reporter.error("ITunes: say not supported");	
 	}
 
 	@Override
 	public void pageUp(int id) throws IOException {
-		reporter.error("KODAK: page up not supported");
+		reporter.error("ITunes: pageUp not supported");		
 	}
 
 	@Override
 	public void pageDown(int id) throws IOException {
-		reporter.error("KODAK: page down not supported");	
+		reporter.error("ITunes: pageDown not supported");	
 	}
 
 	@Override
 	public boolean isPlaying(int id) throws IOException {
-		reporter.error("KODAK: playing not supported");
-		return false;
+		return (itc.getPlayerState()  == ITPlayerState.ITPlayerStatePlaying);
 	}
 
 	@Override
 	public void reboot(int id) throws IOException {
-		reporter.error("KODAK: reboot not supported");	
+		reporter.error("ITunes: reboot not supported");		
 	}
 
 	@Override
 	public void setPlayer(int id, int playerId) throws IOException {
-		reporter.error("KODAK: player not supported");		
+		reporter.error("ITunes: pageDown not supported");
 	}
 
 	@Override
 	public void setRepeat(int id, boolean repeat) throws IOException {
-		reporter.error("KODAK: repeat not supported");	
+		reporter.error("ITunes: setRepeat not supported");	
 	}
 
 	@Override
 	public void setShuffle(int id, boolean shuffle) throws IOException {
-		reporter.error("KODAK: shufffle not supported");
-	}
-	
-	private void sendCommand(int cmd) throws IOException {
-		if (infraredControl == null) infraredControl = provider.getInfraredControl();
-		reporter.print("KODAK: Sending " + cmd + ", " + infraredControl);
-		if (infraredControl != null) infraredControl.sendCommand(0, cmd);
+		reporter.error("iTunes: setShuffle not supported");	
 	}
 }
