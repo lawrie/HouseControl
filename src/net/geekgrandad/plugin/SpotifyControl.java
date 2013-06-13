@@ -60,7 +60,8 @@ public class SpotifyControl implements MediaControl {
 	@Override
 	public void start(int id, String playlist, boolean repeat)
 			throws IOException {
-		String list = config.getPlaylists().get(playlist);
+		String list = config.getPlaylists().get(playlist) + "?autoplay=true";
+		reporter.print("Playing " + list);
 		java.awt.Desktop.getDesktop().browse(java.net.URI.create(list));
 		
 	}

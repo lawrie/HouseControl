@@ -49,13 +49,14 @@
                     <playlist name="melanie" link="http://open.spotify.com/user/grabbas/playlist/1OF2txyzuYnDtDSVVAkaUp"></playlist>
                 </spotify>
             </media>
-            <media id="8" name="it" host="musicserver" type="iTunes">
+            <media id="8" name="it" host="musicserver" type="iTunes"></media>
         </room>
     </floor>
     <speech voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" 
         remote="false" local="true" server="musicserver"></speech>
+    <config listen_port="50000" background_delay="10000"></config>
     <plugins>
-        <plugin class="net.geekgrandad.plugin.LocalSpotifyControl">
+        <plugin class="net.geekgrandad.plugin.SpotifyControl" type="Spotify">
             <interface name="MediaControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.ITunesControl" type="iTunes">
