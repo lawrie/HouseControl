@@ -1,0 +1,68 @@
+<house>
+    <floor id="2" name="First floor">
+        <room id="1" name="Living">
+            <media id="5" name="spot" host="musicserver" socket_timeout="5000" type="Spotify">
+                <spotify>
+      				<playlist name="hiatt" link="http://open.spotify.com/user/grabbas/playlist/7kqeUug8LFcc1G5x85Vs3u"></playlist>
+      				<playlist name="bluegrass" link="http://open.spotify.com/user/grabbas/playlist/1rNcNwvAEhkr8SpMMr544H"></playlist>
+      				<playlist name="dylan" link="http://open.spotify.com/user/grabbas/playlist/5bB3gAtMpGZf3ZchfLrA3C"></playlist>
+      				<playlist name="marley" link="http://open.spotify.com/user/grabbas/playlist/7yQ6qTXmUvAU2QWWIOZoSL"></playlist>
+                    <playlist name="springsteen" link="http://open.spotify.com/user/grabbas/playlist/280kYcQxqNwn8bR2bcen4M"></playlist>
+                    <playlist name="country" link="http://open.spotify.com/user/grabbas/playlist/22xSqobsRdCYndbOCSpQhm"></playlist>
+                    <playlist name="cult" link="http://open.spotify.com/user/grabbas/playlist/7KORIvehmmAaMelCEcfXeW"></playlist>
+                    <playlist name="dire" link="http://open.spotify.com/user/grabbas/playlist/4ux4XpOau6yDj8tMjyfAfP"></playlist>
+                    <playlist name="dido" link="http://open.spotify.com/user/grabbas/playlist/4PatpiTDxd2TiILksMKFXC"></playlist>
+                    <playlist name="early" link="http://open.spotify.com/user/grabbas/playlist/7CFyd9y1mc3BSciNUooydk"></playlist>
+                    <playlist name="elvis" link="http://open.spotify.com/user/grabbas/playlist/5hKu9DamfyD1okIOtqi6UU"></playlist>
+                    <playlist name="folk" link="http://open.spotify.com/user/grabbas/playlist/2iWMpiGgRMVhLtWkeo1Aql"></playlist>
+                    <playlist name="glam" link="http://open.spotify.com/user/grabbas/playlist/71qODECLpEXYqhd9sVet7D"></playlist>
+                    <playlist name="jimi" link="http://open.spotify.com/user/grabbas/playlist/54WN7FjYmGJDbfaLGTd4PF"></playlist>
+                    <playlist name="norah" link="http://open.spotify.com/user/grabbas/playlist/0aRVRQF9kSTDsHxpGrTZa6"></playlist>
+                    <playlist name="brady" link="http://open.spotify.com/user/grabbas/playlist/1WD5Vicc9xkGWNIJxJbKUU"></playlist>
+                    <playlist name="simon" link="http://open.spotify.com/user/grabbas/playlist/0Q837X7Okqk6Ybbj1Nered"></playlist>
+                    <playlist name="protest" link="http://open.spotify.com/user/grabbas/playlist/6gG1acgi7ANQB6qAsP6JLy"></playlist>
+                    <playlist name="randy" link="http://open.spotify.com/user/grabbas/playlist/72JlGtiC8x9abCYTDIZW8H"></playlist>
+                    <playlist name="recent" link="http://open.spotify.com/user/grabbas/playlist/5kBmntSOI1xgzRC2dXTMAv"></playlist>
+                    <playlist name="thompson" link="http://open.spotify.com/user/grabbas/playlist/2srsx92tpdgX6VZJ96q83P"></playlist>
+                    <playlist name="stones" link="http://open.spotify.com/user/grabbas/playlist/2i1Ke5fneT98RcGpq9vgax"></playlist>
+                    <playlist name="ry" link="http://open.spotify.com/user/grabbas/playlist/6kaiCnFvz6Um7nQGNKH1oJ"></playlist>
+                    <playlist name="soul" link="http://open.spotify.com/user/grabbas/playlist/69HA7z2wSZEJ1qgQOtAy5S"></playlist>
+                    <playlist name="van" link="http://open.spotify.com/user/grabbas/playlist/6pG6Q4ibxTzW1LaBb26aYB"></playlist>
+                    <playlist name="willie" link="http://open.spotify.com/user/grabbas/playlist/01BBRKHQ66JkkuQwcSrJjF"></playlist>
+                    <playlist name="joni" link="http://open.spotify.com/user/grabbas/playlist/2OqfjYeiZ1rtQH26o68gC3"></playlist>
+                    <playlist name="young" link="http://open.spotify.com/user/grabbas/playlist/2FOuoECPwBjmy8b9M7fQ7o"></playlist>
+                    <playlist name="london" link="http://open.spotify.com/user/grabbas/playlist/0MmGNWj60XzcTtk9uO4Ggc"></playlist>
+                    <playlist name="waters" link="http://open.spotify.com/user/grabbas/playlist/6Gmec5UnMTSAgNyppimCrP"></playlist>
+                    <playlist name="van" link="http://open.spotify.com/user/grabbas/playlist/6pG6Q4ibxTzW1LaBb26aYB"></playlist>
+                    <playlist name="empty" link="http://open.spotify.com/user/grabbas/playlist/4TdBstcStLezIg2v1GQFcb"></playlist>
+                    <playlist name="alabama" link="http://open.spotify.com/user/grabbas/playlist/4eihS66MISpy576BeulT0o"></playlist>
+                    <playlist name="adele" link="http://open.spotify.com/user/grabbas/playlist/3rXRJNLoXiprei7McncQ3u"></playlist>
+                    <playlist name="rock" link="http://open.spotify.com/user/grabbas/playlist/6KHoOpxsJcr7qcFkNkAfD4"></playlist>
+                    <playlist name="sixties" link="http://open.spotify.com/user/grabbas/playlist/3PukGEHOiiEzg5gY6Ypete"></playlist>
+                    <playlist name="ska" link="http://open.spotify.com/user/grabbas/playlist/6cT06jr6cx44wk2kLYczQs"></playlist>
+                    <playlist name="lehrer" link="http://open.spotify.com/user/grabbas/playlist/2xJEu8XJlMH8UvSQf69sBg"></playlist>
+                    <playlist name="ballads" link="http://open.spotify.com/user/grabbas/playlist/1NzqxaHqY4LzUYkNflTq7q"></playlist>
+                    <playlist name="classical" link="http://open.spotify.com/user/grabbas/playlist/3L2jwLXkWy8AT6RGuQTBkv"></playlist>
+                    <playlist name="iver" link="http://open.spotify.com/user/grabbas/playlist/44vtR9Np9QAZQJQhJYTk3r"></playlist>
+                    <playlist name="women" link="http://open.spotify.com/user/grabbas/playlist/0y1xQvg7wYi6z3aXOxjZ4V"></playlist>
+                    <playlist name="rea" link="http://open.spotify.com/user/grabbas/playlist/66eLLG16X99UTgd8qssTir"></playlist>
+                    <playlist name="melanie" link="http://open.spotify.com/user/grabbas/playlist/1OF2txyzuYnDtDSVVAkaUp"></playlist>
+                </spotify>
+            </media>
+            <media id="8" name="it" host="musicserver" type="iTunes">
+        </room>
+    </floor>
+    <speech voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" 
+        remote="false" local="true" server="musicserver"></speech>
+    <plugins>
+        <plugin class="net.geekgrandad.plugin.LocalSpotifyControl">
+            <interface name="MediaControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.ITunesControl" type="iTunes">
+            <interface name="MediaControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.LocalSpeech">
+            <interface name="SpeechControl"></interface>
+        </plugin>
+    </plugins>
+</house>

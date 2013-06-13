@@ -21,8 +21,11 @@ public class HouseChat extends JFrame implements KeyListener {
 	private StringBuilder sb = new StringBuilder();
 	private String lastLine= null;
 	private int lastPos = 0;
+	private String host;
 	
-	public HouseChat() {
+	public HouseChat(String host) {
+		this.host = host;
+		System.out.println("Host: " + host);
 		getContentPane().add(text,BorderLayout.CENTER);
 		setTitle("House chat");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -32,7 +35,7 @@ public class HouseChat extends JFrame implements KeyListener {
 	}
 	
 	public static void main(String[] args) {
-		new HouseChat();
+		new HouseChat(args.length > 0 ? args[0] : "localhost");
 	}
 	
 	@Override
@@ -64,7 +67,7 @@ public class HouseChat extends JFrame implements KeyListener {
 			//System.out.println("Row: " + row);
 			//System.out.println("Command: " + sb);
 			try {
-				sock = new Socket("localhost", 50000);
+				sock = new Socket(host, 50000);
 			    PrintWriter out = new PrintWriter(sock.getOutputStream(),true);
 			    BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			    out.println(sb.toString());

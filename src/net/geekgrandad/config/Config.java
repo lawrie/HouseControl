@@ -32,7 +32,7 @@ public class Config {
   public static final int MAX_DOORS = 0;
   public static final int MAX_BATTERIES = 11;
   public static final int MAX_PLANTS = 1;
-  public static final int MAX_MEDIA = 7;
+  public static final int MAX_MEDIA = 8;
   public static final int MAX_PHONES = 1;
   public static final int MAX_TABLETS = 1;
   
@@ -188,7 +188,7 @@ public class Config {
   
   public String phoneName;
   
-  private String mediaHost;
+  private String mediaHost, mediaServer;
   
   private String playlist, link;
   
@@ -458,7 +458,7 @@ public class Config {
                 }
               }
           } else if (event.asStartElement().getName().getLocalPart().equals(MEDIA)) {
-            debug("Start TV");
+            debug("Start Media");
             
             // We read the attributes from this tag and process the is and name attributes
             Iterator<Attribute> attributes = startElement.getAttributes();
@@ -471,6 +471,8 @@ public class Config {
             	mediaName = attribute.getValue();
               } else if (attribute.getName().toString().equals(HOST)) {
             	mediaHost = attribute.getValue();
+              } else if (attribute.getName().toString().equals(SERVER)) {
+            	mediaServer = attribute.getValue();
               } else if (attribute.getName().toString().equals(TYPE)) {
             	mediaType = attribute.getValue();
               } else if (attribute.getName().toString().equals(SOCKET_TIMEOUT)) {

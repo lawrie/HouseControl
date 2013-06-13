@@ -26,12 +26,14 @@ import net.geekgrandad.interfaces.LightControl;
 import net.geekgrandad.interfaces.MediaControl;
 import net.geekgrandad.interfaces.PlantControl;
 import net.geekgrandad.interfaces.PowerControl;
+import net.geekgrandad.interfaces.ProgramControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
 import net.geekgrandad.interfaces.SensorControl;
 import net.geekgrandad.interfaces.SocketControl;
 import net.geekgrandad.interfaces.SpeechControl;
 import net.geekgrandad.interfaces.SwitchControl;
+import net.geekgrandad.interfaces.VolumeControl;
 import net.geekgrandad.parser.Parser;
 import net.geekgrandad.parser.Token;
 
@@ -40,8 +42,8 @@ import org.apache.logging.log4j.Logger;
 
 public class HouseControl implements Reporter, Alerter, Provider {
 
-	private static final String CONFIG_FILE = "conf/house.xml";
-	private static Config config = new Config(CONFIG_FILE);
+	private static String configFile = "conf/house.xml";
+	private static Config config;
 
 	// The name of the log4j2 logger used by this class
 	private static final String LOGGER_NAME = "HouseControl";
@@ -81,6 +83,8 @@ public class HouseControl implements Reporter, Alerter, Provider {
     private PowerControl powerControl;
     private PlantControl plantControl;
     private HTTPControl httpControl;
+    private VolumeControl volumeControl;
+    private ProgramControl programControl;
     
     private Token[] tokens;
     
@@ -168,7 +172,11 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						infraredControl = (InfraredControl) o;
 					} else if (s.equals("HTTPControl")) {
 						httpControl = (HTTPControl) o;
-					}
+					} else if (s.equals("VolumeControl")) {
+						volumeControl = (VolumeControl) o;
+					} else if (s.equals("ProgramControl")) {
+						programControl = (ProgramControl) o;
+					} 
 				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
@@ -251,6 +259,9 @@ public class HouseControl implements Reporter, Alerter, Provider {
 
 	// main method
 	public static void main(String[] args) {
+		if (args.length > 0) configFile = "conf/" + args[0] + ".xml";
+		System.out.println("Config file is " + configFile);
+		config = new Config(configFile);
 		(new HouseControl()).run();
 	}
 	
@@ -551,7 +562,11 @@ public class HouseControl implements Reporter, Alerter, Provider {
 				
 				int device = parser.find(tokens[0].getValue(), Parser.devices);
 				debug("Device = " + device);
-				if (numTokens > 2 && tokens[2].getType() == Parser.ACTION) {
+				
+				if (numTokens == 3 && device == Parser.PROGRAM) {
+					programControl.activate(n, tokens[2].getValue());
+					return SUCCESS;
+				} else if (numTokens > 2 && tokens[2].getType() == Parser.ACTION) {
 					int act = parser.find(tokens[2].getValue(), Parser.actions);
 					switch (act) {
 					case Parser.ON:

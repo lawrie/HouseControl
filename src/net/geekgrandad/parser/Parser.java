@@ -43,7 +43,7 @@ public class Parser {
 	
 	public static String[] devices = { "light", "socket", "appliance", "switch", "camera",
 		"sensor", "phone", "media", "radiator",
-		"robot", "alarm", "blind", "heating" };
+		"robot", "alarm", "blind", "heating", "program" };
 
 	public static final int LIGHT = 0;
 	public static final int SOCKET = 1;
@@ -58,6 +58,7 @@ public class Parser {
 	public static final int ALARM = 10;
 	public static final int BLIND = 11;
 	public static final int HEATING = 12;
+	public static final int PROGRAM = 13;
 	
 	public static String[] deviceSets = { "lights", "sockets", "appliances", "switches",
 		"cameras", "sensors", "phones",
