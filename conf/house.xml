@@ -39,7 +39,7 @@
             <media id="3" channel="3" name="av" type="TIVO"></media>
             <media id="4" name="xb" host="192.168.0.79" type="XBMC">
             </media>
-            <media id="5" name="spot" host="musicserver" server="musicserver" socket_timeout="5000" type="RemoteSpotify">
+            <media id="5" name="spot" server="musicserver" socket_timeout="5000" type="remote">
                 <spotify>
       				<playlist name="hiatt" link="http://open.spotify.com/user/grabbas/playlist/7kqeUug8LFcc1G5x85Vs3u"></playlist>
       				<playlist name="bluegrass" link="http://open.spotify.com/user/grabbas/playlist/1rNcNwvAEhkr8SpMMr544H"></playlist>
@@ -88,8 +88,8 @@
                 </spotify>
             </media>
             <media id="6" name="kodak" type="Kodak"></media>
-            <media id="7" name="it" type="iTunes"></media>
-            <media id="8" name="itl" type="iTunes" server="musicserver"></media>
+            <media id="7" name="it" type="remote" server="musicserver" ></media>
+            <media id="8" name="itl" type="iTunes"></media>
             <media id="9" name="spotl" type="Spotify"></media>
             <sensor id="1" name="Jeenode" type="Jeenode">
                 <temperature></temperature>
@@ -119,7 +119,9 @@
             <camera id="2" type="Wanscam" name="Bond" host="ipcam:99"></camera>
             <speech id="1" name="spl" voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" 
                type="FreeTTS"></speech> 
-            <speech id="2" name="spr" type="remote" server="musicserver"></speech>     
+            <speech id="2" name="spr" type="remote" server="musicserver"></speech>
+            <program id="1" name = "pl" type="program"></program>
+            <program id="2" name = "pr" type="remote" server="musicserver"></program>
         </room>
         <room id="2" name="Kitchen">
             <appliance id="3" name="Dishwasher" code="1077486631" type="IAM"></appliance>
@@ -167,9 +169,6 @@
         <plugin class="net.geekgrandad.plugin.DummyHeating">
             <interface name="HeatingControl"></interface>
         </plugin>
-        <plugin class="net.geekgrandad.plugin.RemoteSpotifyControl" type="RemoteSpotify">
-            <interface name="MediaControl"></interface>
-        </plugin>
         <plugin class="net.geekgrandad.plugin.SpotifyControl" type="Spotify">
             <interface name="MediaControl"></interface>
         </plugin>
@@ -211,7 +210,7 @@
             <interface name="PlantControl"></interface>
             <interface name="InfraredControl"></interface>
         </plugin>
-        <plugin class="net.geekgrandad.plugin.GuiProgramControl">
+        <plugin class="net.geekgrandad.plugin.GuiProgramControl" type="program">
             <interface name="ProgramControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.RemoteHouseControl" type="remote">

@@ -64,7 +64,7 @@ public class Config {
   public String[] switchTypes = new String[MAX_SWITCHES];
   public String[] sensorTypes = new String[MAX_SENSORS];
   public String[] mediaTypes = new String[MAX_MEDIA];
-  public String[] mediaHosts = new String[MAX_MEDIA];
+  public String[] mediaServers = new String[MAX_MEDIA];
   public String[] speechTypes = new String[MAX_SPEECH];
   public String[] speechServers = new String[MAX_SPEECH];
   
@@ -193,7 +193,7 @@ public class Config {
   
   public String phoneName;
   
-  private String mediaHost, mediaServer;
+  private String mediaServer;
   
   private String playlist, link;
   
@@ -208,8 +208,8 @@ public class Config {
   public boolean cosm = false;
   public String cosmApiKey, cosmFeed, cosmPower, cosmEnergy;
   
-  public String speechVoice, speechServer;
-  public String speechType, speechName;
+  private String speechVoice, speechServer;
+  private String speechType, speechName;
   
   public int listenPort;
   public String rfm12Port, iamPort, lwrfPort;
@@ -475,8 +475,6 @@ public class Config {
             	media[numMedia++] = mediaId;
               } else if (attribute.getName().toString().equals(NAME)) {
             	mediaName = attribute.getValue();
-              } else if (attribute.getName().toString().equals(HOST)) {
-            	mediaHost = attribute.getValue();
               } else if (attribute.getName().toString().equals(SERVER)) {
             	mediaServer = attribute.getValue();
               } else if (attribute.getName().toString().equals(TYPE)) {
@@ -715,7 +713,7 @@ public class Config {
           } else if (endElement.getName().getLocalPart() == (MEDIA)) {
           	  mediaNames[mediaId-1] = mediaName;
           	  mediaTypes[mediaId-1] = mediaType;
-          	  mediaHosts[mediaId-1] = mediaHost;
+          	  mediaServers[mediaId-1] = mediaServer;
           	  devices.add(new Device(mediaType, mediaName, "", mediaId, -1, Device.MEDIA));
           	  debug("End Media");
           } else if (endElement.getName().getLocalPart() == (SPEECH)) {

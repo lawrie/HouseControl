@@ -73,13 +73,13 @@ public class RemoteSpotifyControl implements MediaControl {
 		if (!force && !musicOn)
 			return "Error";
 		try {
-			Socket sock = new Socket(config.mediaHosts[id-1], config.listenPort);
+			Socket sock = new Socket(config.mediaServers[id-1], config.listenPort);
 			sock.setSoTimeout(config.mediaSocketTimeout);
 			PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					sock.getInputStream()));
 			out.println(cmd);
-			reporter.print("Sending " + cmd + " to media server: " + config.mediaHosts[id-1]);
+			reporter.print("Sending " + cmd + " to media server: " + config.mediaServers[id-1]);
 			String ret = in.readLine();
 			reporter.print("Media server: " + ret);
 			musicOn = true;

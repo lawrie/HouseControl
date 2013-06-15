@@ -87,6 +87,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
     private VolumeControl volumeControl;
     private ProgramControl programControl;
     private RemoteControl[]  remoteSpeechControl = new RemoteControl[Config.MAX_SPEECH];
+    private RemoteControl[]  remoteMediaControl = new RemoteControl[Config.MAX_MEDIA];
     
     private Token[] tokens;
     
@@ -187,8 +188,14 @@ public class HouseControl implements Reporter, Alerter, Provider {
 					} else if (s.equals("RemoteControl")) {
 						for(int i=0;i<Config.MAX_SPEECH;i++) {
 							if (t == null || (config.speechTypes[i] != null && config.speechTypes[i].equals(t))) {
-								print("Setting remote control " + i + ", type = " + t);
+								print("Setting remote speech control " + i + ", type = " + t);
 								remoteSpeechControl[i] = (RemoteControl) o;
+							}
+						}
+						for(int i=0;i<Config.MAX_MEDIA;i++) {
+							if (t == null || (config.mediaTypes[i] != null && config.mediaTypes[i].equals(t))) {
+								print("Setting remote media control " + i + ", type = " + t);
+								remoteMediaControl[i] = (RemoteControl) o;
 							}
 						}
 					} 
@@ -561,6 +568,12 @@ public class HouseControl implements Reporter, Alerter, Provider {
 					print("Sending " + cmd + " to " + server);
 					
 					return remoteSpeechControl[n].send(n+1, server, cmd);				
+				} else if (device == Parser.MEDIA && config.mediaTypes[n].equals("remote")) {
+					String server = config.mediaServers[n];
+					
+					print("Sending " + cmd + " to " + server);
+					
+					return remoteMediaControl[n].send(n+1, server, cmd);				
 				}
 				
 				if (numTokens == 3 && device == Parser.PROGRAM) {

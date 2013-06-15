@@ -1,7 +1,7 @@
 <house>
     <floor id="2" name="First floor">
         <room id="1" name="Living">
-            <media id="5" name="spot" host="musicserver" socket_timeout="5000" type="Spotify">
+            <media id="5" name="spot" type="Spotify">
                 <spotify>
       				<playlist name="hiatt" link="http://open.spotify.com/user/grabbas/playlist/7kqeUug8LFcc1G5x85Vs3u"></playlist>
       				<playlist name="bluegrass" link="http://open.spotify.com/user/grabbas/playlist/1rNcNwvAEhkr8SpMMr544H"></playlist>
@@ -50,8 +50,7 @@
                 </spotify>
             </media>
             <media id="8" name="it" host="musicserver" type="iTunes"></media>
-            <speech id="2" name="spr" voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" 
-               type="FreeTTS"></speech> 
+            <speech id="2" name="spr" voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" type="FreeTTS"></speech> 
         </room>
     </floor>
     <config listen_port="50000" background_delay="10000"></config>

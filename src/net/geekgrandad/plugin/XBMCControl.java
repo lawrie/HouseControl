@@ -40,8 +40,8 @@ public class XBMCControl implements MediaControl {
 	}
 	
 	private String execute(int id, String json) {
-		if (debug) reporter.print("XBMC: " + json + " host = " + config.mediaHosts[id-1]);
-		HttpPost post = new HttpPost("http://" + config.mediaHosts[id-1] + "/jsonrpc");
+		if (debug) reporter.print("XBMC: " + json + " host = " + config.mediaServers[id-1]);
+		HttpPost post = new HttpPost("http://" + config.mediaServers[id-1] + "/jsonrpc");
 		BasicHeader header = new BasicHeader(HTTP.CONTENT_TYPE, "application/json");
 		HttpEntity entity;
 		HttpResponse response;
