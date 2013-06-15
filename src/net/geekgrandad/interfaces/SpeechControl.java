@@ -2,8 +2,8 @@ package net.geekgrandad.interfaces;
 
 public interface SpeechControl extends Controller {
 	
-	public void say(String msg);
+	public void say(int id, String msg);
 	
-	public void setSpeech(Boolean on);
+	public void setSpeech(int id, boolean on);
 	
 }

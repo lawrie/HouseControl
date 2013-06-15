@@ -18,7 +18,7 @@ public class LocalSpeech2 implements SpeechControl {
 	Reporter reporter;
 	
 	@Override
-	public void say(String msg) {
+	public void say(int id, String msg) {
 		if (synth != null && speak) {
 			try {
 				reporter.print("Really really saying " + msg);
@@ -34,7 +34,7 @@ public class LocalSpeech2 implements SpeechControl {
 	}
 
 	@Override
-	public void setSpeech(Boolean on) {
+	public void setSpeech(int id, boolean on) {
 		speak = on;		
 	}
 

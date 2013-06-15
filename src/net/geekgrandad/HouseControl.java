@@ -42,6 +42,7 @@ import org.apache.logging.log4j.Logger;
 
 public class HouseControl implements Reporter, Alerter, Provider {
 
+	// Static data
 	private static String configFile = "conf/house.xml";
 	private static Config config;
 
@@ -63,12 +64,11 @@ public class HouseControl implements Reporter, Alerter, Provider {
 	private static int numCmds = 0;
 	private static int state = 0;
 	private String cmd;
-	private boolean noisy = false;
 	private Logger logger = LogManager.getLogger(LOGGER_NAME);
 	
     private CameraControl[] cameraControl = new CameraControl[Config.MAX_CAMERAS];
     private MediaControl[] mediaControl = new MediaControl[Config.MAX_MEDIA];
-    private SpeechControl speechControl;
+    private SpeechControl[] speechControl = new SpeechControl[Config.MAX_SPEECH];;
     private EmailControl emailControl;
     private AlarmControl alarmControl;
     private HeatingControl heatingControl;
@@ -98,6 +98,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
     private int defaultTVDevice = 2;
     private int defaultMusicDevice = 5;
     private int defaultAVDevice = 3;
+    private int defaultSpeechDevice = 1;
     
     private HashMap<String,Step[]> macros = new HashMap<String,Step[]>();
 
@@ -152,12 +153,17 @@ public class HouseControl implements Reporter, Alerter, Provider {
 								mediaControl[i] = (MediaControl) o;
 							}
 						}
+					} else if (s.equals("SpeechControl")) {
+						for(int i=0;i<Config.MAX_SPEECH;i++) {
+							if (t == null || (config.speechTypes[i] != null && config.speechTypes[i].equals(t))) {
+								print("Setting speech control " + i + ", type = " + t);
+								speechControl[i] = (SpeechControl) o;
+							}
+						}
 					} else if (s.equals("PowerControl")) {
 						powerControl = (PowerControl) o;
 					} else if (s.equals("PlantControl")) {
 						plantControl = (PlantControl) o;
-					} else if (s.equals("SpeechControl")) {
-						speechControl = (SpeechControl) o;
 					} else if (s.equals("AlarmControl")) {
 						alarmControl = (AlarmControl) o;
 					} else if (s.equals("HeatingControl")) {
@@ -272,54 +278,25 @@ public class HouseControl implements Reporter, Alerter, Provider {
 		public void run() {
 			for (;;) {
 				if (alarmControl != null && mediaControl[4] != null) {
-					int alarmTime = alarmControl.getAlarmTime();
-					if (alarmTime != 0 && alarmTime < System.currentTimeMillis()) {
-						// Save the current volume
-						int vol = volume;
-						// Stop the music
-						try {
-							mediaControl[defaultMusicDevice-1].pause(defaultMusicDevice);
-						} catch (IOException e) {
-							musicOn = false;
-						}
-						// Set the volume to max
-						try {
-							mediaControl[defaultMusicDevice-1].setVolume(defaultMusicDevice, 100);
-						} catch (IOException e) {
-							musicOn = false;
-						}
-						// Sound the alarm
-						alarmControl.soundAlarm();
-						// Set the volume back
-						try {
-							mediaControl[defaultMusicDevice-1].setVolume(defaultMusicDevice, vol);
-						} catch (IOException e) {
-							musicOn = false;
-						}
-						// Restart the music
-						try {
-							mediaControl[defaultMusicDevice-1].play(defaultMusicDevice);
-						} catch (IOException e) {
-							musicOn = false;
-						}
-					}
+					alarmControl.checkAlarm();
 				}
+				
 				if (mediaControl[defaultMusicDevice-1] != null) {
 					try {
 						volume = mediaControl[defaultMusicDevice-1].getVolume(defaultMusicDevice);
+						musicOn = true;
 					} catch (IOException e) {
 						musicOn = false;
 					}
 					print("Music on: " + musicOn);
 				}
-				if (config.phoneName != null) phoneConnected = isReachableByPing(config.phoneName);
 				
-				try {
-					Thread.sleep((config.backgroundDelay));
-				} catch (InterruptedException e) {
-				}
+				if (config.phoneName != null) phoneConnected = isReachableByPing(config.phoneName);
+
 				print("Number of commands: " + numCmds + " state: " + state
 						+ " command: " + cmd);
+							
+				delay(config.backgroundDelay);
 			}
 		}
 	}
@@ -366,10 +343,10 @@ public class HouseControl implements Reporter, Alerter, Provider {
 	}
 
 	// Speak a message locally
-	public void say(String msg) {
+	public void say(int n, String msg) {
 		print("Saying " + msg);
-		if (noisy && speechControl != null) {
-			speechControl.say(msg);
+		if (speechControl[n-1] != null) {
+			speechControl[n-1].say(n, msg);
 		}
 	}
 
@@ -453,6 +430,16 @@ public class HouseControl implements Reporter, Alerter, Provider {
 			tokens[1] = new Token("" + (n + 1), Parser.NUMBER, -1);
 			tokens[0] = new Token(Parser.devices[Parser.MEDIA],Parser.DEVICE, -1);
 			numTokens += 1;
+		} else if (tokens[0].getType() == Parser.SPEECH_NAME) {
+			// Replace name with speech n
+			int n = parser.find(tokens[0].getValue(),config.speechNames);
+			expandTokens(1);
+			if (tokens.length > 4) tokens[4] = tokens[3];
+			if (tokens.length > 3) tokens[3] = tokens[2];
+			tokens[2] = tokens[1];
+			tokens[1] = new Token("" + (n + 1), Parser.NUMBER, -1);
+			tokens[0] = new Token(Parser.devices[Parser.SPEECH],Parser.DEVICE, -1);
+			numTokens += 1;
 		} else if (tokens[0].getType() == Parser.VT_ACTION || tokens[0].getType() == Parser.PAN_ACTION) {
 			// Assume media 2
 			expandTokens(2);
@@ -460,6 +447,14 @@ public class HouseControl implements Reporter, Alerter, Provider {
 			tokens[2] = tokens[0];
 			tokens[1] = new Token("" + defaultTVDevice, Parser.NUMBER, -1);
 			tokens[0] = new Token(Parser.devices[Parser.MEDIA],Parser.DEVICE, -1);
+			numTokens += 2;
+		} else if (tokens[0].getType() == Parser.SPEECH_ACTION) {
+			// Use default speech device
+			expandTokens(2);
+			if (tokens.length > 3) tokens[3] = tokens[1];
+			tokens[2] = tokens[0];
+			tokens[1] = new Token("" + defaultSpeechDevice, Parser.NUMBER, -1);
+			tokens[0] = new Token(Parser.devices[Parser.SPEECH],Parser.DEVICE, -1);
 			numTokens += 2;
 		} else if (tokens[0].getType() == Parser.SERVICE || tokens[0].getType() == Parser.DIGIT || tokens[0].getType() == Parser.COLOR) {
 			// Assume media 2
@@ -1025,25 +1020,35 @@ public class HouseControl implements Reporter, Alerter, Provider {
 							return ERROR;
 						}
 						return mediaControl[n].getAlbum(n+1);
+					default:
+						error("Invalid media command");
+						return ERROR;
+					}
+				} else if (device == Parser.SPEECH && numTokens > 2 && tokens[2].getType() == Parser.SPEECH_ACTION) {
+					if (n >= Config.MAX_SPEECH || speechControl[n] == null) {
+						error("Invalid speech device number: " + (n+1));
+						return ERROR;
+					}
+					switch(parser.find(tokens[2].getValue(), Parser.speechActions)) {
 					case Parser.SPEAK:
 						if (tokens.length > 3) {
 							error("Too many parameters");
 							return ERROR;
 						}
-						noisy = true;
+						if (speechControl[n] != null) speechControl[n].setSpeech(n+1, true);
 						return SUCCESS;
 					case Parser.SILENT:
 						if (tokens.length > 3) {
 							error("Too many parameters");
 							return ERROR;
 						}
-						noisy = false;
+						if (speechControl[n] != null) speechControl[n].setSpeech(n+1, false);
 						return SUCCESS;
 					case Parser.SAY:
-						say(cmd.substring(cmd.indexOf("say") + 4));
+						say(n+1, cmd.substring(cmd.indexOf("say") + 4));
 						return SUCCESS;
 					default:
-						error("Invalid media command");
+						error("Invalid speech command");
 						return ERROR;
 					}
 				} else if (device == Parser.ROBOT && numTokens > 2 && tokens[2].getType() == Parser.ROBOT_ACTION) {
@@ -1341,5 +1346,10 @@ public class HouseControl implements Reporter, Alerter, Provider {
 		for(Step s: macro) {
 			executeStep(s.getCmd(), s.getDelay());
 		}
+	}
+
+	@Override
+	public void say(String msg) {
+		say(1,msg);		
 	}
 }

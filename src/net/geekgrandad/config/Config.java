@@ -35,6 +35,7 @@ public class Config {
   public static final int MAX_MEDIA = 9;
   public static final int MAX_PHONES = 1;
   public static final int MAX_TABLETS = 1;
+  public static final int MAX_SPEECH = 2;
   
   public int[][] roomSockets = new int[MAX_ROOMS][];
   public int[][] roomLights = new int[MAX_ROOMS][];
@@ -54,6 +55,7 @@ public class Config {
   private int[] media = new int[MAX_MEDIA];
   private int[] cameras = new int[MAX_CAMERAS];
   private int[] switches = new int[MAX_SWITCHES];
+  private int[] speech = new int[MAX_SPEECH];
   
   public String[] socketTypes = new String[MAX_SOCKETS];
   public String[] lightTypes = new String[MAX_LIGHTS];
@@ -63,6 +65,8 @@ public class Config {
   public String[] sensorTypes = new String[MAX_SENSORS];
   public String[] mediaTypes = new String[MAX_MEDIA];
   public String[] mediaHosts = new String[MAX_MEDIA];
+  public String[] speechTypes = new String[MAX_SPEECH];
+  public String[] speechServers = new String[MAX_SPEECH];
   
   public String[] cameraHostNames = new String[MAX_CAMERAS];
   
@@ -173,6 +177,7 @@ public class Config {
   public String[] cameraNames = new String[MAX_CAMERAS];
   public String[] phoneNames = new String[MAX_PHONES];
   public String[] tabletNames = new String[MAX_TABLETS];
+  public String[] speechNames = new String[MAX_SPEECH];
   
   public HashMap<Integer,String> channelNames = new HashMap<Integer,String>();
   public HashMap<String,String> playlists = new HashMap<String,String>();
@@ -181,7 +186,7 @@ public class Config {
   public HashMap<String,List<String>> classInterfaces = new HashMap<String,List<String>>();
   
   private int floorId, roomId, sensorId, lightId, socketId, windowId, cameraId, applianceId, mediaId;
-  private int phoneId, channelId, tabletId, switchId,emontxId;
+  private int phoneId, channelId, tabletId, switchId,emontxId, speechId;
   
   private String floorName, roomName, sensorName, lightName, socketName, windowName, cameraName, applianceName;
   private String channelName, tabletName, switchName, mediaName;
@@ -193,7 +198,7 @@ public class Config {
   private String playlist, link;
   
   private int numLights, numSockets, numWindows, numCameras, numAppliances, 
-              numMedia, numSensors, numSwitches;
+              numMedia, numSensors, numSwitches, numSpeech;
   private int numFloors = 0;
   private int numRooms = 0;
   
@@ -204,7 +209,7 @@ public class Config {
   public String cosmApiKey, cosmFeed, cosmPower, cosmEnergy;
   
   public String speechVoice, speechServer;
-  public boolean speechLocal, speechRemote;
+  public String speechType, speechName;
   
   public int listenPort;
   public String rfm12Port, iamPort, lwrfPort;
@@ -289,6 +294,7 @@ public class Config {
               numSensors = 0;
               numMedia = 0;
               numSwitches = 0;
+              numSpeech = 0;
               
               // We read the attributes from this tag and process the is and name attributes
               Iterator<Attribute> attributes = startElement.getAttributes();
@@ -594,14 +600,17 @@ public class Config {
              Iterator<Attribute> attributes = startElement.getAttributes();
              while (attributes.hasNext()) {
                Attribute attribute = attributes.next();
-               if (attribute.getName().toString().equals(VOICE)) {
-             	 speechVoice = attribute.getValue();
-               } else if (attribute.getName().toString().equals(LOCAL)) {
-            	 speechLocal = Boolean.parseBoolean(attribute.getValue());
-               } else if (attribute.getName().toString().equals(REMOTE)) {
-            	 speechRemote = Boolean.parseBoolean(attribute.getValue());
+               if (attribute.getName().toString().equals(ID)) {
+               	  speechId = Integer.parseInt(attribute.getValue());
+               	  speech[numSpeech++] = speechId;
+               } else if (attribute.getName().toString().equals(NAME)) {
+             	 speechName = attribute.getValue();
+               } else if (attribute.getName().toString().equals(VOICE)) {
+               	 speechVoice = attribute.getValue();
                } else if (attribute.getName().toString().equals(SERVER)) {
                	 speechServer = attribute.getValue();
+               } else if (attribute.getName().toString().equals(TYPE)) {
+                  speechType = attribute.getValue();
                }
              }
           } else if (event.asStartElement().getName().getLocalPart().equals(CONFIG)) {
@@ -708,6 +717,12 @@ public class Config {
           	  mediaTypes[mediaId-1] = mediaType;
           	  mediaHosts[mediaId-1] = mediaHost;
           	  devices.add(new Device(mediaType, mediaName, "", mediaId, -1, Device.MEDIA));
+          	  debug("End Media");
+          } else if (endElement.getName().getLocalPart() == (SPEECH)) {
+          	  speechNames[speechId-1] = speechName;
+          	  speechTypes[speechId-1] = speechType;
+          	  speechServers[speechId-1] = speechServer;
+          	  devices.add(new Device(speechType, speechName, "", speechId, -1, Device.SPEECH));
           	  debug("End Media");
           } else if (endElement.getName().getLocalPart() == (LIGHTLEVEL)) {
         	  debug("End light level");
@@ -923,8 +938,7 @@ public class Config {
     System.out.println("COSM Energy stream: " + cosmEnergy);
     
     System.out.println("\nSpeech voice: " + speechVoice);
-    System.out.println("Speech local: " + speechLocal);
-    System.out.println("Speech remote: " + speechRemote);
+    System.out.println("Speech type: " + speechType);
     System.out.println("Speech server: " + speechServer);
     
     System.out.println("\nListen port: " + listenPort);

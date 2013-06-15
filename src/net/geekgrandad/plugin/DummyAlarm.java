@@ -38,4 +38,41 @@ public class DummyAlarm implements AlarmControl {
 		alerter.say("Buzz buzz buzz, beep beep beep, buzz buzz buzz");
 		
 	}
+
+	@Override
+	public void checkAlarm() {
+		if (alarmTime != 0 && alarmTime < System.currentTimeMillis()) {
+			// Save the current volume
+			/*
+			int vol = volume;
+			// Stop the music
+			try {
+				mediaControl[defaultMusicDevice-1].pause(defaultMusicDevice);
+			} catch (IOException e) {
+				musicOn = false;
+			}
+			// Set the volume to max
+			try {
+				mediaControl[defaultMusicDevice-1].setVolume(defaultMusicDevice, 100);
+			} catch (IOException e) {
+				musicOn = false;
+			}
+			// Sound the alarm
+			alarmControl.soundAlarm();
+			// Set the volume back
+			try {
+				mediaControl[defaultMusicDevice-1].setVolume(defaultMusicDevice, vol);
+			} catch (IOException e) {
+				musicOn = false;
+			}
+			// Restart the music
+			try {
+				mediaControl[defaultMusicDevice-1].play(defaultMusicDevice);
+			} catch (IOException e) {
+				musicOn = false;
+			}
+			*/
+		}
+		
+	}
 }

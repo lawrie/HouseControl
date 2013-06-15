@@ -35,15 +35,18 @@ public class Parser {
 	public static final int COLOR = 23;
 	public static final int DEFAULT = 24;
 	public static final int MEDIA_NAME = 25;
+	public static final int SPEECH_ACTION = 26;
+	public static final int SPEECH_NAME = 27;
 	
 	public static String[] areas = { "floor", "room" };
 
 	public static final int FLOOR = 0;
 	public static final int ROOM = 1;
 	
-	public static String[] devices = { "light", "socket", "appliance", "switch", "camera",
+	public static String[] devices = { 
+		"light", "socket", "appliance", "switch", "camera",
 		"sensor", "phone", "media", "radiator",
-		"robot", "alarm", "blind", "heating", "program" };
+		"robot", "alarm", "blind", "heating", "program", "speech" };
 
 	public static final int LIGHT = 0;
 	public static final int SOCKET = 1;
@@ -59,6 +62,7 @@ public class Parser {
 	public static final int BLIND = 11;
 	public static final int HEATING = 12;
 	public static final int PROGRAM = 13;
+	public static final int SPEECH = 14;
 	
 	public static String[] deviceSets = { "lights", "sockets", "appliances", "switches",
 		"cameras", "sensors", "phones",
@@ -217,30 +221,33 @@ public class Parser {
 	public static final int VOLDOWN = 1;
 	public static final int MUTE = 2;
 
-	public static String[] musicActions = { "stop", "skip", "speak", "silent", 
-		                                    "play", "say", "playlist", "pause", "ff",
+	public static String[] musicActions = { "stop", "skip",  
+		                                    "play", "playlist", "pause", "ff",
 		                                    "fb", "skipb", "slow", "record", "start",
 		                                    "track", "artist", "album", "open", "player"};
  
 	public static final int STOP = 0;
 	public static final int SKIP = 1;
-	public static final int SPEAK = 2;
-	public static final int SILENT = 3;
-	public static final int PLAY = 4;
-	public static final int SAY = 5;
-	public static final int PLAYLIST = 6;
-	public static final int PAUSE = 7;
-	public static final int FF = 8;
-	public static final int FB = 9;
-	public static final int SKIPB = 10;
-	public static final int SLOW = 11;
-	public static final int RECORD = 12;
-	public static final int START = 13;
-	public static final int TRACK = 14;
-	public static final int ARTIST = 15;
-	public static final int ALBUM = 16;
-	public static final int OPEN = 17;
-	public static final int PLAYER = 18;
+	public static final int PLAY = 2;
+	public static final int PLAYLIST = 3;
+	public static final int PAUSE = 4;
+	public static final int FF = 5;
+	public static final int FB = 6;
+	public static final int SKIPB = 7;
+	public static final int SLOW = 8;
+	public static final int RECORD = 9;
+	public static final int START = 10;
+	public static final int TRACK = 11;
+	public static final int ARTIST = 12;
+	public static final int ALBUM = 13;
+	public static final int OPEN = 14;
+	public static final int PLAYER = 15;
+	
+	public static String[] speechActions = { "speak", "silent", "say" };
+	
+	public static final int SPEAK = 0;
+	public static final int SILENT = 1;
+	public static final int SAY = 2;
 	
 	public static String[] digits = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
 	
@@ -506,6 +513,10 @@ public class Parser {
 			type = SWITCH_NAME;
 		else if (find(token, config.mediaNames) >= 0)
 			type = MEDIA_NAME;
+		else if (find(token, speechActions) >= 0)
+			type = SPEECH_ACTION;
+		else if (find(token, config.speechNames) >= 0)
+			type = SPEECH_NAME;
 
 		return type;
 	}

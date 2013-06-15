@@ -12,4 +12,6 @@ public interface AlarmControl extends Controller {
 	
 	public void soundAlarm();
 	
+	public void checkAlarm();
+	
 }

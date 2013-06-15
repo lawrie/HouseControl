@@ -116,7 +116,10 @@
             <window id="3" name="back">
                 <blind id="3" type="coulisse" name="back"></blind>
             </window>  
-            <camera id="2" type="Wanscam" name="Bond" host="ipcam:99"></camera>     
+            <camera id="2" type="Wanscam" name="Bond" host="ipcam:99"></camera>
+            <speech id="1" name="spl" voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" 
+               type="FreeTTS"></speech> 
+            <speech id="2" name="spr" type="remote" server="musicserver"></speech>     
         </room>
         <room id="2" name="Kitchen">
             <appliance id="3" name="Dishwasher" code="1077486631" type="IAM"></appliance>
@@ -148,8 +151,6 @@
         recipient="lawrie.griffiths@ntlworld.com"></email>
     <cosm api_key="5e8sM5Ls6RJhqilxUPtdq3LEF8ySAKxIbkVMS2RudjZiTT0g" 
         feed="86697" power="0" energy="1"></cosm>
-    <speech voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" 
-        remote="true" local="true" server="musicserver"></speech>
     <config listen_port="50000" rfm12_port="COM15" lwrf_port="COM8" 
         iam_port="COM20" iam_min_value="3" iam_min_off_period="120000"
         occupied_interval="300000" ping_timeout="5000" background_delay="10000"></config>
@@ -181,7 +182,7 @@
         <plugin class="net.geekgrandad.plugin.ITunesControl" type="iTunes">
             <interface name="MediaControl"></interface>
         </plugin>
-        <plugin class="net.geekgrandad.plugin.LocalSpeech2">
+        <plugin class="net.geekgrandad.plugin.LocalSpeech2" type="FreeTTS">
             <interface name="SpeechControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.DummyAlarm">
