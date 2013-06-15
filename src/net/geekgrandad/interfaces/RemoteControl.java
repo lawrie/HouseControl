@@ -4,6 +4,6 @@ import java.io.IOException;
 
 public interface RemoteControl extends Controller {
 
-		public String send(int id, String cmd) throws IOException;
+		public String send(int id, String server, String cmd) throws IOException;
 		
 }

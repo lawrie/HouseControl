@@ -214,5 +214,8 @@
         <plugin class="net.geekgrandad.plugin.GuiProgramControl">
             <interface name="ProgramControl"></interface>
         </plugin>
+        <plugin class="net.geekgrandad.plugin.RemoteHouseControl" type="remote">
+            <interface name="RemoteControl"></interface>
+        </plugin>
     </plugins>
 </house>

@@ -23,15 +23,15 @@ public class RemoteHouseControl implements RemoteControl {
 	}
 
 	@Override
-	public String send(int id, String cmd) throws IOException {
+	public String send(int id, String server, String cmd) throws IOException {
 		try {
-			Socket sock = new Socket(config.mediaHosts[id-1], config.listenPort);
+			Socket sock = new Socket(server, config.listenPort);
 			sock.setSoTimeout(config.mediaSocketTimeout);
 			PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					sock.getInputStream()));
 			out.println(cmd);
-			reporter.print("Sending " + cmd + " to server: " + config.mediaHosts[id-1]);
+			reporter.print("Sending " + cmd + " to server: " + server);
 			String ret = in.readLine();
 			reporter.print("Remote server: " + ret);
 			out.close();

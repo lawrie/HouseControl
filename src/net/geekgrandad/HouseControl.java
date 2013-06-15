@@ -28,6 +28,7 @@ import net.geekgrandad.interfaces.PlantControl;
 import net.geekgrandad.interfaces.PowerControl;
 import net.geekgrandad.interfaces.ProgramControl;
 import net.geekgrandad.interfaces.Provider;
+import net.geekgrandad.interfaces.RemoteControl;
 import net.geekgrandad.interfaces.Reporter;
 import net.geekgrandad.interfaces.SensorControl;
 import net.geekgrandad.interfaces.SocketControl;
@@ -85,6 +86,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
     private HTTPControl httpControl;
     private VolumeControl volumeControl;
     private ProgramControl programControl;
+    private RemoteControl[]  remoteSpeechControl = new RemoteControl[Config.MAX_SPEECH];
     
     private Token[] tokens;
     
@@ -182,6 +184,13 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						volumeControl = (VolumeControl) o;
 					} else if (s.equals("ProgramControl")) {
 						programControl = (ProgramControl) o;
+					} else if (s.equals("RemoteControl")) {
+						for(int i=0;i<Config.MAX_SPEECH;i++) {
+							if (t == null || (config.speechTypes[i] != null && config.speechTypes[i].equals(t))) {
+								print("Setting remote control " + i + ", type = " + t);
+								remoteSpeechControl[i] = (RemoteControl) o;
+							}
+						}
 					} 
 				}
 			} catch (ClassNotFoundException e) {
@@ -281,7 +290,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 					alarmControl.checkAlarm();
 				}
 				
-				if (mediaControl[defaultMusicDevice-1] != null) {
+				/*if (mediaControl[defaultMusicDevice-1] != null) {
 					try {
 						volume = mediaControl[defaultMusicDevice-1].getVolume(defaultMusicDevice);
 						musicOn = true;
@@ -289,7 +298,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						musicOn = false;
 					}
 					print("Music on: " + musicOn);
-				}
+				}*/
 				
 				if (config.phoneName != null) phoneConnected = isReachableByPing(config.phoneName);
 
@@ -544,6 +553,15 @@ public class HouseControl implements Reporter, Alerter, Provider {
 				
 				int device = parser.find(tokens[0].getValue(), Parser.devices);
 				debug("Device = " + device);
+				
+				// Check if it is remote
+				if (device == Parser.SPEECH && config.speechTypes[n].equals("remote")) {
+					String server = config.speechServers[n];
+					
+					print("Sending " + cmd + " to " + server);
+					
+					return remoteSpeechControl[n].send(n+1, server, cmd);				
+				}
 				
 				if (numTokens == 3 && device == Parser.PROGRAM) {
 					programControl.activate(n, tokens[2].getValue());
