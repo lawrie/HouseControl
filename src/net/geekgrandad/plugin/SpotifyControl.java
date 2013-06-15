@@ -4,15 +4,13 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.util.Locale;
+
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.Port;
-import javax.speech.AudioException;
-import javax.speech.EngineException;
 import javax.speech.synthesis.Synthesizer;
 
 import net.geekgrandad.config.Config;
