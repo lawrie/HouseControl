@@ -12,17 +12,13 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.Port;
 import javax.speech.AudioException;
-import javax.speech.Central;
 import javax.speech.EngineException;
-import javax.speech.EngineStateError;
 import javax.speech.synthesis.Synthesizer;
-import javax.speech.synthesis.SynthesizerModeDesc;
 
 import net.geekgrandad.config.Config;
 import net.geekgrandad.interfaces.MediaControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
-import net.geekgrandad.music.ActivateWindow;
 
 public class SpotifyControl implements MediaControl {
 	private Synthesizer synth;
@@ -34,21 +30,6 @@ public class SpotifyControl implements MediaControl {
 	public void setProvider(Provider provider) {
 		this.reporter = provider.getReporter();
 		this.config = provider.getConfig();
-		
-	    // Create a speak synthesizer and start it
-	    try {  
-	      System.setProperty("freetts.voices", "com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory");
-	      // Create a synthesizer for English
-	      synth = Central.createSynthesizer(new SynthesizerModeDesc(Locale.ENGLISH));
-	      synth.allocate();
-	      synth.resume();
-	    } catch (EngineException e1) {
-	      e1.printStackTrace();
-	    } catch (EngineStateError e1) {
-	      e1.printStackTrace();
-	    } catch (AudioException e) {
-	      e.printStackTrace();
-	    }
 	    
 	    try {
 			robot = new Robot();
@@ -340,7 +321,7 @@ public class SpotifyControl implements MediaControl {
   private void say(String msg) {
 	try {  
 	      // Speak the message
-      synth.speakPlainText(msg, null);
+      synth.speak(msg, null);
   
       // Wait till speaking is done
       synth.waitEngineState(Synthesizer.QUEUE_EMPTY);

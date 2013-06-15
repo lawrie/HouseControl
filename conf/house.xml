@@ -39,7 +39,7 @@
             <media id="3" channel="3" name="av" type="TIVO"></media>
             <media id="4" name="xb" host="192.168.0.79" type="XBMC">
             </media>
-            <media id="5" name="spot" host="musicserver" server="musicserver" socket_timeout="5000" type="Spotify">
+            <media id="5" name="spot" host="musicserver" server="musicserver" socket_timeout="5000" type="RemoteSpotify">
                 <spotify>
       				<playlist name="hiatt" link="http://open.spotify.com/user/grabbas/playlist/7kqeUug8LFcc1G5x85Vs3u"></playlist>
       				<playlist name="bluegrass" link="http://open.spotify.com/user/grabbas/playlist/1rNcNwvAEhkr8SpMMr544H"></playlist>
@@ -90,6 +90,7 @@
             <media id="6" name="kodak" type="Kodak"></media>
             <media id="7" name="it" type="iTunes"></media>
             <media id="8" name="itl" type="iTunes" server="musicserver"></media>
+            <media id="9" name="spotl" type="Spotify"></media>
             <sensor id="1" name="Jeenode" type="Jeenode">
                 <temperature></temperature>
                 <lightlevel></lightlevel>
@@ -165,7 +166,10 @@
         <plugin class="net.geekgrandad.plugin.DummyHeating">
             <interface name="HeatingControl"></interface>
         </plugin>
-        <plugin class="net.geekgrandad.plugin.RemoteSpotifyControl" type="Spotify">
+        <plugin class="net.geekgrandad.plugin.RemoteSpotifyControl" type="RemoteSpotify">
+            <interface name="MediaControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.SpotifyControl" type="Spotify">
             <interface name="MediaControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.XBMCControl" type="XBMC">
@@ -177,7 +181,7 @@
         <plugin class="net.geekgrandad.plugin.ITunesControl" type="iTunes">
             <interface name="MediaControl"></interface>
         </plugin>
-        <plugin class="net.geekgrandad.plugin.LocalSpeech">
+        <plugin class="net.geekgrandad.plugin.LocalSpeech2">
             <interface name="SpeechControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.DummyAlarm">

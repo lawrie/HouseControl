@@ -14,7 +14,6 @@
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-api-2.0-beta4.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-core-2.0-beta4.jar"/>
-	<classpathentry kind="lib" path="lib/freetts-jsapi10.jar"/>
 	<classpathentry kind="lib" path="lib/freetts.jar"/>
 	<classpathentry kind="lib" path="lib/cmu_us_kal.jar"/>
 	<classpathentry kind="lib" path="lib/en_us.jar"/>
@@ -27,8 +26,11 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="HouseControl/bin"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/jsapi.jar"/>
 	<classpathentry kind="lib" path="lib/json.jar"/>
 	<classpathentry kind="lib" path="lib/itunescontroller.jar"/>
+	<classpathentry kind="lib" path="lib/jsr113.jar"/>
+	<classpathentry kind="lib" path="lib/org.jvoicexml.jsapi2.jar"/>
+	<classpathentry kind="lib" path="lib/org.jvoicexml.jsapi2.jse.freetts.jar"/>
+	<classpathentry kind="lib" path="lib/org.jvoicexml.jsapi2.jse.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

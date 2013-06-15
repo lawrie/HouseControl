@@ -58,7 +58,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 	private OutputStream os;
 	private Thread backGround = new Thread(new Background());
 	private boolean phoneConnected = false;
-	private boolean musicOn = true;
+	private boolean musicOn = false;
 	private int volume;
 	private static int numCmds = 0;
 	private static int state = 0;
@@ -365,25 +365,12 @@ public class HouseControl implements Reporter, Alerter, Provider {
 		return null;
 	}
 
-	// Speak a message on this computer
-	private void sayLocal(String msg) {
-		if (speechControl != null) speechControl.say(msg);
-	}
-
-	// Speak a message on the music server or locally, if music server not
-	// available
+	// Speak a message locally
 	public void say(String msg) {
 		print("Saying " + msg);
-		if (!noisy)
-			return;
-		if (musicOn)
-			try {
-				mediaControl[4].say(5, msg);
-			} catch (IOException e) {
-				error("IOException in say");
-			}
-		else
-			sayLocal(msg);
+		if (noisy && speechControl != null) {
+			speechControl.say(msg);
+		}
 	}
 
 	// Send an email

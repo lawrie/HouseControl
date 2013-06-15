@@ -6,7 +6,6 @@ import java.awt.Robot;
 import net.geekgrandad.interfaces.ProgramControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
-import net.geekgrandad.music.ActivateWindow;
 
 public class GuiProgramControl implements ProgramControl {
 	private Robot robot;
