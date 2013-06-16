@@ -13,7 +13,8 @@ public class Device {
 	public static final int SWITCH = 2;
 	public static final int APPLIANCE = 3;
 	public static final int SPEECH = 4;
-	public static final int MEDIA= 5;
+	public static final int MEDIA = 5;
+	public static final int COMPUTER = 6;
 	
 	public Device(String technology, String name, String code, int id, int channel, int type) {
 		this.name = name;

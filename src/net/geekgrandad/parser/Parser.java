@@ -37,6 +37,8 @@ public class Parser {
 	public static final int MEDIA_NAME = 25;
 	public static final int SPEECH_ACTION = 26;
 	public static final int SPEECH_NAME = 27;
+	public static final int COMPUTER_NAME = 28;
+	public static final int COMPUTER_ACTION = 29;
 	
 	public static String[] areas = { "floor", "room" };
 
@@ -46,7 +48,8 @@ public class Parser {
 	public static String[] devices = { 
 		"light", "socket", "appliance", "switch", "camera",
 		"sensor", "phone", "media", "radiator",
-		"robot", "alarm", "blind", "heating", "program", "speech" };
+		"robot", "alarm", "blind", "heating", "program", 
+		"speech", "computer" };
 
 	public static final int LIGHT = 0;
 	public static final int SOCKET = 1;
@@ -63,6 +66,7 @@ public class Parser {
 	public static final int HEATING = 12;
 	public static final int PROGRAM = 13;
 	public static final int SPEECH = 14;
+	public static final int COMPUTER = 15;
 	
 	public static String[] deviceSets = { "lights", "sockets", "appliances", "switches",
 		"cameras", "sensors", "phones",
@@ -176,7 +180,7 @@ public class Parser {
 	public static final String[] actions = { 
 		"on", "off", "status", "value", "set", 
 		"mood", "email", "clear", "signal", 
-		"back", "delete", "reboot", "shutdown" };
+		"back", "delete" };
 
 	public static final int ON = 0;
 	public static final int OFF = 1;
@@ -189,8 +193,11 @@ public class Parser {
 	public static final int SIGNAL = 8;
 	public static final int BACK = 9;
 	public static final int DELETE = 10;
-	public static final int REBOOT = 11;
-	public static final int SHUT_DOWN = 12;
+	
+	public static final String[] computerActions = { "reboot", "shutdown"};
+	
+	public static final int REBOOT = 0;
+	public static final int SHUT_DOWN = 1;
 
 	public static String[] robotActions = {"fetch", "clean", "grab", "release"};
 	
@@ -517,6 +524,10 @@ public class Parser {
 			type = SPEECH_ACTION;
 		else if (find(token, config.speechNames) >= 0)
 			type = SPEECH_NAME;
+		else if (find(token, computerActions) >= 0)
+			type = COMPUTER_ACTION;
+		else if (find(token, config.computerNames) >= 0)
+			type = COMPUTER_NAME;
 
 		return type;
 	}

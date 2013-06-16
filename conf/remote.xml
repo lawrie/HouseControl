@@ -51,6 +51,7 @@
             </media>
             <media id="8" name="it" host="musicserver" type="iTunes"></media>
             <speech id="2" name="spr" voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" type="FreeTTS"></speech> 
+            <computer id="2" name="desk" type="XP"></computer>
         </room>
     </floor>
     <config listen_port="50000" background_delay="10000"></config>
@@ -63,6 +64,9 @@
         </plugin>
         <plugin class="net.geekgrandad.plugin.LocalSpeech2" type="FreeTTS">
             <interface name="SpeechControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.XPControl" type="XP">
+            <interface name="ComputerControl"></interface>
         </plugin>
     </plugins>
 </house>

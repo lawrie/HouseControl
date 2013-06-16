@@ -16,6 +16,7 @@ import net.geekgrandad.interfaces.Alerter;
 import net.geekgrandad.interfaces.ApplianceControl;
 import net.geekgrandad.interfaces.CalendarControl;
 import net.geekgrandad.interfaces.CameraControl;
+import net.geekgrandad.interfaces.ComputerControl;
 import net.geekgrandad.interfaces.Controller;
 import net.geekgrandad.interfaces.DatalogControl;
 import net.geekgrandad.interfaces.EmailControl;
@@ -88,6 +89,8 @@ public class HouseControl implements Reporter, Alerter, Provider {
     private ProgramControl programControl;
     private RemoteControl[]  remoteSpeechControl = new RemoteControl[Config.MAX_SPEECH];
     private RemoteControl[]  remoteMediaControl = new RemoteControl[Config.MAX_MEDIA];
+    private ComputerControl computerControl;
+    private RemoteControl remoteComputerControl;
     
     private Token[] tokens;
     
@@ -183,6 +186,13 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						httpControl = (HTTPControl) o;
 					} else if (s.equals("VolumeControl")) {
 						volumeControl = (VolumeControl) o;
+					} else if (s.equals("ComputerControl")) {
+						for(int i=0;i<Config.MAX_COMPUTERS;i++) {
+							if (t == null || (config.computerTypes[i] != null && config.computerTypes[i].equals(t))) {
+								print("Setting remote computer control " + i + ", type = " + t);
+								computerControl = (ComputerControl) o;
+							}
+						}
 					} else if (s.equals("ProgramControl")) {
 						programControl = (ProgramControl) o;
 					} else if (s.equals("RemoteControl")) {
@@ -196,6 +206,12 @@ public class HouseControl implements Reporter, Alerter, Provider {
 							if (t == null || (config.mediaTypes[i] != null && config.mediaTypes[i].equals(t))) {
 								print("Setting remote media control " + i + ", type = " + t);
 								remoteMediaControl[i] = (RemoteControl) o;
+							}
+						}
+						for(int i=0;i<Config.MAX_COMPUTERS;i++) {
+							if (t == null || (config.computerTypes[i] != null && config.computerTypes[i].equals(t))) {
+								print("Setting remote media control " + i + ", type = " + t);
+								remoteComputerControl = (RemoteControl) o;
 							}
 						}
 					} 
@@ -409,6 +425,15 @@ public class HouseControl implements Reporter, Alerter, Provider {
 			tokens[1] = new Token("" + (n + 1), Parser.NUMBER, -1);
 			tokens[0] = new Token(Parser.devices[Parser.SOCKET],Parser.DEVICE, -1);
 			numTokens += 1;
+		} else if (tokens[0].getType() == Parser.COMPUTER_NAME) {
+			// Replace name with computer n
+			int n = parser.find(tokens[0].getValue(),config.computerNames);
+			expandTokens(1);
+			if (tokens.length > 3) tokens[3] = tokens[2];
+			tokens[2] = tokens[1];
+			tokens[1] = new Token("" + (n + 1), Parser.NUMBER, -1);
+			tokens[0] = new Token(Parser.devices[Parser.COMPUTER],Parser.DEVICE, -1);
+			numTokens += 1;
 		} else if (tokens[0].getType() == Parser.LIGHT_NAME) {
 			// Replace name with light n
 			int n = parser.find(tokens[0].getValue(),config.lightNames);
@@ -574,6 +599,12 @@ public class HouseControl implements Reporter, Alerter, Provider {
 					print("Sending " + cmd + " to " + server);
 					
 					return remoteMediaControl[n].send(n+1, server, cmd);				
+				} else if (device == Parser.COMPUTER && config.computerTypes[n].equals("remote")) {
+					String server = config.computerServers[n];
+					
+					print("Sending " + cmd + " to " + server);
+					
+					return remoteComputerControl.send(n+1, server, cmd);				
 				}
 				
 				if (numTokens == 3 && device == Parser.PROGRAM) {
@@ -610,6 +641,8 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						case Parser.SWITCH:
 						case Parser.SENSOR:
 						case Parser.PHONE:
+						case Parser.SPEECH:
+						case Parser.COMPUTER:
 							error("Cannot turn this device on or off");
 							return ERROR;
 						default:
@@ -633,6 +666,8 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						case Parser.ALARM:
 							int togo = alarmControl.getAlarmTime();
 							return switchString(togo > 0);
+						case Parser.COMPUTER:
+							return switchString(true);
 						default:
 							error("Cannot return the status of this device");
 							return ERROR;
@@ -699,14 +734,6 @@ public class HouseControl implements Reporter, Alerter, Provider {
 							error("Device does not support BACK");
 							return ERROR;
 						}	
-					case Parser.REBOOT:
-						if (device == Parser.MEDIA) {
-							mediaControl[n].reboot(n+1);
-							return SUCCESS;
-						} else {
-							error("Device does not support reboot");
-							return ERROR;
-						}
 					default:
 						error("Unsupported action");
 						return ERROR;
@@ -737,7 +764,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						mediaControl[n].color(n+1, AV.GREEN);
 						return SUCCESS;
 					}
-				} else if (numTokens > 2 && tokens[2].getType() == Parser.SERVICE) {
+				} else if (device == Parser.MEDIA && numTokens > 2 && tokens[2].getType() == Parser.SERVICE) {
 					String service = tokens[2].getValue();
 					switch(parser.find(service,Parser.services)) {
 					case Parser.VOLUME:
@@ -1053,6 +1080,36 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						return mediaControl[n].getAlbum(n+1);
 					default:
 						error("Invalid media command");
+						return ERROR;
+					}
+				} else if (device == Parser.COMPUTER && numTokens > 2 && tokens[2].getType() == Parser.COMPUTER_ACTION) {
+					if (n >= Config.MAX_SPEECH || speechControl[n] == null) {
+						error("Invalid speech device number: " + (n+1));
+						return ERROR;
+					}
+					switch(parser.find(tokens[2].getValue(), Parser.computerActions)) {
+					case Parser.REBOOT:
+						computerControl.reboot();
+						return SUCCESS;
+					case Parser.SHUT_DOWN:
+						computerControl.shutdown();
+						return SUCCESS;
+					}
+				} else if (device == Parser.COMPUTER && numTokens > 2 && tokens[2].getType() == Parser.SERVICE) {
+					String service = tokens[2].getValue();
+					switch(parser.find(service,Parser.services)) {
+					case Parser.VOLUME:
+						if (numTokens == 3) {
+							return "" + computerControl.getVolume();
+						} else  if (numTokens == 4 && tokens[3].getType() == Parser.NUMBER) {
+							computerControl.setVolume(Integer.parseInt(tokens[3].getValue()));
+							return SUCCESS;
+						} else {
+							error("Invalid volume command");
+							return ERROR;
+						}
+					default:
+						error("Computers do not supported this service");
 						return ERROR;
 					}
 				} else if (device == Parser.SPEECH && numTokens > 2 && tokens[2].getType() == Parser.SPEECH_ACTION) {

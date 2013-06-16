@@ -120,8 +120,10 @@
             <speech id="1" name="spl" voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" 
                type="FreeTTS"></speech> 
             <speech id="2" name="spr" type="remote" server="musicserver"></speech>
-            <program id="1" name = "pl" type="program"></program>
-            <program id="2" name = "pr" type="remote" server="musicserver"></program>
+            <program id="1" name="pl" type="program"></program>
+            <program id="2" name="pr" type="remote" server="musicserver"></program>
+            <computer id="1" name="tosh" type="XP"></computer>
+            <computer id="2" name="desk" type="remote" server="musicserver"></computer>
         </room>
         <room id="2" name="Kitchen">
             <appliance id="3" name="Dishwasher" code="1077486631" type="IAM"></appliance>
@@ -215,6 +217,9 @@
         </plugin>
         <plugin class="net.geekgrandad.plugin.RemoteHouseControl" type="remote">
             <interface name="RemoteControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.XPControl" type="XP">
+            <interface name="ComputerControl"></interface>
         </plugin>
     </plugins>
 </house>

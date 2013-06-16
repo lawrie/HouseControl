@@ -36,6 +36,7 @@ public class Config {
   public static final int MAX_PHONES = 1;
   public static final int MAX_TABLETS = 1;
   public static final int MAX_SPEECH = 2;
+  public static final int MAX_COMPUTERS = 7;
   
   public int[][] roomSockets = new int[MAX_ROOMS][];
   public int[][] roomLights = new int[MAX_ROOMS][];
@@ -56,6 +57,7 @@ public class Config {
   private int[] cameras = new int[MAX_CAMERAS];
   private int[] switches = new int[MAX_SWITCHES];
   private int[] speech = new int[MAX_SPEECH];
+  private int[] computers = new int[MAX_COMPUTERS];
   
   public String[] socketTypes = new String[MAX_SOCKETS];
   public String[] lightTypes = new String[MAX_LIGHTS];
@@ -67,6 +69,8 @@ public class Config {
   public String[] mediaServers = new String[MAX_MEDIA];
   public String[] speechTypes = new String[MAX_SPEECH];
   public String[] speechServers = new String[MAX_SPEECH];
+  public String[] computerTypes = new String[MAX_COMPUTERS];
+  public String[] computerServers = new String[MAX_COMPUTERS];
   
   public String[] cameraHostNames = new String[MAX_CAMERAS];
   
@@ -151,6 +155,7 @@ public class Config {
   private static final String HEATING = "heating";
   private static final String ROBOT = "robot";
   private static final String MEDIA = "media";
+  private static final String COMPUTER = "computer";
   
   private static final String CAMERA_CONTROL = "camera_control";
   private static final String SPEECH_CONTROL = "speech_control";
@@ -178,6 +183,7 @@ public class Config {
   public String[] phoneNames = new String[MAX_PHONES];
   public String[] tabletNames = new String[MAX_TABLETS];
   public String[] speechNames = new String[MAX_SPEECH];
+  public String[] computerNames = new String[MAX_COMPUTERS];
   
   public HashMap<Integer,String> channelNames = new HashMap<Integer,String>();
   public HashMap<String,String> playlists = new HashMap<String,String>();
@@ -186,19 +192,19 @@ public class Config {
   public HashMap<String,List<String>> classInterfaces = new HashMap<String,List<String>>();
   
   private int floorId, roomId, sensorId, lightId, socketId, windowId, cameraId, applianceId, mediaId;
-  private int phoneId, channelId, tabletId, switchId,emontxId, speechId;
+  private int phoneId, channelId, tabletId, switchId,emontxId, speechId, computerId;
   
   private String floorName, roomName, sensorName, lightName, socketName, windowName, cameraName, applianceName;
-  private String channelName, tabletName, switchName, mediaName;
+  private String channelName, tabletName, switchName, mediaName, computerName;
   
   public String phoneName;
   
-  private String mediaServer;
+  private String mediaServer, computerServer;
   
   private String playlist, link;
   
   private int numLights, numSockets, numWindows, numCameras, numAppliances, 
-              numMedia, numSensors, numSwitches, numSpeech;
+              numMedia, numSensors, numSwitches, numSpeech, numComputers;
   private int numFloors = 0;
   private int numRooms = 0;
   
@@ -209,7 +215,7 @@ public class Config {
   public String cosmApiKey, cosmFeed, cosmPower, cosmEnergy;
   
   private String speechVoice, speechServer;
-  private String speechType, speechName;
+  private String speechType, speechName, computerType;
   
   public int listenPort;
   public String rfm12Port, iamPort, lwrfPort;
@@ -295,6 +301,7 @@ public class Config {
               numMedia = 0;
               numSwitches = 0;
               numSpeech = 0;
+              numComputers = 0;
               
               // We read the attributes from this tag and process the is and name attributes
               Iterator<Attribute> attributes = startElement.getAttributes();
@@ -461,6 +468,24 @@ public class Config {
               	  windows[numWindows++] = windowId;
                 } else if (attribute.getName().toString().equals(NAME)) {
                   windowName = attribute.getValue();
+                }
+              }
+          } else if (event.asStartElement().getName().getLocalPart().equals(COMPUTER)) {
+              debug("Start computer");
+              
+              // We read the attributes from this tag and process the is and name attributes
+              Iterator<Attribute> attributes = startElement.getAttributes();
+              while (attributes.hasNext()) {
+                Attribute attribute = attributes.next();
+                if (attribute.getName().toString().equals(ID)) {
+              	  computerId = Integer.parseInt(attribute.getValue());
+              	  computers[numComputers++] = computerId;
+                } else if (attribute.getName().toString().equals(NAME)) {
+                  computerName = attribute.getValue();
+                } else if (attribute.getName().toString().equals(TYPE)) {
+                  computerType = attribute.getValue();
+                } else if (attribute.getName().toString().equals(SERVER)) {
+                  computerServer = attribute.getValue();
                 }
               }
           } else if (event.asStartElement().getName().getLocalPart().equals(MEDIA)) {
@@ -721,6 +746,12 @@ public class Config {
           	  speechTypes[speechId-1] = speechType;
           	  speechServers[speechId-1] = speechServer;
           	  devices.add(new Device(speechType, speechName, "", speechId, -1, Device.SPEECH));
+          	  debug("End Media");
+          } else if (endElement.getName().getLocalPart() == (COMPUTER)) {
+          	  computerNames[computerId-1] = computerName;
+          	  computerTypes[computerId-1] = computerType;
+          	  computerServers[computerId-1] = computerServer;
+          	  devices.add(new Device(computerType, computerName, "", computerId, -1, Device.COMPUTER));
           	  debug("End Media");
           } else if (endElement.getName().getLocalPart() == (LIGHTLEVEL)) {
         	  debug("End light level");
