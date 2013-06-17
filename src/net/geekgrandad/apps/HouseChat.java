@@ -91,7 +91,7 @@ public class HouseChat extends JFrame implements KeyListener {
 			sb = new StringBuilder();
 		} else if (key == 8) {
 			sb.setLength(sb.length() - 1);
-		} else if (Character.isLetterOrDigit(key) || key == ' ') {
+		} else if (Character.isLetterOrDigit(key) || key == ' ' || key == '.') {
 	        sb.append(key);
 		} 	 
 		lastPos = text.getCaretPosition();

@@ -16,4 +16,6 @@ public interface ComputerControl extends Controller {
 	
 	public void sendKey(String program, int keyCode);
 	
+	public void browse(String url) throws IOException;
+	
 }

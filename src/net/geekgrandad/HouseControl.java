@@ -1088,6 +1088,9 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 					case Parser.EXECUTE:
 						computerControl.execute(tokens[3].getValue());
 						return SUCCESS;
+					case Parser.SURF:
+						computerControl.browse("http://" + cmd.substring( cmd.indexOf("surf") + 5));
+						return SUCCESS;
 					case Parser.KEY:
 						computerControl.sendKey(tokens[3].getValue(), Integer.parseInt(tokens[4].getValue()));
 						return SUCCESS;

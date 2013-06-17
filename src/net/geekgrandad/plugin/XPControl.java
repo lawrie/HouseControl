@@ -10,6 +10,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.Port;
 
+import net.geekgrandad.interfaces.Browser;
 import net.geekgrandad.interfaces.ComputerControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
@@ -18,10 +19,12 @@ import net.geekgrandad.util.ActivateWindow;
 public class XPControl implements ComputerControl {
 	private Reporter reporter;
 	private Robot robot;
+	private Browser browser;
 	
 	@Override
 	public void setProvider(Provider provider) {
-		reporter = provider.getReporter();	
+		reporter = provider.getReporter();
+		browser = provider.getBrowser();
 		
 		try {
 			robot = new Robot();
@@ -126,5 +129,10 @@ public class XPControl implements ComputerControl {
 				// do nothing
 			}
 		}
+	}
+
+	@Override
+	public void browse(String url) throws IOException {
+		browser.browse(url);	
 	}
 }

@@ -193,12 +193,12 @@ public class Parser {
 	public static final int BACK = 9;
 	public static final int DELETE = 10;
 	
-	public static final String[] computerActions = { "reboot", "shutdown", "execute", "activate", "key"};
+	public static final String[] computerActions = { "reboot", "shutdown", "execute", "surf", "key"};
 	
 	public static final int REBOOT = 0;
 	public static final int SHUT_DOWN = 1;
 	public static final int EXECUTE = 2;
-	public static final int ACTIVATE = 3;
+	public static final int SURF = 3;
 	public static final int KEY = 4;
 
 	public static String[] robotActions = {"fetch", "clean", "grab", "release"};
