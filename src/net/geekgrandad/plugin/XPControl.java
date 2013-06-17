@@ -1,5 +1,7 @@
 package net.geekgrandad.plugin;
 
+import java.awt.AWTException;
+import java.awt.Robot;
 import java.io.IOException;
 
 import javax.sound.sampled.AudioSystem;
@@ -11,13 +13,21 @@ import javax.sound.sampled.Port;
 import net.geekgrandad.interfaces.ComputerControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
+import net.geekgrandad.util.ActivateWindow;
 
 public class XPControl implements ComputerControl {
 	private Reporter reporter;
+	private Robot robot;
 	
 	@Override
 	public void setProvider(Provider provider) {
-		reporter = provider.getReporter();		
+		reporter = provider.getReporter();	
+		
+		try {
+			robot = new Robot();
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -92,5 +102,29 @@ public class XPControl implements ComputerControl {
 				}     
 	        }  
 	    }
+	}
+
+	@Override
+	public int execute(String cmd) throws IOException  {
+		Runtime.getRuntime().exec(cmd);
+        return 0;
+	}
+
+	@Override
+	public void sendKey(String program, int keyCode) {
+		reporter.print("Activating " + program);
+		String title = ActivateWindow.activate(program);
+		reporter.print("Title is " + title);
+		if (title == null) {
+			reporter.error("Could not find program");
+		} else {
+	        robot.keyPress(keyCode);
+	        robot.keyRelease(keyCode);
+	        try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// do nothing
+			}
+		}
 	}
 }

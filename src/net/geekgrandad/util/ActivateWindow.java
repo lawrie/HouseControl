@@ -1,4 +1,4 @@
-package net.geekgrandad.plugin;
+package net.geekgrandad.util;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -19,7 +19,7 @@ public class ActivateWindow {
 	          char[] windowText = new char[512];
 	          user32.GetWindowText(hWnd, windowText, 512);
 	          String wText = Native.toString(windowText);
-	          if (wText.startsWith(name)) {
+	          if (wText.contains(name)) {
 	        	  title = wText;
 	        	  wind = hWnd;
 	        	  return false;

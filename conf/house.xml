@@ -120,8 +120,6 @@
             <speech id="1" name="spl" voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" 
                type="FreeTTS"></speech> 
             <speech id="2" name="spr" type="remote" server="musicserver"></speech>
-            <program id="1" name="pl" type="program"></program>
-            <program id="2" name="pr" type="remote" server="musicserver"></program>
             <computer id="1" name="tosh" type="XP"></computer>
             <computer id="2" name="desk" type="remote" server="musicserver"></computer>
         </room>
@@ -183,7 +181,7 @@
         <plugin class="net.geekgrandad.plugin.ITunesControl" type="iTunes">
             <interface name="MediaControl"></interface>
         </plugin>
-        <plugin class="net.geekgrandad.plugin.LocalSpeech2" type="FreeTTS">
+        <plugin class="net.geekgrandad.plugin.LocalSpeech" type="FreeTTS">
             <interface name="SpeechControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.DummyAlarm">
@@ -211,9 +209,6 @@
             <interface name="PowerControl"></interface>
             <interface name="PlantControl"></interface>
             <interface name="InfraredControl"></interface>
-        </plugin>
-        <plugin class="net.geekgrandad.plugin.GuiProgramControl" type="program">
-            <interface name="ProgramControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.RemoteHouseControl" type="remote">
             <interface name="RemoteControl"></interface>

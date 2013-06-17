@@ -11,7 +11,7 @@ import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
 import net.geekgrandad.interfaces.SpeechControl;
 
-public class LocalSpeech2 implements SpeechControl {
+public class LocalSpeech implements SpeechControl {
 	private boolean speak = true;
 	private Synthesizer synth;
 	Config config;

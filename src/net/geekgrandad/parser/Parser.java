@@ -48,7 +48,7 @@ public class Parser {
 	public static String[] devices = { 
 		"light", "socket", "appliance", "switch", "camera",
 		"sensor", "phone", "media", "radiator",
-		"robot", "alarm", "blind", "heating", "program", 
+		"robot", "alarm", "blind", "heating", 
 		"speech", "computer" };
 
 	public static final int LIGHT = 0;
@@ -64,9 +64,8 @@ public class Parser {
 	public static final int ALARM = 10;
 	public static final int BLIND = 11;
 	public static final int HEATING = 12;
-	public static final int PROGRAM = 13;
-	public static final int SPEECH = 14;
-	public static final int COMPUTER = 15;
+	public static final int SPEECH = 13;
+	public static final int COMPUTER = 14;
 	
 	public static String[] deviceSets = { "lights", "sockets", "appliances", "switches",
 		"cameras", "sensors", "phones",
@@ -194,10 +193,13 @@ public class Parser {
 	public static final int BACK = 9;
 	public static final int DELETE = 10;
 	
-	public static final String[] computerActions = { "reboot", "shutdown"};
+	public static final String[] computerActions = { "reboot", "shutdown", "execute", "activate", "key"};
 	
 	public static final int REBOOT = 0;
 	public static final int SHUT_DOWN = 1;
+	public static final int EXECUTE = 2;
+	public static final int ACTIVATE = 3;
+	public static final int KEY = 4;
 
 	public static String[] robotActions = {"fetch", "clean", "grab", "release"};
 	

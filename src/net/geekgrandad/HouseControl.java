@@ -14,6 +14,7 @@ import net.geekgrandad.interfaces.AV;
 import net.geekgrandad.interfaces.AlarmControl;
 import net.geekgrandad.interfaces.Alerter;
 import net.geekgrandad.interfaces.ApplianceControl;
+import net.geekgrandad.interfaces.Browser;
 import net.geekgrandad.interfaces.CalendarControl;
 import net.geekgrandad.interfaces.CameraControl;
 import net.geekgrandad.interfaces.ComputerControl;
@@ -27,7 +28,6 @@ import net.geekgrandad.interfaces.LightControl;
 import net.geekgrandad.interfaces.MediaControl;
 import net.geekgrandad.interfaces.PlantControl;
 import net.geekgrandad.interfaces.PowerControl;
-import net.geekgrandad.interfaces.ProgramControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.RemoteControl;
 import net.geekgrandad.interfaces.Reporter;
@@ -35,14 +35,13 @@ import net.geekgrandad.interfaces.SensorControl;
 import net.geekgrandad.interfaces.SocketControl;
 import net.geekgrandad.interfaces.SpeechControl;
 import net.geekgrandad.interfaces.SwitchControl;
-import net.geekgrandad.interfaces.VolumeControl;
 import net.geekgrandad.parser.Parser;
 import net.geekgrandad.parser.Token;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class HouseControl implements Reporter, Alerter, Provider {
+public class HouseControl implements Reporter, Alerter, Provider, Browser {
 
 	// Static data
 	private static String configFile = "conf/house.xml";
@@ -85,8 +84,6 @@ public class HouseControl implements Reporter, Alerter, Provider {
     private PowerControl powerControl;
     private PlantControl plantControl;
     private HTTPControl httpControl;
-    private VolumeControl volumeControl;
-    private ProgramControl programControl;
     private RemoteControl[]  remoteSpeechControl = new RemoteControl[Config.MAX_SPEECH];
     private RemoteControl[]  remoteMediaControl = new RemoteControl[Config.MAX_MEDIA];
     private ComputerControl computerControl;
@@ -184,8 +181,6 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						infraredControl = (InfraredControl) o;
 					} else if (s.equals("HTTPControl")) {
 						httpControl = (HTTPControl) o;
-					} else if (s.equals("VolumeControl")) {
-						volumeControl = (VolumeControl) o;
 					} else if (s.equals("ComputerControl")) {
 						for(int i=0;i<Config.MAX_COMPUTERS;i++) {
 							if (t == null || (config.computerTypes[i] != null && config.computerTypes[i].equals(t))) {
@@ -193,8 +188,6 @@ public class HouseControl implements Reporter, Alerter, Provider {
 								computerControl = (ComputerControl) o;
 							}
 						}
-					} else if (s.equals("ProgramControl")) {
-						programControl = (ProgramControl) o;
 					} else if (s.equals("RemoteControl")) {
 						for(int i=0;i<Config.MAX_SPEECH;i++) {
 							if (t == null || (config.speechTypes[i] != null && config.speechTypes[i].equals(t))) {
@@ -429,6 +422,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 			// Replace name with computer n
 			int n = parser.find(tokens[0].getValue(),config.computerNames);
 			expandTokens(1);
+			if (tokens.length > 4) tokens[4] = tokens[3];
 			if (tokens.length > 3) tokens[3] = tokens[2];
 			tokens[2] = tokens[1];
 			tokens[1] = new Token("" + (n + 1), Parser.NUMBER, -1);
@@ -607,10 +601,7 @@ public class HouseControl implements Reporter, Alerter, Provider {
 					return remoteComputerControl.send(n+1, server, cmd);				
 				}
 				
-				if (numTokens == 3 && device == Parser.PROGRAM) {
-					programControl.activate(n, tokens[2].getValue());
-					return SUCCESS;
-				} else if (numTokens > 2 && tokens[2].getType() == Parser.ACTION) {
+				if (numTokens > 2 && tokens[2].getType() == Parser.ACTION) {
 					int act = parser.find(tokens[2].getValue(), Parser.actions);
 					switch (act) {
 					case Parser.ON:
@@ -1083,8 +1074,8 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						return ERROR;
 					}
 				} else if (device == Parser.COMPUTER && numTokens > 2 && tokens[2].getType() == Parser.COMPUTER_ACTION) {
-					if (n >= Config.MAX_SPEECH || speechControl[n] == null) {
-						error("Invalid speech device number: " + (n+1));
+					if (n >= Config.MAX_COMPUTERS || computerControl == null) {
+						error("Invalid computer device number: " + (n+1));
 						return ERROR;
 					}
 					switch(parser.find(tokens[2].getValue(), Parser.computerActions)) {
@@ -1093,6 +1084,12 @@ public class HouseControl implements Reporter, Alerter, Provider {
 						return SUCCESS;
 					case Parser.SHUT_DOWN:
 						computerControl.shutdown();
+						return SUCCESS;
+					case Parser.EXECUTE:
+						computerControl.execute(tokens[3].getValue());
+						return SUCCESS;
+					case Parser.KEY:
+						computerControl.sendKey(tokens[3].getValue(), Integer.parseInt(tokens[4].getValue()));
 						return SUCCESS;
 					}
 				} else if (device == Parser.COMPUTER && numTokens > 2 && tokens[2].getType() == Parser.SERVICE) {
@@ -1439,5 +1436,14 @@ public class HouseControl implements Reporter, Alerter, Provider {
 	@Override
 	public void say(String msg) {
 		say(1,msg);		
+	}
+
+	@Override
+	public void browse(String url) throws IOException {
+		java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));		
+	}
+	
+	public Browser getBrowser() {
+		return this;
 	}
 }

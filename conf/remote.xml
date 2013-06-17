@@ -62,7 +62,7 @@
         <plugin class="net.geekgrandad.plugin.ITunesControl" type="iTunes">
             <interface name="MediaControl"></interface>
         </plugin>
-        <plugin class="net.geekgrandad.plugin.LocalSpeech2" type="FreeTTS">
+        <plugin class="net.geekgrandad.plugin.LocalSpeech" type="FreeTTS">
             <interface name="SpeechControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.XPControl" type="XP">

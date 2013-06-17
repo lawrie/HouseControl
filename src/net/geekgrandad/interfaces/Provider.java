@@ -19,5 +19,7 @@ public interface Provider {
 	public DatalogControl getDatalogControl();
 	
 	public InfraredControl getInfraredControl();
+	
+	public Browser getBrowser();
 
 }

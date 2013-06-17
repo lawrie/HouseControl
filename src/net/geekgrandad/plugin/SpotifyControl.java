@@ -14,20 +14,24 @@ import javax.sound.sampled.Port;
 import javax.speech.synthesis.Synthesizer;
 
 import net.geekgrandad.config.Config;
+import net.geekgrandad.interfaces.Browser;
 import net.geekgrandad.interfaces.MediaControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
+import net.geekgrandad.util.ActivateWindow;
 
 public class SpotifyControl implements MediaControl {
 	private Synthesizer synth;
     private Reporter reporter;
 	private Config config;
 	private Robot robot;
+	private Browser browser;
 
 	@Override
 	public void setProvider(Provider provider) {
 		this.reporter = provider.getReporter();
 		this.config = provider.getConfig();
+		this.browser = provider.getBrowser();
 	    
 	    try {
 			robot = new Robot();
@@ -41,8 +45,7 @@ public class SpotifyControl implements MediaControl {
 			throws IOException {
 		String list = config.getPlaylists().get(playlist) + "?autoplay=true";
 		reporter.print("Playing " + list);
-		java.awt.Desktop.getDesktop().browse(java.net.URI.create(list));
-		
+		browser.browse(list);		
 	}
 
 	@Override
