@@ -6,12 +6,16 @@ import net.geekgrandad.interfaces.MediaControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
 
+import com.dt.iTunesController.ITLibraryPlaylist;
 import com.dt.iTunesController.ITPlayerState;
 import com.dt.iTunesController.ITPlaylist;
 import com.dt.iTunesController.ITPlaylistCollection;
+import com.dt.iTunesController.ITPlaylistSearchField;
 import com.dt.iTunesController.ITSource;
 import com.dt.iTunesController.ITSourceCollection;
 import com.dt.iTunesController.ITTrack;
+import com.dt.iTunesController.ITTrackCollection;
+import com.dt.iTunesController.ITUserPlaylist;
 import com.dt.iTunesController.iTunes;
 
 public class ITunesControl implements MediaControl {
@@ -35,19 +39,31 @@ public class ITunesControl implements MediaControl {
 	@Override
 	public void start(int id, String playlist, boolean repeat)
 			throws IOException {
-		ITSourceCollection sources = itc.getSources();
-		reporter.print("iTunes: number of sources: " + sources.getCount());
-		reporter.print("iTunes: sources: " + sources);
-		ITSource source = sources.getItem(1);
-		reporter.print("iTunes: source: " + source);
+		ITSource source = itc.getLibrarySource();
 		ITPlaylistCollection lists = source.getPlaylists();
 		ITPlaylist list = lists.ItemByName(playlist);
 		list.playFirstTrack();
 	}
 
 	@Override
-	public void open(int id, String file, boolean repeat) throws IOException {
-		itc.playFile(file);
+	public void open(int id, String file, boolean repeat) throws IOException {;
+		
+		ITSource source = itc.getLibrarySource();
+		ITPlaylistCollection lists = source.getPlaylists();
+		ITPlaylist temp = lists.ItemByName("temp");
+		if (temp != null) temp.delete();
+		
+		ITLibraryPlaylist all = itc.getLibraryPlaylist();
+		
+		reporter.print("Library contains " + all.getTracks().getCount() + " tracks");
+		ITTrackCollection tracks = all.search(file, ITPlaylistSearchField.ITPlaylistSearchFieldAll);
+		reporter.print("Search returned " + ((int) tracks.getCount()) + " tracks");
+		ITUserPlaylist pl = (ITUserPlaylist) itc.createPlaylist("temp");
+		for(int i=1; i <= tracks.getCount(); i++) {
+			ITTrack track = tracks.getItem(i);
+			pl.addTrack(track);
+		}
+		pl.playFirstTrack();
 	}
 
 	@Override

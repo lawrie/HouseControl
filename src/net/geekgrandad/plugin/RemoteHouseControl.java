@@ -42,7 +42,7 @@ public class RemoteHouseControl implements RemoteControl {
 			reporter.error("Unknown host in send");
 			return ("Error");
 		} catch (IOException e) {
-			reporter.error("IO Exception in send");
+			reporter.error("IO Exception in send: " + e);
 			return "Error";
 		}
 		
