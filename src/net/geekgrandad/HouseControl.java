@@ -15,7 +15,6 @@ import net.geekgrandad.interfaces.AlarmControl;
 import net.geekgrandad.interfaces.Alerter;
 import net.geekgrandad.interfaces.ApplianceControl;
 import net.geekgrandad.interfaces.Browser;
-import net.geekgrandad.interfaces.CalendarControl;
 import net.geekgrandad.interfaces.CameraControl;
 import net.geekgrandad.interfaces.ComputerControl;
 import net.geekgrandad.interfaces.Controller;
@@ -26,7 +25,6 @@ import net.geekgrandad.interfaces.HeatingControl;
 import net.geekgrandad.interfaces.InfraredControl;
 import net.geekgrandad.interfaces.LightControl;
 import net.geekgrandad.interfaces.MediaControl;
-import net.geekgrandad.interfaces.PlantControl;
 import net.geekgrandad.interfaces.PowerControl;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.RemoteControl;
@@ -60,8 +58,6 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 	private OutputStream os;
 	private Thread backGround = new Thread(new Background());
 	private boolean phoneConnected = false;
-	private boolean musicOn = false;
-	private int volume;
 	private static int numCmds = 0;
 	private static int state = 0;
 	private String cmd;
@@ -74,7 +70,6 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
     private AlarmControl alarmControl;
     private HeatingControl heatingControl;
     private DatalogControl datalogControl;
-    private CalendarControl calendarControl;
     private LightControl[] lightControl = new LightControl[Config.MAX_LIGHTS];
     private SocketControl[] socketControl = new SocketControl[Config.MAX_SOCKETS];
     private SwitchControl[] switchControl = new SwitchControl[Config.MAX_SWITCHES];
@@ -82,7 +77,6 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
     private ApplianceControl[] applianceControl = new ApplianceControl[Config.MAX_APPLIANCES];
     private InfraredControl infraredControl;
     private PowerControl powerControl;
-    private PlantControl plantControl;
     private HTTPControl httpControl;
     private RemoteControl[]  remoteSpeechControl = new RemoteControl[Config.MAX_SPEECH];
     private RemoteControl[]  remoteMediaControl = new RemoteControl[Config.MAX_MEDIA];
@@ -165,14 +159,10 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 						}
 					} else if (s.equals("PowerControl")) {
 						powerControl = (PowerControl) o;
-					} else if (s.equals("PlantControl")) {
-						plantControl = (PlantControl) o;
 					} else if (s.equals("AlarmControl")) {
 						alarmControl = (AlarmControl) o;
 					} else if (s.equals("HeatingControl")) {
 						heatingControl = (HeatingControl) o;
-					} else if (s.equals("CalendarControl")) {
-						calendarControl = (CalendarControl) o;
 					} else if (s.equals("EmailControl")) {
 						emailControl = (EmailControl) o;
 					} else if (s.equals("DatalogControl")) {
@@ -969,17 +959,14 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 					switch(parser.find(tokens[2].getValue(), Parser.musicActions)) {
 					case Parser.PLAY:
 						if (tokens.length > 3) {
-							error("Too many parameters");
-							return ERROR;
+							mediaControl[n].start(n+1, cmd.substring(cmd.indexOf("play")+5), true);
+							return SUCCESS;
+						} else {
+							mediaControl[n].play(n+1);
 						}
-						mediaControl[n].play(n+1);
 						return SUCCESS;
 					case Parser.START:
-						if (tokens.length > 4) {
-							error("Too many parameters");
-							return ERROR;
-						}
-						mediaControl[n].start(n+1, tokens[3].getValue(), true);
+						mediaControl[n].start(n+1, cmd.substring(cmd.indexOf("start")+6), true);
 						return SUCCESS;
 					case Parser.PLAYER:
 						if (tokens.length > 4) {
@@ -1419,7 +1406,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 	
 	private void delay(int millis) {
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(millis);
 		} catch (InterruptedException e) {
 			// ignore
 		}
