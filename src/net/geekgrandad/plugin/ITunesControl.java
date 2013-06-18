@@ -42,6 +42,7 @@ public class ITunesControl implements MediaControl {
 		ITSource source = itc.getLibrarySource();
 		ITPlaylistCollection lists = source.getPlaylists();
 		ITPlaylist list = lists.ItemByName(playlist);
+		itc.getBrowserWindow().setSelectedPlaylist(list);
 		list.playFirstTrack();
 	}
 
@@ -63,6 +64,7 @@ public class ITunesControl implements MediaControl {
 			ITTrack track = tracks.getItem(i);
 			pl.addTrack(track);
 		}
+		itc.getBrowserWindow().setSelectedPlaylist(pl);
 		pl.playFirstTrack();
 	}
 

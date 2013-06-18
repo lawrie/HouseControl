@@ -976,10 +976,6 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 						mediaControl[n].setPlayer(n+1, Integer.parseInt(tokens[3].getValue()));
 						return SUCCESS;
 					case Parser.OPEN:
-						if (tokens.length > 5) {
-							error("Too many parameters");
-							return ERROR;
-						}
 						mediaControl[n].open(n+1, cmd.substring(cmd.indexOf("open")+5), true);
 						return SUCCESS;
 					case Parser.PAUSE:
