@@ -149,8 +149,7 @@
     <heating default_temperature="16" temperature_sensor="1" humidity_sensor="1"></heating>
     <phone id="1" type="android" name="phone"></phone>
     <tablet id="1" type="android"></tablet>
-    <email user="lawrie.griffiths" password="password" 
-        recipient="lawrie.griffiths@ntlworld.com"></email>
+    <email recipient="lawrie.griffiths@ntlworld.com"></email>
     <cosm api_key="5e8sM5Ls6RJhqilxUPtdq3LEF8ySAKxIbkVMS2RudjZiTT0g" 
         feed="86697" power="0" energy="1"></cosm>
     <config listen_port="50000" rfm12_port="COM15" lwrf_port="COM8" 
@@ -163,7 +162,7 @@
         <plugin class="net.geekgrandad.plugin.WanscamControl" type="Wanscam">
             <interface name="CameraControl"></interface>
         </plugin>
-        <plugin class="net.geekgrandad.plugin.GoogleMail" type="gmail">
+        <plugin class="net.geekgrandad.plugin.EMail" type="gmail">
             <interface name="EmailControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.DummyHeating">
@@ -187,7 +186,7 @@
         <plugin class="net.geekgrandad.plugin.DummyAlarm">
             <interface name="AlarmControl"></interface>
         </plugin>
-        <plugin class="net.geekgrandad.plugin.CosmUpdate">
+        <plugin class="net.geekgrandad.plugin.XivelyUpdate">
             <interface name="DatalogControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.IAMControl" type="IAM">

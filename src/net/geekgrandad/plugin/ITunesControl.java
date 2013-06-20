@@ -12,14 +12,13 @@ import com.dt.iTunesController.ITPlaylist;
 import com.dt.iTunesController.ITPlaylistCollection;
 import com.dt.iTunesController.ITPlaylistSearchField;
 import com.dt.iTunesController.ITSource;
-import com.dt.iTunesController.ITSourceCollection;
 import com.dt.iTunesController.ITTrack;
 import com.dt.iTunesController.ITTrackCollection;
 import com.dt.iTunesController.ITUserPlaylist;
 import com.dt.iTunesController.iTunes;
 
 public class ITunesControl implements MediaControl {
-	private iTunes itc = new iTunes();
+	private iTunes itc;
 	private Reporter reporter;
 	
 	public static void main(String[] args) {
@@ -39,6 +38,7 @@ public class ITunesControl implements MediaControl {
 	@Override
 	public void start(int id, String playlist, boolean repeat)
 			throws IOException {
+		checkItc();
 		ITSource source = itc.getLibrarySource();
 		ITPlaylistCollection lists = source.getPlaylists();
 		ITPlaylist list = lists.ItemByName(playlist);
@@ -48,7 +48,7 @@ public class ITunesControl implements MediaControl {
 
 	@Override
 	public void open(int id, String file, boolean repeat) throws IOException {;
-		
+		checkItc();
 		ITSource source = itc.getLibrarySource();
 		ITPlaylistCollection lists = source.getPlaylists();
 		ITPlaylist temp = lists.ItemByName("temp");
@@ -81,16 +81,19 @@ public class ITunesControl implements MediaControl {
 
 	@Override
 	public void pause(int id) throws IOException {
+		checkItc();
 		itc.pause();	
 	}
 
 	@Override
 	public void stop(int id) throws IOException {
+		checkItc();
 		itc.playPause();	
 	}
 
 	@Override
 	public void play(int id) throws IOException {
+		checkItc();
 		itc.play();		
 	}
 
@@ -101,6 +104,7 @@ public class ITunesControl implements MediaControl {
 
 	@Override
 	public void ff(int id) throws IOException {
+		checkItc();
 		itc.fastForward();	
 	}
 
@@ -111,11 +115,13 @@ public class ITunesControl implements MediaControl {
 
 	@Override
 	public void skip(int id) throws IOException {
+		checkItc();
 		itc.nextTrack();		
 	}
 
 	@Override
 	public void skipb(int id) throws IOException {
+		checkItc();
 		itc.previousTrack();	
 	}
 
@@ -171,28 +177,33 @@ public class ITunesControl implements MediaControl {
 
 	@Override
 	public void volumeUp(int id) throws IOException {
+		checkItc();
 		int vol = itc.getSoundVolume();
 		itc.setSoundVolume(vol+1);	
 	}
 
 	@Override
 	public void volumeDown(int id) throws IOException {
+		checkItc();
 		int vol = itc.getSoundVolume();
 		itc.setSoundVolume(vol-1);		
 	}
 
 	@Override
 	public void mute(int id) throws IOException {
+		checkItc();
 		itc.setMute(true);
 	}
 
 	@Override
 	public int getVolume(int id) throws IOException {
+		checkItc();
 		return itc.getSoundVolume();
 	}
 
 	@Override
 	public void setVolume(int id, int volume) throws IOException {
+		checkItc();
 		itc.setSoundVolume(volume);		
 	}
 
@@ -203,6 +214,7 @@ public class ITunesControl implements MediaControl {
 
 	@Override
 	public String getTrack(int id) throws IOException {
+		checkItc();
 		ITTrack itt = itc.getCurrentTrack();
 		return itt.getName();
 	}
@@ -251,6 +263,7 @@ public class ITunesControl implements MediaControl {
 
 	@Override
 	public void turnOff(int id) throws IOException {
+		checkItc();
 		itc.quit();	
 	}
 
@@ -266,18 +279,21 @@ public class ITunesControl implements MediaControl {
 
 	@Override
 	public String getArtist(int id) throws IOException {
+		checkItc();
 		ITTrack itt = itc.getCurrentTrack();
 		return itt.getArtist();
 	}
 
 	@Override
 	public String getAlbum(int id) throws IOException {
+		checkItc();
 		ITTrack itt = itc.getCurrentTrack();
 		return itt.getAlbum();
 	}
 
 	@Override
 	public String getPlaylist(int id) throws IOException {
+		checkItc();
 		ITPlaylist p = itc.getCurrentPlaylist();	
 		return p.getName();
 	}
@@ -299,6 +315,7 @@ public class ITunesControl implements MediaControl {
 
 	@Override
 	public boolean isPlaying(int id) throws IOException {
+		checkItc();
 		return (itc.getPlayerState()  == ITPlayerState.ITPlayerStatePlaying);
 	}
 
@@ -320,5 +337,9 @@ public class ITunesControl implements MediaControl {
 	@Override
 	public void setShuffle(int id, boolean shuffle) throws IOException {
 		reporter.error("iTunes: setShuffle not supported");	
+	}
+	
+	private void checkItc() {
+		if (itc == null) itc = new iTunes();
 	}
 }

@@ -53,7 +53,20 @@ public class XPControl implements ComputerControl {
 
 	@Override
 	public void reboot() {
-		// TODO Auto-generated method stub	
+	    String shutdownCommand = null;
+	    String osName = System.getProperty("os.name");        
+	    if (osName.startsWith("Win")) {
+	      shutdownCommand = "shutdown.exe -r -t 0";
+	    } else if (osName.startsWith("Linux") || osName.startsWith("Mac")) {
+	      shutdownCommand = "shutdown -r 0";
+	    } else {
+	      System.err.println("Shutdown unsupported operating system ...");
+	    }
+	    if (shutdownCommand != null)
+	      try {
+	        Runtime.getRuntime().exec(shutdownCommand);
+	      } catch (IOException e) {}
+	    System.exit(0);	
 	}
 
 	@Override

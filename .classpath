@@ -19,7 +19,6 @@
 	<classpathentry kind="lib" path="lib/en_us.jar"/>
 	<classpathentry kind="lib" path="lib/cmulex.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/jcosmapi.jar"/>
 	<classpathentry kind="lib" path="lib/commons-codec-1.8.jar"/>
 	<classpathentry kind="lib" path="lib/jacob.jar">
 		<attributes>
@@ -32,5 +31,10 @@
 	<classpathentry kind="lib" path="lib/org.jvoicexml.jsapi2.jar"/>
 	<classpathentry kind="lib" path="lib/org.jvoicexml.jsapi2.jse.freetts.jar"/>
 	<classpathentry kind="lib" path="lib/org.jvoicexml.jsapi2.jse.jar"/>
+	<classpathentry kind="lib" path="lib/xively4j.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-annotations-2.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-core-2.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-databind-2.1.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
