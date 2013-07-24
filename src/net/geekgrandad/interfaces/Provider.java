@@ -20,6 +20,12 @@ public interface Provider {
 	
 	public InfraredControl getInfraredControl();
 	
+	public MediaControl getMediaControl(int n);
+	
+	public int getCurrentMediaDevice();
+	
+	public void setCurrentMediaDevice(int id);
+	
 	public Browser getBrowser();
 
 }

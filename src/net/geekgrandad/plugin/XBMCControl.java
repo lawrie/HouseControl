@@ -2,6 +2,8 @@ package net.geekgrandad.plugin;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -75,18 +77,41 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public void start(int id, String playlist, boolean repeat) {
-		String s = playlist.replaceAll("X", " ");
-		this.playlist = s;
-		reporter.print("XBMC: playlist:" + s);
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\": {\"directory\": \"/storage/music/Bob Dylan/" + s + "\" } }, \"id\": 1}"); 	
+		this.playlist = playlist;
+		reporter.print("XBMC: playlist:" + playlist);
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\": {\"file\": \"special://profile/playlists/music/" + playlist + ".xsp\" } }, \"id\": 1}"); 	
 	}
 
 	@Override
 	public void open(int id, String file, boolean repeat) {
+		getArtists(id);
+		getGenres(id);
+		getAlbums(id);
+		getMusicVideos(id);
 		int sp = file.indexOf(" ");
-		String albumId = file.substring(sp+1);
+		String xbmcId = file.substring(sp+1);
 		String prop = file.substring(0, sp);
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\": {\"" + prop + "id\":" + albumId + "} }, \"id\": 1}");
+		String quote = "\"";
+		try {
+			Integer.parseInt(xbmcId);
+		} catch (NumberFormatException e) {
+			if (prop.equals("artist")) xbmcId = "" + artists.get(xbmcId);
+			else if (prop.equals("genre")) xbmcId = "" + genres.get(xbmcId);
+			else if (prop.equals("album")) xbmcId = "" + albums.get(xbmcId);
+			else if (prop.equals("musicvideo")) xbmcId = "" + musicVideos.get(xbmcId);
+		}
+		
+		if (prop.equals("slideshow")) {
+			prop = "directory";
+			xbmcId = "/storage/pictures/" + xbmcId;
+		}
+		
+		if (!prop.equals("directory") && !prop.equals("file")) {
+			prop = prop + "id";
+			quote = "";
+		}
+
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\": {\"" + prop + "\":" + quote + xbmcId + quote + "} }, \"id\": 1}");
 	}
 	@Override
 	public void type(int id, String s) {
@@ -96,9 +121,14 @@ public class XBMCControl implements MediaControl {
 	public void activate(int id, String window) {
 		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"GUI.ActivateWindow\", \"params\": {\"window\": \"" + window + "\"}, \"id\": 1}");
 	}
+	
+	public void activate(int id, String window, String section) {
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"GUI.ActivateWindow\", \"params\": {\"window\": \"" + window + "\", \"parameters\":[\"" + section + "\"]}, \"id\": 1}");
+	}
 
 	@Override
 	public void select(int id, String service) {
+		getAddons(id);
 		if (service.equals("home")) home(id);
 		else if (service.equals("context")) contextMenu(id);
 		else if (service.equals("info")) activate(id,"infodialog");
@@ -109,12 +139,14 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public void pause(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\":" + playerId + "}, \"id\": 1}");	
+		boolean[] players = activePlayers(id);
+		if (players[playerId]) execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\":" + playerId + "}, \"id\": 1}");	
 	}
 
 	@Override
 	public void stop(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Stop\", \"params\": { \"playerid\":" + playerId + "}, \"id\": 1}");	
+		boolean[] players = activePlayers(id);
+		if (players[playerId]) execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Stop\", \"params\": { \"playerid\":" + playerId + "}, \"id\": 1}");	
 	}
 
 	@Override
@@ -129,22 +161,26 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public void ff(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetSpeed\", \"params\": { \"playerid\":" + playerId + ", \"speed\":2 }, \"id\": 1}");	
+		boolean[] players = activePlayers(id);
+		if (players[playerId]) execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetSpeed\", \"params\": { \"playerid\":" + playerId + ", \"speed\":2 }, \"id\": 1}");	
 	}
 
 	@Override
 	public void fb(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetSpeed\", \"params\": { \"playerid\":" +playerId + ", \"speed\":-2 }, \"id\": 1}");	
+		boolean[] players = activePlayers(id);
+		if (players[playerId]) execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetSpeed\", \"params\": { \"playerid\":" +playerId + ", \"speed\":-2 }, \"id\": 1}");	
 	}
 
 	@Override
 	public void skip(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Move\", \"params\": { \"playerid\": " + playerId + ", \"direction\":\"right\" }, \"id\": 1}");		
+		boolean[] players = activePlayers(id);
+		if (players[playerId]) execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Move\", \"params\": { \"playerid\": " + playerId + ", \"direction\":\"right\" }, \"id\": 1}");		
 	}
 
 	@Override
 	public void skipb(int id) {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Move\", \"params\": { \"playerid\": " + playerId + ", \"direction\":\"left\" }, \"id\": 1}");
+		boolean[] players = activePlayers(id);
+		if (players[playerId]) execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Move\", \"params\": { \"playerid\": " + playerId + ", \"direction\":\"left\" }, \"id\": 1}");
 	}
 
 	@Override
@@ -271,12 +307,12 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public void thumbsUp(int id) {
-		reporter.error("XBMC: Rating not supported");		
+		reporter.error("XBMC: Rating not yet supported");		
 	}
 
 	@Override
 	public void thumbsDown(int id) {
-		reporter.error("XBMC: Rating not supported");
+		reporter.error("XBMC: Rating not yet supported");
 	}
 
 	@Override
@@ -432,15 +468,155 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public void setRepeat(int id, boolean repeat) throws IOException {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetRepeat\", \"params\": {\"repeat\":\"all\", \"playerid\":" + playerId + "}, \"id\": 1}");	
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetRepeat\", \"params\": {\"repeat\":\"" + (repeat ? "all" : "off")  + "\", \"playerid\":" + playerId + "}, \"id\": 1}");	
 	}
 
 	@Override
 	public void setShuffle(int id, boolean shuffle) throws IOException {
-		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetShuffle\", \"params\": {\"shuffle\":\"toggle\", \"playerid\":" + playerId + "}, \"id\": 1}");	
+		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetShuffle\", \"params\": {\"shuffle\":\"" +  (shuffle ? "true" : "false") + "\", \"playerid\":" + playerId + "}, \"id\": 1}");	
 	}
 	
 	public void setFullScreen(int id) throws IOException {
 		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"GUI.SetFullscreen\", \"params\": {\"fullscreen\":\"toggle\"}, \"id\": 1}");
+	}
+	
+	public void zoom(int id, int level) {
+		boolean[] players = activePlayers(id);
+		if (players[playerId]) execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Zoom\", \"params\": { \"playerid\": " + playerId + ", \"zoom\":" + level +  "}, \"id\": 1}");
+	}
+	
+	public void rotate(int id) {
+		boolean[] players = activePlayers(id);
+		if (players[playerId]) execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Rotate\", \"params\": { \"playerid\": " + playerId + ", \"value\":\"clockwise\"}, \"id\": 1}");
+	}
+	
+	public void togglePartyMode(int id) {
+		boolean[] players = activePlayers(id);
+		if (players[playerId]) execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetPartyMode\", \"params\": { \"playerid\": " + playerId + ", \"partymode\":\"toggle\"}, \"id\": 1}");
+	}
+	
+	private HashMap<String,Integer> artists = new HashMap<String,Integer>();
+	
+	private void getArtists(int id) {
+		if (artists.isEmpty()) {
+			String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"AudioLibrary.GetArtists\", \"id\": 1}");
+			try {
+				JSONObject obj = new JSONObject(s);
+				JSONObject result = (JSONObject) obj.get("result");
+				JSONArray artists = ((JSONArray) result.get("artists"));	
+				for(int i=0;i<artists.length();i++) {
+					JSONObject artist =  artists.getJSONObject(i);
+					String artistName = (String) artist.get("artist");
+					int artistId = (Integer) artist.get("artistid");
+					this.artists.put(artistName,artistId);
+				}		
+			} catch (JSONException e) {
+				reporter.error("JSON error in getArtists");
+			}
+		}
+	}
+	
+	private HashMap<String,Integer> genres = new HashMap<String,Integer>();
+	
+	private void getGenres(int id) {
+		if (genres.isEmpty()) {
+			String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"AudioLibrary.GetGenres\", \"id\": 1}");
+			try {
+				JSONObject obj = new JSONObject(s);
+				JSONObject result = (JSONObject) obj.get("result");
+				JSONArray items = ((JSONArray) result.get("genres"));	
+				for(int i=0;i<items.length();i++) {
+					JSONObject genre =  items.getJSONObject(i);
+					String genreName = (String) genre.get("label");
+					int genreId = (Integer) genre.get("genreid");
+					this.genres.put(genreName,genreId);
+				}		
+			} catch (JSONException e) {
+				reporter.error("JSON error in getGenres");
+			}
+		}
+	}
+	
+	private HashMap<String,Integer> albums = new HashMap<String,Integer>();
+	
+	private void getAlbums(int id) {
+		if (albums.isEmpty()) {
+			String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"AudioLibrary.GetAlbums\", \"id\": 1}");
+			try {
+				JSONObject obj = new JSONObject(s);
+				JSONObject result = (JSONObject) obj.get("result");
+				JSONArray items = ((JSONArray) result.get("albums"));	
+				for(int i=0;i<items.length();i++) {
+					JSONObject album =  items.getJSONObject(i);
+					String albumName = (String) album.get("label");
+					int albumId = (Integer) album.get("albumid");
+					this.albums.put(albumName,albumId);
+				}		
+			} catch (JSONException e) {
+				reporter.error("JSON error in getAlbums");
+			}
+		}
+	}
+	
+	private HashMap<String,Integer> musicVideos = new HashMap<String,Integer>();
+	
+	private void getMusicVideos(int id) {
+		if (musicVideos.isEmpty()) {
+			String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"VideoLibrary.GetMusicVideos\", \"id\": 1}");
+			try {
+				JSONObject obj = new JSONObject(s);
+				JSONObject result = (JSONObject) obj.get("result");
+				JSONArray items = ((JSONArray) result.get("musicvideos"));	
+				for(int i=0;i<items.length();i++) {
+					JSONObject item =  items.getJSONObject(i);
+					String label = (String) item.get("label");
+					int xbmcId = (Integer) item.get("musicvideoid");
+					this.musicVideos.put(label,xbmcId);
+				}		
+			} catch (JSONException e) {
+				reporter.error("JSON error in getMusicVideos");
+			}
+		}
+	}
+	
+	private boolean[] activePlayers(int id) {
+		boolean[] players = new boolean[3];
+		String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetActivePlayers\", \"id\": 1}");
+		try {
+			JSONObject obj = new JSONObject(s);
+			JSONArray items = (JSONArray) obj.get("result");	
+			for(int i=0;i<items.length();i++) {
+				JSONObject item =  items.getJSONObject(i);
+				int playerId = (Integer) item.get("playerid");
+				players[playerId] = true;
+				reporter.print("Player " + playerId + " is active");
+			}		
+		} catch (JSONException e) {
+			reporter.error("JSON error in getAlbums");
+		}
+		
+		return players;
+	}
+	
+	private HashMap<String,String> addons = new HashMap<String,String>();
+	
+	private void getAddons(int id) {
+		if (addons.isEmpty()) {
+			String s = execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Addons.GetAddons\", \"id\": 1}");
+			try {
+				JSONObject obj = new JSONObject(s);
+				JSONObject result = (JSONObject) obj.get("result");
+				JSONArray items = ((JSONArray) result.get("addons"));	
+				for(int i=0;i<items.length();i++) {
+					JSONObject item =  items.getJSONObject(i);
+					String type = (String) item.get("type");
+					String xbmcId = (String) item.get("addonid");
+					this.addons.put(xbmcId,type);
+					reporter.print("Addon: " + xbmcId + " , type: " + type);
+				}		
+			} catch (JSONException e) {
+				reporter.error("JSON error in getAddons");
+			}
+		}
 	}
 }

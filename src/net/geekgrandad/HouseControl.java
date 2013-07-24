@@ -33,6 +33,7 @@ import net.geekgrandad.interfaces.SensorControl;
 import net.geekgrandad.interfaces.SocketControl;
 import net.geekgrandad.interfaces.SpeechControl;
 import net.geekgrandad.interfaces.SwitchControl;
+import net.geekgrandad.interfaces.WeatherControl;
 import net.geekgrandad.parser.Parser;
 import net.geekgrandad.parser.Token;
 
@@ -82,6 +83,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
     private RemoteControl[]  remoteMediaControl = new RemoteControl[Config.MAX_MEDIA];
     private ComputerControl computerControl;
     private RemoteControl remoteComputerControl;
+    private WeatherControl weatherControl;
     
     private Token[] tokens;
     
@@ -93,7 +95,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
     private String defaultService = null;
     
     private int defaultTVDevice = 2;
-    private int defaultMusicDevice = 5;
+    private int defaultMediaDevice = 4;
     private int defaultAVDevice = 3;
     private int defaultSpeechDevice = 1;
     
@@ -159,6 +161,8 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 						}
 					} else if (s.equals("PowerControl")) {
 						powerControl = (PowerControl) o;
+					} else if (s.equals("WeatherControl")) {
+						weatherControl = (WeatherControl) o;
 					} else if (s.equals("AlarmControl")) {
 						alarmControl = (AlarmControl) o;
 					} else if (s.equals("HeatingControl")) {
@@ -511,7 +515,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 			expandTokens(2);
 			if (tokens.length > 3)tokens[3] = tokens[1];
 			tokens[2] = tokens[0];
-			tokens[1] = new Token("" +  + defaultMusicDevice, Parser.NUMBER, -1);
+			tokens[1] = new Token("" +  + defaultMediaDevice, Parser.NUMBER, -1);
 			tokens[0] = new Token(Parser.devices[Parser.MEDIA], Parser.DEVICE, -1);
 			numTokens += 2;
 		} else if (tokens[0].getType() == Parser.DEVICE_SET) {
@@ -649,6 +653,8 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 							return switchString(togo > 0);
 						case Parser.COMPUTER:
 							return switchString(true);
+						case Parser.WEATHER_STATION:
+							return weatherControl.getWeather();
 						default:
 							error("Cannot return the status of this device");
 							return ERROR;
@@ -839,6 +845,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 					case Parser.SKY_ON_DEMAND:
 					case Parser.PLAYLISTS:
 					case Parser.DILBERT:
+					case Parser.PODCASTS:
 						mediaControl[n].select(n+1, service);
 						return SUCCESS;
 					case Parser.SOURCE:
@@ -898,7 +905,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 						infraredControl.sendCommand(n+1, code);
 						return SUCCESS;
 					case Parser.TYPE:
-						mediaControl[n].type(n+1, tokens[3].getValue());
+						mediaControl[n].type(n+1, cmd.substring(cmd.indexOf("type") + 5));
 						return SUCCESS;
 					case Parser.PAGE_UP:
 						mediaControl[n].pageUp(n+1);
@@ -1431,5 +1438,20 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 	
 	public Browser getBrowser() {
 		return this;
+	}
+
+	@Override
+	public MediaControl getMediaControl(int n) {
+		return mediaControl[n-1];
+	}
+
+	@Override
+	public int getCurrentMediaDevice() {
+		return defaultMediaDevice;
+	}
+
+	@Override
+	public void setCurrentMediaDevice(int id) {
+		defaultMediaDevice = id;		
 	}
 }

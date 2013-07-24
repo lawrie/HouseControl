@@ -25,7 +25,7 @@ public class Config {
   public static final int MAX_SENSORS = 11;
   public static final int MAX_SWITCHES = 2;
   public static final int MAX_LIGHTS = 4;
-  public static final int MAX_SOCKETS = 5;
+  public static final int MAX_SOCKETS = 7;
   public static final int MAX_CAMERAS = 2;
   public static final int MAX_APPLIANCES = 5;
   public static final int MAX_WINDOWS = 3;
@@ -105,6 +105,7 @@ public class Config {
   private static final String SERVER = "server";
   private static final String LISTEN_PORT = "listen_port";
   private static final String LWRF_PORT = "lwrf_port";
+  private static final String X10_PORT = "x10_port";
   private static final String IAM_PORT = "iam_port";
   private static final String RFM12_PORT = "rfm12_port";
   private static final String CODE = "code";
@@ -218,7 +219,7 @@ public class Config {
   private String speechType, speechName, computerType;
   
   public int listenPort;
-  public String rfm12Port, iamPort, lwrfPort;
+  public String rfm12Port, iamPort, lwrfPort, x10Port;
   
   public long[] iamCodes = new long[MAX_APPLIANCES];
   private long iamCode;
@@ -649,6 +650,8 @@ public class Config {
              	  rfm12Port = attribute.getValue();
                 } else if (attribute.getName().toString().equals(LWRF_PORT)) {
              	  lwrfPort = attribute.getValue();
+                } else if (attribute.getName().toString().equals(X10_PORT)) {
+               	  x10Port = attribute.getValue();
                 } else if (attribute.getName().toString().equals(IAM_PORT)) {
                   iamPort = attribute.getValue();
                 } else if (attribute.getName().toString().equals(IAM_MIN_VALUE)) {

@@ -49,7 +49,7 @@ public class Parser {
 		"light", "socket", "appliance", "switch", "camera",
 		"sensor", "phone", "media", "radiator",
 		"robot", "alarm", "blind", "heating", 
-		"speech", "computer" };
+		"speech", "computer", "wstation" };
 
 	public static final int LIGHT = 0;
 	public static final int SOCKET = 1;
@@ -66,6 +66,8 @@ public class Parser {
 	public static final int HEATING = 12;
 	public static final int SPEECH = 13;
 	public static final int COMPUTER = 14;
+	public static final int WEATHER_STATION = 15;
+	
 	
 	public static String[] deviceSets = { "lights", "sockets", "appliances", "switches",
 		"cameras", "sensors", "phones",
@@ -113,7 +115,7 @@ public class Parser {
 		"featured", "navix", "weather", "ted",
 		"context", "pictures", "filemanager",
 		"video", "skyondemand", "playlists",
-		"dilbert"
+		"dilbert", "podcasts"
 	};
 	
 	public static final int SPOTIFY = 0;
@@ -169,6 +171,7 @@ public class Parser {
 	public static final int SKY_ON_DEMAND = 50;
 	public static final int PLAYLISTS = 51;
 	public static final int DILBERT = 52;
+	public static final int PODCASTS = 53;
 	
 	public static final String[] source = { "stb", "dvd", "blueray" };
 	
