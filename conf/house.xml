@@ -3,6 +3,13 @@
         <room id="7" name="Hall">
             <camera id="1" name="Snooper" type="rpi" host="192.168.0.8:8081"></camera>
             <socket id="3" name="Snoopy" type="LWRF" code="6febbeedb77b" channel="3"></socket>
+            <computer id="3" name="Led" type="remote" server="192.168.0.13" ></computer>
+            <computer id="4" name="Shoulder" type="remote" server="192.168.0.13" ></computer>
+            <computer id="5" name="Elbow" type="remote" server="192.168.0.13" ></computer>
+            <computer id="6" name="Wrist" type="remote" server="192.168.0.13" ></computer>
+            <computer id="7" name="Gripper" type="remote" server="192.168.0.13" ></computer>
+            <computer id="8" name="Base" type="remote" server="192.168.0.13" ></computer>
+            <computer id="9" name="Keith" type="remote" server="192.168.0.13" ></computer>
         </room>
         <room id="5" name="Dining">
             <emontx id="10">
@@ -22,10 +29,12 @@
             <light id="4" name="Picasso" type="LWRF" code="6febbeedb77b" channel="8"></light>
             <socket id="1" name="Fan" type="LWRF" code="6febbeedb77b" channel="1"></socket>
             <socket id="2" name="Spy" type="LWRF" code="6febbeedb77b" channel="2"></socket>
-            <socket id="4" name="Frame" type="LWRF" code="6febbeedb77b" channel="9"></socket>
+            <socket id="4" name="Frame" type="LWRF" code="6febbeedb77b" channel="4"></socket>
             <socket id="5" name="Dock" type="LWRF" code="6febbeedb77b" channel="10"></socket>
-            <socket id="6" name="Coffee" type="LWRF" code="6febbeedb77b" channel="11"></socket>
-            <socket id="7" name="Print" type="LWRF" code="6febbeedb77b" channel="12"></socket>
+            <socket id="6" name="Coffee" type="LWRF" code="6febbeedb77b" channel="12"></socket>
+            <socket id="7" name="Print" type="LWRF" code="6febbeedb77b" channel="11"></socket>
+            <socket id="8" name="Trans" type="LWRF" code="6febbeedb77b" channel="9"></socket>
+            <socket id="9" name="Pi" type="LWRF" code="6febbeedb77b" channel="13"></socket>
             <appliance id="4" name="bedmedia" code="2037787242" type="IAM"></appliance>
             <media id="1" channel="1" name="tv" type="TIVO"></media>
             <media id="2" channel="2" name="vt" type="TIVO">
@@ -147,7 +156,6 @@
         </room>
         <room id="9" name="Landing"></room>
     </floor>
-    <robot id="1" name="keith"></robot>
     <wstation id="1" name="wunder"></wstation>
     <heating default_temperature="16" temperature_sensor="1" humidity_sensor="1"></heating>
     <phone id="1" type="android" name="phone"></phone>

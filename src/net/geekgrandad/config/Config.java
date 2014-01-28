@@ -24,8 +24,8 @@ public class Config {
   public static final int MAX_ROOMS = 9;
   public static final int MAX_SENSORS = 11;
   public static final int MAX_SWITCHES = 2;
-  public static final int MAX_LIGHTS = 4;
-  public static final int MAX_SOCKETS = 7;
+  public static final int MAX_LIGHTS = 5;
+  public static final int MAX_SOCKETS = 9;
   public static final int MAX_CAMERAS = 2;
   public static final int MAX_APPLIANCES = 5;
   public static final int MAX_WINDOWS = 3;
@@ -36,7 +36,7 @@ public class Config {
   public static final int MAX_PHONES = 1;
   public static final int MAX_TABLETS = 1;
   public static final int MAX_SPEECH = 2;
-  public static final int MAX_COMPUTERS = 7;
+  public static final int MAX_COMPUTERS = 10;
   
   public int[][] roomSockets = new int[MAX_ROOMS][];
   public int[][] roomLights = new int[MAX_ROOMS][];

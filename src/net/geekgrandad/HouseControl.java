@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -279,6 +280,25 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 			return InetAddress.getByName(host).isReachable(config.pingTimeout);
 		} catch (Exception e) {
 			return false;
+		}
+	}
+	
+	public byte[] getMACAddress(String host) {
+		try {
+			InetAddress address = InetAddress.getByName(host);
+			NetworkInterface ni = NetworkInterface.getByInetAddress(address);
+			return ni.getHardwareAddress();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public String getIPAddress(String host) {
+		try {
+			InetAddress address = InetAddress.getByName(host);
+			return address.getHostAddress();
+		} catch (Exception e) {
+			return null;
 		}
 	}
 
