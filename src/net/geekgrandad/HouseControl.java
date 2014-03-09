@@ -551,8 +551,8 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 		
 		// Print tokens
 		for(int i=0;i<tokens.length;i++) {
-			print("Token " + (i+1) + ": " + tokens[i].getValue());
-			print("Token " + (i+1) + " type: " + tokens[i].getType());
+			debug("Token " + (i+1) + ": " + tokens[i].getValue());
+			debug("Token " + (i+1) + " type: " + tokens[i].getType());
 		}
 		
 		// Execute command

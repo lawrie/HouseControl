@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+    <project name="HouseControl" basedir="." default="jar">
+    <property file="local.properties" />
+    <property name="source.dir"     value="src"/>
+    <property name="class.dir"      value="build"/>
+    <property name="jar.dir"        value="."/>
+    <property name="lib.dir"        value="lib"/>
+    <property name="main.class"     value="net.geekgrandad.HouseControl"/>
+    
+    <path id="libraries.path">    
+    	<fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean" description="delete old files">
+        <delete dir="${class.dir}"/>
+    </target>
+
+    <target name="compile" description="build class files" depends="clean">
+        <mkdir dir="${class.dir}"/>
+        <javac srcdir="${source.dir}" destdir="${class.dir}">
+            <classpath refid="libraries.path"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${class.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+                <attribute name="Class-Path" value="${lib.dir}/mail.jar ${lib.dir}/jacob.jar ${lib.dir}/jna-3.5.1.jar ${lib.dir}/platform-3.5.1.jar ${lib.dir}/xively4j.jar ${lib.dir}/freetts.jar ${lib.dir}/cms_us_kal.jar ${lib.dir}/cmulex.jar ${lib.dir}/en_us.jar ${lib.dir}/jsr113.jar ${lib.dir}/org.jvoicexml.jsapi2.jar ${lib.dir}/org.jvoicexml.jsapi2.jse.jar ${lib.dir}/org.jvoicexml.jsapi2.jse.freetts.jar ${lib.dir}/httpclient-4.2.3.jar ${lib.dir}/httpcore-4.2.2.jar ${lib.dir}/json.jar ${lib.dir}/RXTXcomm.jar ${lib.dir}/log4j-core-2.0-beta4.jar ${lib.dir}/log4j-api-2.0-beta4.jar ${lib.dir}/log4j-1.2.16.jar ${lib.dir}/commons-logging-1.1.1.jar ${lib.dir}/commons-codec-1.8.jar"/>
+            </manifest>
+        </jar>  
+    </target>
+</project>
