@@ -1,4 +1,4 @@
 cd ..
-java -cp "lib/*;HouseControl.jar" -Djava.library.path=bin net.geekgrandad.HouseControl %1
+java -cp "lib/*;bin" -Djava.library.path=bin net.geekgrandad.HouseControl %1
 cd bin
 

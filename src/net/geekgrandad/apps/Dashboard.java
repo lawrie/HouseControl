@@ -1,8 +1,9 @@
 package net.geekgrandad.apps;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -15,9 +16,11 @@ import java.net.UnknownHostException;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
@@ -29,13 +32,15 @@ public class Dashboard extends JFrame {
 	private String host = "localhost";
 	private JLabel power, temperature, light, occupied, dishWasher, bedMedia, xbox, dryer, washer;
 	private JPanel panel;
-	private Border raisedEtched = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);;
+	private Border raisedEtched = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
+	private JTextField cmd = new JTextField(10);
+	private JButton send = new JButton("Send");
 
 	public Dashboard() {
 		super("Dashboard");
 		setAlwaysOnTop( true );
 		panel = new JPanel();
-		panel.setPreferredSize(new Dimension(200,600));
+		panel.setPreferredSize(new Dimension(200,500));
 		panel.setBackground(background);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		setContentPane(panel);
@@ -50,6 +55,22 @@ public class Dashboard extends JFrame {
 		bedMedia = detail("Bed media");
 		xbox = detail("XBox");
 		
+		cmd.setMaximumSize(new Dimension(150,30));
+		panel.add(cmd);
+		panel.add(send);
+		
+		send.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String reply = get(cmd.getText());
+				System.out.println("Reply is " + reply);
+				cmd.setText("");
+			}
+			
+		});
+		
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    addWindowListener(new WindowAdapter() {
 	        @Override
@@ -61,11 +82,13 @@ public class Dashboard extends JFrame {
 	
 	public JLabel detail(String label) {
 		JPanel p = new JPanel();
+		p.setBackground(new Color(0x32C9D1));
 		p.setBorder(raisedEtched);
 		p.setMaximumSize(new Dimension(150,30));
 		JLabel l = new JLabel(label+":");
 		p.add(l);
 		JLabel v = new JLabel("n/a");
+		v.setForeground(new Color(0xFA8507));
 		p.add(v);
 		panel.add(Box.createRigidArea(new Dimension(0, 5)));
 		panel.add(p);

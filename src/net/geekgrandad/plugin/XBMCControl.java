@@ -2,7 +2,6 @@ package net.geekgrandad.plugin;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.http.HttpEntity;
@@ -31,8 +30,7 @@ public class XBMCControl implements MediaControl {
 	private Reporter reporter;
 	private Config config;
 	private HttpClient client = new DefaultHttpClient();
-	private int volume = 0; // TODO: needs array
-	private String playlist = " ";
+	private int volume = 0; 
 	private int playerId = 0;
 
 	@Override
@@ -77,7 +75,6 @@ public class XBMCControl implements MediaControl {
 
 	@Override
 	public void start(int id, String playlist, boolean repeat) {
-		this.playlist = playlist;
 		reporter.print("XBMC: playlist:" + playlist);
 		execute(id, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\": {\"file\": \"special://profile/playlists/music/" + playlist + ".xsp\" } }, \"id\": 1}"); 	
 	}
