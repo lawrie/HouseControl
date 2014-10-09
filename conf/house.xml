@@ -35,6 +35,7 @@
             <socket id="7" name="Print" type="LWRF" code="6febbeedb77b" channel="11"></socket>
             <socket id="8" name="Trans" type="LWRF" code="6febbeedb77b" channel="9"></socket>
             <socket id="9" name="Pi" type="LWRF" code="6febbeedb77b" channel="13"></socket>
+            <socket id="10" name="Bench" type="LWRF" code="6febbeedb77b" channel="14"></socket>
             <appliance id="4" name="bedmedia" code="2037787242" type="IAM"></appliance>
             <media id="1" channel="1" name="tv" type="TIVO"></media>
             <media id="2" channel="2" name="vt" type="TIVO">

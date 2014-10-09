@@ -29,16 +29,18 @@ public class Dashboard extends JFrame {
 	private static final Color background = Color.WHITE;
 	
 	private Socket sock;
-	private String host = "localhost";
+	private String host;
 	private JLabel power, temperature, light, occupied, dishWasher, bedMedia, xbox, dryer, washer;
 	private JPanel panel;
 	private Border raisedEtched = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 	private JTextField cmd = new JTextField(10);
 	private JButton send = new JButton("Send");
+	private JLabel reply = new JLabel();
 
-	public Dashboard() {
+	public Dashboard(String host) {
 		super("Dashboard");
 		setAlwaysOnTop( true );
+		this.host = host;
 		panel = new JPanel();
 		panel.setPreferredSize(new Dimension(200,500));
 		panel.setBackground(background);
@@ -52,24 +54,23 @@ public class Dashboard extends JFrame {
 		dishWasher = detail("Dish washer");
 		dryer = detail("Dryer");
 		washer = detail("Washer");
-		bedMedia = detail("Bed media");
+		bedMedia = detail("Bedroom");
 		xbox = detail("XBox");
 		
 		cmd.setMaximumSize(new Dimension(150,30));
+		reply.setMaximumSize(new Dimension(150,30));
 		panel.add(cmd);
 		panel.add(send);
+		panel.add(reply);
 		
 		send.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String reply = get(cmd.getText());
-				System.out.println("Reply is " + reply);
+				String rep = get(cmd.getText());
 				cmd.setText("");
+				reply.setText(rep);
 			}
-			
 		});
-		
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    addWindowListener(new WindowAdapter() {
@@ -98,17 +99,17 @@ public class Dashboard extends JFrame {
 	
 	public void run() {
 		for(;;) {
-			power.setText(get("power"));
-			temperature.setText(get("temperature 3"));
-			light.setText(get("lightlevel 2"));
-			occupied.setText(get("occupied 3").equals("on") ? "yes" : "no");
-			dishWasher.setText(get("Dishwasher value"));
-			bedMedia.setText(get("Bedmedia value"));
-			xbox.setText(get("Xbox value"));
-			dryer.setText(get("Dryer value"));
-			washer.setText(get("Washer value"));
-			revalidate();
 			try {
+				power.setText(get("power") + " watts");
+				temperature.setText(get("temperature 3") + " °C");
+				light.setText(get("lightlevel 2") + " %");
+				occupied.setText(get("occupied 3").equals("on") ? "yes" : "no");
+				dishWasher.setText(get("Dishwasher value") + " watts");
+				bedMedia.setText(get("Bedmedia value") + " watts");
+				xbox.setText(get("Xbox value") + " watts");
+				dryer.setText(get("Dryer value") + " watts");
+				washer.setText(get("Washer value") + " watts");
+				revalidate();
 				Thread.sleep(3000);
 			} catch (InterruptedException e) {
 				// Ignore
@@ -122,6 +123,7 @@ public class Dashboard extends JFrame {
 		    PrintWriter out = new PrintWriter(sock.getOutputStream(),true);
 		    BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		    out.println(msg);
+		    out.flush();
 		    String ret = in.readLine();
 		    out.close();
 		    in.close();
@@ -142,7 +144,7 @@ public class Dashboard extends JFrame {
 	}
 	
 	public static void main(String[] args) {
-		Dashboard dash = new Dashboard();
+		Dashboard dash = new Dashboard(args.length > 0 ? args[0] : "localhost");
 		dash.pack();
 		dash.setVisible(true);
 		dash.run();

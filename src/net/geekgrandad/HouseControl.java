@@ -255,14 +255,15 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 				error("Exception executing cmd: " + e);
 			} finally {
 				// After a line read, close streams and socket
+				if (os != null)
+					try {
+						os.flush();
+						os.close();
+					} catch (IOException e) {
+					}
 				if (is != null)
 					try {
 						is.close();
-					} catch (IOException e) {
-					}
-				if (os != null)
-					try {
-						os.close();
 					} catch (IOException e) {
 					}
 				if (s != null)

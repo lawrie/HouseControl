@@ -25,7 +25,7 @@ public class Config {
   public static final int MAX_SENSORS = 11;
   public static final int MAX_SWITCHES = 2;
   public static final int MAX_LIGHTS = 5;
-  public static final int MAX_SOCKETS = 9;
+  public static final int MAX_SOCKETS = 10;
   public static final int MAX_CAMERAS = 2;
   public static final int MAX_APPLIANCES = 5;
   public static final int MAX_WINDOWS = 3;
