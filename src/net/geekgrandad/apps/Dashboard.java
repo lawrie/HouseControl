@@ -101,7 +101,7 @@ public class Dashboard extends JFrame {
 		for(;;) {
 			try {
 				power.setText(get("power") + " watts");
-				temperature.setText(get("temperature 3") + " °C");
+				temperature.setText(get("temperature 3") + " C");
 				light.setText(get("lightlevel 2") + " %");
 				occupied.setText(get("occupied 3").equals("on") ? "yes" : "no");
 				dishWasher.setText(get("Dishwasher value") + " watts");
