@@ -7,13 +7,16 @@
     <Console name="Error" target="SYSTEM_ERR">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"/>
     </Console>
+    <File name="Log" fileName="log/app.log">
+        <PatternLayout pattern="%d{yyyy-mm-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </File>
   </appenders>
   <loggers>
     <root level="error">
       <appender-ref ref="Error"/>
     </root>
     <logger name="HouseControl" level="info" additivity="true">
-      <appender-ref ref="Console"/>
+      <appender-ref ref="Log"/>
     </logger>
   </loggers>
 </configuration>

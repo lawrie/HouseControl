@@ -103,7 +103,8 @@ public class Dashboard extends JFrame {
 				power.setText(get("power") + " watts");
 				temperature.setText(get("temperature 3") + " C");
 				light.setText(get("lightlevel 2") + " %");
-				occupied.setText(get("occupied 3").equals("on") ? "yes" : "no");
+				String occ = get("occupied 3");
+				occupied.setText(occ != null && occ.equals("on") ? "yes" : "no");
 				dishWasher.setText(get("Dishwasher value") + " watts");
 				bedMedia.setText(get("Bedmedia value") + " watts");
 				xbox.setText(get("Xbox value") + " watts");
