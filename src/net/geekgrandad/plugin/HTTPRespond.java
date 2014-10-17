@@ -57,7 +57,7 @@ public class HTTPRespond implements HTTPControl {
 			for (int light : config.roomLights[LIVING_ROOM]) {
 				lightControl.switchLight(light, true);
 			}
-		} else if (req.equals(HTTP_LIGHT)) {
+		} else if (req.equals(HTTP_DARK)) {
 			// Switch living room lights off
 			for (int light : config.roomLights[LIVING_ROOM]) {
 				lightControl.switchLight(light, false);

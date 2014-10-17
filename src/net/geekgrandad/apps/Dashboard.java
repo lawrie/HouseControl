@@ -42,7 +42,7 @@ public class Dashboard extends JFrame {
 		setAlwaysOnTop( true );
 		this.host = host;
 		panel = new JPanel();
-		panel.setPreferredSize(new Dimension(200,500));
+		panel.setPreferredSize(new Dimension(250,500));
 		panel.setBackground(background);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		setContentPane(panel);
@@ -57,18 +57,23 @@ public class Dashboard extends JFrame {
 		bedMedia = detail("Bedroom");
 		xbox = detail("XBox");
 		
-		cmd.setMaximumSize(new Dimension(150,30));
-		reply.setMaximumSize(new Dimension(150,30));
+		cmd.setMaximumSize(new Dimension(200,30));
+		reply.setMaximumSize(new Dimension(200,30));
 		panel.add(cmd);
 		panel.add(send);
 		panel.add(reply);
 		
 		send.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				String rep = get(cmd.getText());
-				cmd.setText("");
-				reply.setText(rep);
+			public void actionPerformed(ActionEvent e) {
+				sendCommand();
+			}
+		});
+		
+		cmd.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sendCommand();
 			}
 		});
 		
@@ -81,11 +86,17 @@ public class Dashboard extends JFrame {
 	    });
 	}
 	
+	private void sendCommand() {
+		String rep = get(cmd.getText());
+		cmd.setText("");
+		reply.setText(rep);
+	}
+	
 	public JLabel detail(String label) {
 		JPanel p = new JPanel();
 		p.setBackground(new Color(0x32C9D1));
 		p.setBorder(raisedEtched);
-		p.setMaximumSize(new Dimension(150,30));
+		p.setMaximumSize(new Dimension(200,30));
 		JLabel l = new JLabel(label+":");
 		p.add(l);
 		JLabel v = new JLabel("n/a");

@@ -343,7 +343,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 
 	// Send string reply
 	private void writeString(String s) throws IOException {
-		os.write(s.getBytes());
+		os.write((s+"\n").getBytes());
 	}
 
 	// Print a message on the console
