@@ -3,7 +3,7 @@
     <property file="local.properties" />
     <property name="source.dir"     value="src"/>
     <property name="class.dir"      value="build"/>
-    <property name="jar.dir"        value="."/>
+    <property name="jar.dir"        value="lib"/>
     <property name="lib.dir"        value="lib"/>
     <property name="main.class"     value="net.geekgrandad.HouseControl"/>
     

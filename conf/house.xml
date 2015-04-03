@@ -1,15 +1,15 @@
 <house>
     <floor id="1" name="Ground floor">
         <room id="7" name="Hall">
-            <camera id="1" name="Snooper" type="rpi" host="192.168.0.5:8081"></camera>
+            <camera id="1" name="Snooper" type="rpi" host="doorcam:8081"></camera>
             <socket id="3" name="Snoopy" type="LWRF" code="6febbeedb77b" channel="3"></socket>
-            <computer id="3" name="Led" type="remote" server="192.168.0.13" ></computer>
-            <computer id="4" name="Shoulder" type="remote" server="192.168.0.13" ></computer>
-            <computer id="5" name="Elbow" type="remote" server="192.168.0.13" ></computer>
-            <computer id="6" name="Wrist" type="remote" server="192.168.0.13" ></computer>
-            <computer id="7" name="Gripper" type="remote" server="192.168.0.13" ></computer>
-            <computer id="8" name="Base" type="remote" server="192.168.0.13" ></computer>
-            <computer id="9" name="Keith" type="remote" server="192.168.0.13" ></computer>
+            <computer id="3" name="Led" type="remote" server="keith" ></computer>
+            <computer id="4" name="Shoulder" type="remote" server="keith" ></computer>
+            <computer id="5" name="Elbow" type="remote" server="keith" ></computer>
+            <computer id="6" name="Wrist" type="remote" server="keith" ></computer>
+            <computer id="7" name="Gripper" type="remote" server="keith" ></computer>
+            <computer id="8" name="Base" type="remote" server="keith" ></computer>
+            <computer id="9" name="Keith" type="remote" server="keith" ></computer>
         </room>
         <room id="5" name="Dining">
             <emontx id="10">
@@ -17,6 +17,10 @@
                 <power></power>
             </emontx>
             <appliance id="5" name="xbox" code="1880848504" type="IAM"></appliance>
+            <mqtt_sensor name="esp8266">
+                <temperature topic="/weather/temperature"></temperature>
+                <pressure topic="/weather/pressure"></pressure>
+            </mqtt_sensor>
         </room>
         <room id="6" name="Utility">
             <appliance id="1" name="Dryer" type="IAM" code="1884046140"></appliance>
@@ -29,8 +33,8 @@
             <light id="4" name="Picasso" type="LWRF" code="6febbeedb77b" channel="8"></light>
             <socket id="1" name="Fan" type="LWRF" code="6febbeedb77b" channel="1"></socket>
             <socket id="2" name="Spy" type="LWRF" code="6febbeedb77b" channel="2"></socket>
-            <socket id="4" name="Frame" type="LWRF" code="6febbeedb77b" channel="4"></socket>
-            <socket id="5" name="Dock" type="LWRF" code="6febbeedb77b" channel="10"></socket>
+            <socket id="4" name="Banjolele" type="LWRF" code="6febbeedb77b" channel="4"></socket>
+            <socket id="5" name="Guitare" type="LWRF" code="6febbeedb77b" channel="10"></socket>
             <socket id="6" name="Coffee" type="LWRF" code="6febbeedb77b" channel="12"></socket>
             <socket id="7" name="Print" type="LWRF" code="6febbeedb77b" channel="11"></socket>
             <socket id="8" name="Trans" type="LWRF" code="6febbeedb77b" channel="9"></socket>
@@ -117,6 +121,13 @@
                 <plant></plant>
                 <battery></battery>
             </sensor>
+            <sensor id="8" name="Couch" type="Jeenode">
+                <temperature></temperature>
+                <lightlevel></lightlevel>
+                <motion></motion>
+                <plant></plant>
+                <battery></battery>
+            </sensor>
             <window id="1" name="front">
                 <blind id="1" type="coulisse" name="front"></blind>
                 <switch id="1" name="Front" type="LWRF" code="6FEBDBDEDB7D" channel="10"></switch>
@@ -164,9 +175,11 @@
     <email recipient="lawrie.griffiths@ntlworld.com"></email>
     <cosm api_key="5e8sM5Ls6RJhqilxUPtdq3LEF8ySAKxIbkVMS2RudjZiTT0g" 
         feed="86697" power="0" energy="1"></cosm>
-    <config listen_port="50000" rfm12_port="COM15" lwrf_port="COM8" x10_port="COM9"
-        iam_port="COM20" iam_min_value="3" iam_min_off_period="120000"
-        occupied_interval="300000" ping_timeout="5000" background_delay="10000"></config>
+    <!-- Windows ports:  rfm12_port="COM15" lwrf_port="COM8" x10_port="COM9" iam_port="COM20"-->
+    <config listen_port="50000" rfm12_port="/dev/ttyUSB0" lwrf_port="/dev/ttyACM0" x10_port="COM9"
+        iam_port="/dev/ttyUSB1" iam_min_value="3" iam_min_off_period="120000"
+        occupied_interval="300000" ping_timeout="5000" background_delay="10000"
+        mqtt_server="tcp://nodered:1883"></config>
     <plugins>
         <plugin class="net.geekgrandad.plugin.TivoControl" type="TIVO">
             <interface name="MediaControl"></interface>
@@ -232,6 +245,9 @@
         </plugin>
         <plugin class="net.geekgrandad.plugin.WundergroundWeather">
             <interface name="WeatherControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.MQTTControl">
+            <interface name="MQTT"></interface>
         </plugin>
     </plugins>
 </house>

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -22,7 +23,8 @@ public class Config {
 		
   public static final int MAX_FLOORS = 3;
   public static final int MAX_ROOMS = 9;
-  public static final int MAX_SENSORS = 11;
+  public static final int MAX_SENSORS = 12;
+  public static final int MAX_MQTT_SENSORS = 1;
   public static final int MAX_SWITCHES = 2;
   public static final int MAX_LIGHTS = 5;
   public static final int MAX_SOCKETS = 10;
@@ -42,6 +44,7 @@ public class Config {
   public int[][] roomLights = new int[MAX_ROOMS][];
   public int[][] roomAppliances = new int[MAX_ROOMS][];
   public int[][] roomSensors = new int[MAX_ROOMS][];
+  public int[][] roomMqttSensors = new int[MAX_ROOMS][];
   public int[][] roomCameras = new int[MAX_ROOMS][];
   public int[][] roomWindows = new int[MAX_ROOMS][];
   public int[][] roomSwitches = new int[MAX_ROOMS][];
@@ -53,6 +56,7 @@ public class Config {
   private int[] windows = new int[MAX_WINDOWS];
   private int[] appliances = new int[MAX_APPLIANCES];
   private int[] sensors = new int[MAX_SENSORS];
+  private int[] mqttSensors = new int[MAX_MQTT_SENSORS];
   private int[] media = new int[MAX_MEDIA];
   private int[] cameras = new int[MAX_CAMERAS];
   private int[] switches = new int[MAX_SWITCHES];
@@ -121,20 +125,24 @@ public class Config {
   private static final String BACKGROUND_DELAY = "background_delay";
   private static final String HOST = "host";
   private static final String CLASS = "class";
+  private static final String TOPIC = "topic";
+  private static final String MQTT_SERVER = "mqtt_server";
   
   // Elements
   private static final String FLOOR = "floor";
   private static final String ROOM = "room";
   private static final String SENSOR = "sensor";
+  private static final String MQTT_SENSOR = "mqtt_sensor";
   private static final String LIGHT = "light";
   private static final String SOCKET = "socket";
   private static final String SWITCH = "switch";
   private static final String APPLIANCE = "appliance";
   private static final String BATTERY = "battery";
   private static final String LIGHTLEVEL = "lightlevel";
-  private static final String TEMPERATURE = "temperature";
+  public static final String TEMPERATURE = "temperature";
   private static final String MOTION = "motion";
   private static final String HUMIDITY = "humidity";
+  public static final String PRESSURE = "pressure";
   private static final String PHONE = "phone";
   private static final String SPOTIFY = "spotify";
   private static final String PLAYLIST = "playlist";
@@ -174,6 +182,7 @@ public class Config {
   public String[] floorNames = new String[MAX_FLOORS];
   public String[] roomNames = new String[MAX_ROOMS];
   public String[] sensorNames = new String[MAX_SENSORS];
+  public String[] mqttSensorNames = new String[MAX_MQTT_SENSORS];
   public String[] lightNames = new String[MAX_LIGHTS];
   public String[] socketNames = new String[MAX_SOCKETS];
   public String[] switchNames = new String[MAX_SWITCHES];
@@ -191,6 +200,7 @@ public class Config {
   public HashMap<String,String> typeClass = new HashMap<String,String>();
   public HashMap<String,String> classType = new HashMap<String,String>();
   public HashMap<String,List<String>> classInterfaces = new HashMap<String,List<String>>();
+  public HashMap<String,String> mqttTopics = new HashMap<String,String>();
   
   private int floorId, roomId, sensorId, lightId, socketId, windowId, cameraId, applianceId, mediaId;
   private int phoneId, channelId, tabletId, switchId,emontxId, speechId, computerId;
@@ -205,12 +215,13 @@ public class Config {
   private String playlist, link;
   
   private int numLights, numSockets, numWindows, numCameras, numAppliances, 
-              numMedia, numSensors, numSwitches, numSpeech, numComputers;
+              numMedia, numSensors, numSwitches, numSpeech, numComputers, numMqttSensors;
   private int numFloors = 0;
   private int numRooms = 0;
   
   public boolean email=false;
   public String emailUser, emailPassword, emailRecipient;
+  public String topic, mqttServer;
   
   public boolean cosm = false;
   public String cosmApiKey, cosmFeed, cosmPower, cosmEnergy;
@@ -299,6 +310,7 @@ public class Config {
               numCameras=0;
               numAppliances = 0;
               numSensors = 0;
+              numMqttSensors = 0;
               numMedia = 0;
               numSwitches = 0;
               numSpeech = 0;
@@ -329,6 +341,18 @@ public class Config {
             	sensorName = attribute.getValue();
               } else if (attribute.getName().toString().equals(TYPE)) {
             	sensorType = attribute.getValue();
+              }
+            }
+          } else if (event.asStartElement().getName().getLocalPart().equals(MQTT_SENSOR)) {
+        	debug("Start mqtt sensor");
+        	
+            // We read the attributes from this tag and process the is and name attributes
+            Iterator<Attribute> attributes = startElement.getAttributes();
+            while (attributes.hasNext()) {
+              Attribute attribute = attributes.next();
+              if (attribute.getName().toString().equals(NAME)) {
+            	sensorName = attribute.getValue();
+            	numMqttSensors++;
               }
             }
           } else if (event.asStartElement().getName().getLocalPart().equals(LIGHT)) {
@@ -539,10 +563,30 @@ public class Config {
             debug("Start light level");
         } else if (event.asStartElement().getName().getLocalPart().equals(TEMPERATURE)) {
             debug("Start temperature");
+            
+            Iterator<Attribute> attributes = startElement.getAttributes();
+            while (attributes.hasNext()) {
+              Attribute attribute = attributes.next();
+              if (attribute.getName().toString().equals(TOPIC)) {
+            	  topic = attribute.getValue();
+            	  mqttTopics.put(sensorName + ":" + TEMPERATURE, topic);
+              }
+            }
         } else if (event.asStartElement().getName().getLocalPart().equals(MOTION)) {
             debug("Start motion");
         } else if (event.asStartElement().getName().getLocalPart().equals(HUMIDITY)) {
             debug("Start humidity");
+        } else if (event.asStartElement().getName().getLocalPart().equals(PRESSURE)) {
+            debug("Start pressure");
+            
+            Iterator<Attribute> attributes = startElement.getAttributes();
+            while (attributes.hasNext()) {
+              Attribute attribute = attributes.next();
+              if (attribute.getName().toString().equals(TOPIC)) {
+            	  topic = attribute.getValue();
+            	  mqttTopics.put(sensorName + ":" + PRESSURE, topic);
+              }
+            }
         } else if (event.asStartElement().getName().getLocalPart().equals(PLANT)) {
             debug("Start plant");
             plantSensorId = sensorId;
@@ -664,7 +708,9 @@ public class Config {
                   pingTimeout = Integer.parseInt(attribute.getValue());
                 } else if (attribute.getName().toString().equals(BACKGROUND_DELAY)) {
                   backgroundDelay = Integer.parseInt(attribute.getValue());
-                }
+                } else if (attribute.getName().toString().equals(MQTT_SERVER)) {
+                    mqttServer = attribute.getValue();
+                  }
               }
            } else if (event.asStartElement().getName().getLocalPart().equals(HEATING)) {
                debug("Start heating");
@@ -762,7 +808,9 @@ public class Config {
         	  debug("End temperature");
           } else if (endElement.getName().getLocalPart() == (HUMIDITY)) {
         	  debug("End humidity");
-          } else if (endElement.getName().getLocalPart() == (MOTION)) {
+          } else if (endElement.getName().getLocalPart() == (PRESSURE)) {
+        	  debug("End pressure");
+          }else if (endElement.getName().getLocalPart() == (MOTION)) {
         	  debug("End motion");
           } else if (endElement.getName().getLocalPart() == (PLANT)) {
         	  debug("End plant");
@@ -808,6 +856,10 @@ public class Config {
           	  sensorNames[sensorId-1] = sensorName;
           	  sensorTypes[sensorId-1] = sensorType;
           	  debug("End sensor id  = " + sensorId + ", name = " + sensorNames[sensorId-1]);
+          } else if (endElement.getName().getLocalPart() == (MQTT_SENSOR)) {
+        	  mqttSensors[numMqttSensors-1] = numMqttSensors;
+          	  mqttSensorNames[numMqttSensors-1] = sensorName;
+          	  debug("End mqtt name = " + mqttSensorNames[numMqttSensors-1]);
           } else if (endElement.getName().getLocalPart() == (ROOM)) {
           	roomNames[roomId-1] = roomName;
           	
@@ -815,6 +867,10 @@ public class Config {
           	int[] a = new int[numSensors];
           	roomSensors[roomId-1] = a;
           	for(int i=0;i<numSensors;i++) a[i] = sensors[i];
+          	
+          	a = new int[numMqttSensors];
+          	roomMqttSensors[roomId-1] = a;
+          	for(int i=0;i<numMqttSensors;i++) a[i] = mqttSensors[i];
           	
           	// Room sockets
           	a = new int[numSockets];
@@ -932,6 +988,18 @@ public class Config {
     	}
     }
     
+    System.out.println("\nRoom Mqtt Sensors:");
+    for(int i=0;i<MAX_ROOMS;i++) {
+    	if (roomMqttSensors[i] != null && roomMqttSensors[i].length > 0) {
+	    	System.out.print("  " + roomNames[i] + ": ");
+	    	for(int j = 0;j<roomMqttSensors[i].length;j++) {
+	    		int n = roomMqttSensors[i][j];
+	    		System.out.print(n + "(" + mqttSensorNames[n-1] + ") ");
+	    	}
+	    	System.out.println();
+    	}
+    }
+    
     System.out.println("\nRoom Cameras:");
     for(int i=0;i<MAX_ROOMS;i++) {
     	if (roomCameras[i] != null && roomCameras[i].length > 0) {
@@ -978,6 +1046,8 @@ public class Config {
     System.out.println("LWRF port: " + lwrfPort);
     System.out.println("IAM port: " + iamPort);
     
+    System.out.println("\nMQTT Server: " + mqttServer);
+    
     System.out.println("\nPhone name: " + phoneName);
     
     System.out.println("\nDefault temperature: " + defaultTemperature);
@@ -994,6 +1064,12 @@ public class Config {
     
     System.out.println("\nRobot id: " + robotId);
     System.out.println("Robot name: " + robotName);
+    
+    System.out.println("\nMQTT topics");
+    Set<String> set = mqttTopics.keySet();
+    for(String s: set) {
+    	System.out.println(s + "\t" + mqttTopics.get(s));
+    }
     
     System.out.println("\nPlugin Type to Class: ");
     for(String s: typeClass.keySet()) {

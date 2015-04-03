@@ -25,6 +25,7 @@ import net.geekgrandad.interfaces.HTTPControl;
 import net.geekgrandad.interfaces.HeatingControl;
 import net.geekgrandad.interfaces.InfraredControl;
 import net.geekgrandad.interfaces.LightControl;
+import net.geekgrandad.interfaces.MQTT;
 import net.geekgrandad.interfaces.MediaControl;
 import net.geekgrandad.interfaces.PowerControl;
 import net.geekgrandad.interfaces.Provider;
@@ -72,6 +73,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
     private AlarmControl alarmControl;
     private HeatingControl heatingControl;
     private DatalogControl datalogControl;
+    private MQTT mqttControl;
     private LightControl[] lightControl = new LightControl[Config.MAX_LIGHTS];
     private SocketControl[] socketControl = new SocketControl[Config.MAX_SOCKETS];
     private SwitchControl[] switchControl = new SwitchControl[Config.MAX_SWITCHES];
@@ -105,7 +107,8 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 	// Run the main thread
 	public void run() {
 		
-		// Load plugins		
+		// Load plugins	
+		print("Loading plugins");
 		for(String c: config.classInterfaces.keySet()) {
 			try {
 				String t = config.classType.get(c);
@@ -176,6 +179,8 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 						infraredControl = (InfraredControl) o;
 					} else if (s.equals("HTTPControl")) {
 						httpControl = (HTTPControl) o;
+					} else if (s.equals("MQTT")) {
+						mqttControl = (MQTT) o;
 					} else if (s.equals("ComputerControl")) {
 						for(int i=0;i<Config.MAX_COMPUTERS;i++) {
 							if (t == null || (config.computerTypes[i] != null && config.computerTypes[i].equals(t))) {
@@ -552,8 +557,8 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 		
 		// Print tokens
 		for(int i=0;i<tokens.length;i++) {
-			debug("Token " + (i+1) + ": " + tokens[i].getValue());
-			debug("Token " + (i+1) + " type: " + tokens[i].getType());
+			print("Token " + (i+1) + ": " + tokens[i].getValue());
+			print("Token " + (i+1) + " type: " + tokens[i].getType());
 		}
 		
 		// Execute command
@@ -593,7 +598,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 				}
 				
 				int device = parser.find(tokens[0].getValue(), Parser.devices);
-				debug("Device = " + device);
+				print("Device = " + device);
 				
 				// Check if it is remote
 				if (device == Parser.SPEECH && config.speechTypes[n].equals("remote")) {
@@ -646,6 +651,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 						case Parser.CAMERA:
 						case Parser.SWITCH:
 						case Parser.SENSOR:
+						case Parser.MQTT_SENSOR:
 						case Parser.PHONE:
 						case Parser.SPEECH:
 						case Parser.COMPUTER:
@@ -1165,7 +1171,12 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 				} else if (numTokens > 2 && tokens[2].getType() == Parser.QUANTITY) {
 					switch(parser.find(tokens[2].getValue(),Parser.quantities)) {
 					case Parser.TEMPERATURE:
-						return "" + sensorControl[n].getTemperature(n+1);
+						if (device == Parser.SENSOR) return "" + sensorControl[n].getTemperature(n+1);
+						else if (device == Parser.MQTT_SENSOR) return mqttControl.getValue(config.mqttTopics.get("esp8266:" + Config.TEMPERATURE));
+						else {
+							error("Invalid quantity for device");
+							return ERROR;
+						}
 					case Parser.HUMIDITY:
 					case Parser.SOIL_MOISTURE:
 						return "" + sensorControl[n].getHumidity(n+1);
@@ -1179,6 +1190,8 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 						return "" + powerControl.getEnergy();
 					case Parser.OCCUPIED:
 						return switchString(sensorControl[n].getMotion(n+1));
+					case Parser.PRESSURE:
+						return mqttControl.getValue(config.mqttTopics.get("esp8266:" + Config.PRESSURE));
 					default:
 						error("Unsupported quantity");
 						return ERROR;

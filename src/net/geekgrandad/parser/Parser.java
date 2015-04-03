@@ -39,6 +39,7 @@ public class Parser {
 	public static final int SPEECH_NAME = 27;
 	public static final int COMPUTER_NAME = 28;
 	public static final int COMPUTER_ACTION = 29;
+	public static final int MQTT_SENSOR_NAME = 30;
 	
 	public static String[] areas = { "floor", "room" };
 
@@ -49,7 +50,7 @@ public class Parser {
 		"light", "socket", "appliance", "switch", "camera",
 		"sensor", "phone", "media", "radiator",
 		"robot", "alarm", "blind", "heating", 
-		"speech", "computer", "wstation" };
+		"speech", "computer", "wstation", "mqtt_sensor" };
 
 	public static final int LIGHT = 0;
 	public static final int SOCKET = 1;
@@ -67,7 +68,7 @@ public class Parser {
 	public static final int SPEECH = 13;
 	public static final int COMPUTER = 14;
 	public static final int WEATHER_STATION = 15;
-	
+	public static final int MQTT_SENSOR = 16;
 	
 	public static String[] deviceSets = { "lights", "sockets", "appliances", "switches",
 		"cameras", "sensors", "phones",
@@ -88,7 +89,7 @@ public class Parser {
 	public static String[] quantities = { 
 		"temperature", "humidity", "lightlevel", "battery",
 		"power", "occupied", "energy", "sound",
-		"soil_moisture" };
+		"soil_moisture", "pressure" };
 
 	public static final int TEMPERATURE = 0;
 	public static final int HUMIDITY = 1;
@@ -99,6 +100,7 @@ public class Parser {
 	public static final int ENERGY = 6;
 	public static final int SOUND = 7;
 	public static final int SOIL_MOISTURE = 8;
+	public static final int PRESSURE = 9;
 	
 	public static final String[] services = {
 		"spotify", "itunes", "guide", "channel",

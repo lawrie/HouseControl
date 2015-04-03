@@ -123,8 +123,8 @@ public class Dashboard extends JFrame {
 				washer.setText(get("Washer value") + " watts");
 				revalidate();
 				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				// Ignore
+			} catch (Exception e) {
+				System.err.println(e);
 			}
 		}
 	}
