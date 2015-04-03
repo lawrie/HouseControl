@@ -557,8 +557,8 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 		
 		// Print tokens
 		for(int i=0;i<tokens.length;i++) {
-			print("Token " + (i+1) + ": " + tokens[i].getValue());
-			print("Token " + (i+1) + " type: " + tokens[i].getType());
+			debug("Token " + (i+1) + ": " + tokens[i].getValue());
+			debug("Token " + (i+1) + " type: " + tokens[i].getType());
 		}
 		
 		// Execute command
@@ -598,7 +598,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 				}
 				
 				int device = parser.find(tokens[0].getValue(), Parser.devices);
-				print("Device = " + device);
+				debug("Device = " + device);
 				
 				// Check if it is remote
 				if (device == Parser.SPEECH && config.speechTypes[n].equals("remote")) {
