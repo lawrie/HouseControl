@@ -34,7 +34,7 @@
             <socket id="1" name="Fan" type="LWRF" code="6febbeedb77b" channel="1"></socket>
             <socket id="2" name="Spy" type="LWRF" code="6febbeedb77b" channel="2"></socket>
             <socket id="4" name="Banjolele" type="LWRF" code="6febbeedb77b" channel="4"></socket>
-            <socket id="5" name="Guitare" type="LWRF" code="6febbeedb77b" channel="10"></socket>
+            <socket id="5" name="Guitar" type="LWRF" code="6febbeedb77b" channel="10"></socket>
             <socket id="6" name="Coffee" type="LWRF" code="6febbeedb77b" channel="12"></socket>
             <socket id="7" name="Print" type="LWRF" code="6febbeedb77b" channel="11"></socket>
             <socket id="8" name="Trans" type="LWRF" code="6febbeedb77b" channel="9"></socket>
@@ -124,8 +124,8 @@
             <sensor id="8" name="Couch" type="Jeenode">
                 <temperature></temperature>
                 <lightlevel></lightlevel>
+                <humidity></humidity>
                 <motion></motion>
-                <plant></plant>
                 <battery></battery>
             </sensor>
             <window id="1" name="front">
