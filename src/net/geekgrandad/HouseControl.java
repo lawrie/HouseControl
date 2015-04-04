@@ -466,6 +466,24 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 			tokens[1] = new Token("" + (n + 1), Parser.NUMBER, -1);
 			tokens[0] = new Token(Parser.devices[Parser.APPLIANCE],Parser.DEVICE, -1);
 			numTokens += 1;
+		} else if (tokens[0].getType() == Parser.SENSOR_NAME) {
+			// Replace name with sensor n
+			int n = parser.find(tokens[0].getValue(),config.sensorNames);
+			expandTokens(1);
+			if (tokens.length > 3) tokens[3] = tokens[2];
+			tokens[2] = tokens[1];
+			tokens[1] = new Token("" + (n + 1), Parser.NUMBER, -1);
+			tokens[0] = new Token(Parser.devices[Parser.SENSOR],Parser.DEVICE, -1);
+			numTokens += 1;
+		} else if (tokens[0].getType() == Parser.MQTT_SENSOR_NAME) {
+			// Replace name with mqtt sensor n
+			int n = parser.find(tokens[0].getValue(),config.mqttSensorNames);
+			expandTokens(1);
+			if (tokens.length > 3) tokens[3] = tokens[2];
+			tokens[2] = tokens[1];
+			tokens[1] = new Token("" + (n + 1), Parser.NUMBER, -1);
+			tokens[0] = new Token(Parser.devices[Parser.MQTT_SENSOR],Parser.DEVICE, -1);
+			numTokens += 1;
 		} else if (tokens[0].getType() == Parser.CAMERA_NAME) {
 			// Replace name with socket n
 			int n = parser.find(tokens[0].getValue(),config.cameraNames);

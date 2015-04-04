@@ -515,6 +515,8 @@ public class Parser {
 			type = ROBOT_ACTION;
 		else if (find(token, config.sensorNames) >= 0)
 			type = SENSOR_NAME;
+		else if (find(token, config.mqttSensorNames) >= 0)
+			type = MQTT_SENSOR_NAME;
 		else if (find(token, config.socketNames) >= 0)
 			type = SOCKET_NAME;
 		else if (find(token, config.lightNames) >= 0)
