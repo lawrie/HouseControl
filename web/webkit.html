@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+   var v = document.getElementById('v');
+   navigator.getUserMedia = (navigator.getUserMedia || 
+                             navigator.webkitGetUserMedia || 
+                             navigator.mozGetUserMedia || 
+                             navigator.msGetUserMedia);
+   if (navigator.getUserMedia) {
+      // Request access to video only
+      navigator.getUserMedia(
+         {
+            video:true,
+            audio:false
+         },        
+         function(stream) {
+            v.src = window.URL.createObjectURL(stream);
+            v.play();
+         },
+         function(error) {
+            alert('Something went wrong. (error code ' + error.code + ')');
+            return;
+         }
+      );
+   }
+   else {
+      alert('Sorry, the browser you are using doesn\'t support getUserMedia');
+      return;
+   }
+});
+</script>
+</head>
+<body>
+<h1>WebRTC test</h1>
+<video id='v'></video>
+</body>
+</html>
