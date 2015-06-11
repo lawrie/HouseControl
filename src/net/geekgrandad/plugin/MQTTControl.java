@@ -11,23 +11,29 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import net.geekgrandad.config.Config;
 import net.geekgrandad.interfaces.MQTT;
 import net.geekgrandad.interfaces.Provider;
+import net.geekgrandad.interfaces.Quantity;
 import net.geekgrandad.interfaces.Reporter;
+import net.geekgrandad.interfaces.SensorControl;
 
-public class MQTTControl implements MQTT, MqttCallback {
+public class MQTTControl implements MQTT, MqttCallback, SensorControl {
 	private Reporter reporter;
 	private MqttClient client;
 	private HashMap<String,String> values = new HashMap<String,String>();
+	private long lastMessage = 0;
+	private Config config;
 
 	@Override
 	public void setProvider(Provider provider) {
 		reporter = provider.getReporter();
+		config = provider.getConfig();
 		
 		MemoryPersistence persistence = new MemoryPersistence();
 		String broker = provider.getConfig().mqttServer;
 		String clientId = "housecontrol";
-		Collection<String> topics = provider.getConfig().mqttTopics.values();
+		Collection<String> topics = config.mqttTopics.values();
 		
         try {
             client = new MqttClient(broker, clientId, persistence);
@@ -84,11 +90,32 @@ public class MQTTControl implements MQTT, MqttCallback {
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
 		reporter.print("MQTT message arrived: " + topic + ":" + message);
 		values.put(topic, message.toString());
+		lastMessage = System.currentTimeMillis();
 	}
 
 	@Override
 	public String getValue(String topic) {
 		reporter.print("Getting value for " + topic + " returned " + values.get(topic));
 		return values.get(topic);
+	}
+
+	@Override
+	public boolean getSensorStatus(int sensor) {
+		return (System.currentTimeMillis() - lastMessage < 60000); // message in last minute
+	}
+
+	@Override
+	public float getQuantity(int sensor, Quantity q) {
+		String name = config.sensorNames[sensor-1];
+		String key = name + ":" + q.name().toLowerCase();
+		String topic = config.mqttTopics.get(key);
+		//System.out.println("Key is " + key + ", topic is " + topic);
+		if (topic == null) return Float.NaN;
+		float value = Float.parseFloat(values.get(topic));
+		if (q == Quantity.TEMPERATURE) value /= 10;
+		else if (q == Quantity.ATMOSPHERIC_PRESSURE) value /= 100;
+		else if (q == Quantity.RELATIVE_HUMIDITY) value /= 10;
+		else if (q == Quantity.ILLUMINANCE) value /= 10;
+		return value;
 	}
 }

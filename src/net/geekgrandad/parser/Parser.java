@@ -39,7 +39,6 @@ public class Parser {
 	public static final int SPEECH_NAME = 27;
 	public static final int COMPUTER_NAME = 28;
 	public static final int COMPUTER_ACTION = 29;
-	public static final int MQTT_SENSOR_NAME = 30;
 	
 	public static String[] areas = { "floor", "room" };
 
@@ -50,7 +49,7 @@ public class Parser {
 		"light", "socket", "appliance", "switch", "camera",
 		"sensor", "phone", "media", "radiator",
 		"robot", "alarm", "blind", "heating", 
-		"speech", "computer", "wstation", "mqtt_sensor" };
+		"speech", "computer", "wstation"};
 
 	public static final int LIGHT = 0;
 	public static final int SOCKET = 1;
@@ -68,7 +67,6 @@ public class Parser {
 	public static final int SPEECH = 13;
 	public static final int COMPUTER = 14;
 	public static final int WEATHER_STATION = 15;
-	public static final int MQTT_SENSOR = 16;
 	
 	public static String[] deviceSets = { "lights", "sockets", "appliances", "switches",
 		"cameras", "sensors", "phones",
@@ -515,8 +513,6 @@ public class Parser {
 			type = ROBOT_ACTION;
 		else if (find(token, config.sensorNames) >= 0)
 			type = SENSOR_NAME;
-		else if (find(token, config.mqttSensorNames) >= 0)
-			type = MQTT_SENSOR_NAME;
 		else if (find(token, config.socketNames) >= 0)
 			type = SOCKET_NAME;
 		else if (find(token, config.lightNames) >= 0)

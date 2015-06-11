@@ -9,6 +9,7 @@ import net.geekgrandad.interfaces.InfraredControl;
 import net.geekgrandad.interfaces.PlantControl;
 import net.geekgrandad.interfaces.PowerControl;
 import net.geekgrandad.interfaces.Provider;
+import net.geekgrandad.interfaces.Quantity;
 import net.geekgrandad.interfaces.Reporter;
 import net.geekgrandad.interfaces.SensorControl;
 import net.geekgrandad.rf.RFControl;
@@ -64,31 +65,6 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 	@Override
 	public boolean getSensorStatus(int sensor) {
 		return sensorOn[sensor];
-	}
-
-	@Override
-	public int getTemperature(int sensor) {
-		return temp[sensor];
-	}
-
-	@Override
-	public int getHumidity(int sensor) {
-		return humidity[sensor];
-	}
-
-	@Override
-	public int getLightLevel(int sensor) {
-		return light[sensor];
-	}
-
-	@Override
-	public boolean getMotion(int sensor) {
-		return (occupied[sensor] != 0 && (System.currentTimeMillis() - occupied[sensor]) < config.occupiedInterval);
-	}
-
-	@Override
-	public boolean getBatteryLow(int sensor) {
-		return batteryLow[sensor];
 	}
 	
 	// Send single byte infrared command via RFM12
@@ -198,5 +174,43 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 			} catch (InterruptedException e) {
 			}
 		}
+	}
+
+	@Override
+	public float getQuantity(int sensor, Quantity q) {
+		switch(q) {
+		case TEMPERATURE:
+			return temp[sensor];
+		case AIR_QUALITY:
+			break;
+		case ATMOSPHERIC_PRESSURE:
+			break;
+		case BATTERY_LOW:
+			return batteryLow[sensor] ? 1 : 0;
+		case ENERGY:
+			return (float) energy;
+		case FORCE:
+			return humidity[sensor];
+		case ILLUMINANCE:
+			return light[sensor];
+		case MOTION:
+			return (occupied[sensor] != 0 && (System.currentTimeMillis() - occupied[sensor]) < config.occupiedInterval) ? 1 : 0;
+		case POWER:
+			return power;
+		case RELATIVE_HUMIDITY:
+			return humidity[sensor];
+		case SOIL_HUMIDITY:
+			return humidity[sensor];
+		case SOUND_LEVEL:
+			break;
+		case TIME:
+			break;
+		case VOLTAGE:
+			break;
+		default:
+			break;
+			
+		}
+		return Float.NaN;
 	}
 }

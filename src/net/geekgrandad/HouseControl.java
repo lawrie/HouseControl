@@ -29,6 +29,7 @@ import net.geekgrandad.interfaces.MQTT;
 import net.geekgrandad.interfaces.MediaControl;
 import net.geekgrandad.interfaces.PowerControl;
 import net.geekgrandad.interfaces.Provider;
+import net.geekgrandad.interfaces.Quantity;
 import net.geekgrandad.interfaces.RemoteControl;
 import net.geekgrandad.interfaces.Reporter;
 import net.geekgrandad.interfaces.SensorControl;
@@ -475,15 +476,6 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 			tokens[1] = new Token("" + (n + 1), Parser.NUMBER, -1);
 			tokens[0] = new Token(Parser.devices[Parser.SENSOR],Parser.DEVICE, -1);
 			numTokens += 1;
-		} else if (tokens[0].getType() == Parser.MQTT_SENSOR_NAME) {
-			// Replace name with mqtt sensor n
-			int n = parser.find(tokens[0].getValue(),config.mqttSensorNames);
-			expandTokens(1);
-			if (tokens.length > 3) tokens[3] = tokens[2];
-			tokens[2] = tokens[1];
-			tokens[1] = new Token("" + (n + 1), Parser.NUMBER, -1);
-			tokens[0] = new Token(Parser.devices[Parser.MQTT_SENSOR],Parser.DEVICE, -1);
-			numTokens += 1;
 		} else if (tokens[0].getType() == Parser.CAMERA_NAME) {
 			// Replace name with socket n
 			int n = parser.find(tokens[0].getValue(),config.cameraNames);
@@ -669,7 +661,6 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 						case Parser.CAMERA:
 						case Parser.SWITCH:
 						case Parser.SENSOR:
-						case Parser.MQTT_SENSOR:
 						case Parser.PHONE:
 						case Parser.SPEECH:
 						case Parser.COMPUTER:
@@ -1189,27 +1180,27 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 				} else if (numTokens > 2 && tokens[2].getType() == Parser.QUANTITY) {
 					switch(parser.find(tokens[2].getValue(),Parser.quantities)) {
 					case Parser.TEMPERATURE:
-						if (device == Parser.SENSOR) return "" + sensorControl[n].getTemperature(n+1);
-						else if (device == Parser.MQTT_SENSOR) return mqttControl.getValue(config.mqttTopics.get("esp8266:" + Config.TEMPERATURE));
+						if (device == Parser.SENSOR) return "" + sensorControl[n].getQuantity(n+1, Quantity.TEMPERATURE);
 						else {
 							error("Invalid quantity for device");
 							return ERROR;
 						}
 					case Parser.HUMIDITY:
+						return "" + sensorControl[n].getQuantity(n+1, Quantity.RELATIVE_HUMIDITY);
 					case Parser.SOIL_MOISTURE:
-						return "" + sensorControl[n].getHumidity(n+1);
+						return "" + sensorControl[n].getQuantity(n+1, Quantity.SOIL_HUMIDITY);
 					case Parser.LIGHT_LEVEL:
-						return "" + sensorControl[n].getLightLevel(n+1);
+						return "" + sensorControl[n].getQuantity(n+1, Quantity.ILLUMINANCE);
 					case Parser.BATTERY:
-						return "" + !sensorControl[n].getBatteryLow(n+1);
+						return "" + sensorControl[n].getQuantity(n+1, Quantity.BATTERY_LOW);
 					case Parser.POWER:
 						return "" + powerControl.getPower();
 					case Parser.ENERGY:
 						return "" + powerControl.getEnergy();
 					case Parser.OCCUPIED:
-						return switchString(sensorControl[n].getMotion(n+1));
+						return switchString(sensorControl[n].getQuantity(n+1, Quantity.MOTION) > 0);
 					case Parser.PRESSURE:
-						return mqttControl.getValue(config.mqttTopics.get("esp8266:" + Config.PRESSURE));
+						return "" + sensorControl[n].getQuantity(n+1, Quantity.ATMOSPHERIC_PRESSURE);
 					default:
 						error("Unsupported quantity");
 						return ERROR;
@@ -1290,8 +1281,8 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 						int t = 0;
 						int i = 0;
 						for(int s: config.roomSensors[n-1]) {
-							print("Adding " + sensorControl[s].getTemperature(s) + " for room " + n + " sensor " + s);
-							t += sensorControl[s].getTemperature(s);
+							print("Adding " + sensorControl[s].getQuantity(s, Quantity.TEMPERATURE) + " for room " + n + " sensor " + s);
+							t += sensorControl[s].getQuantity(s, Quantity.TEMPERATURE);
 							i++;			
 						}
 						return "" + (i == 0 ? 0 : (t/i));
@@ -1299,8 +1290,8 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 						int h = 0;
 						i = 0;
 						for(int s: config.roomSensors[n-1]) {
-							print("Adding " + sensorControl[s].getHumidity(s) + " for room " + n + " sensor " + s);
-							h += sensorControl[s].getHumidity(s);
+							print("Adding " + sensorControl[s].getQuantity(s, Quantity.RELATIVE_HUMIDITY) + " for room " + n + " sensor " + s);
+							h += sensorControl[s].getQuantity(s, Quantity.RELATIVE_HUMIDITY);
 							i++;			
 						}
 						return "" + (i == 0 ? 0 : (h/i));
@@ -1308,8 +1299,8 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 						int l = 0;
 						i = 0;
 						for(int s: config.roomSensors[n-1]) {
-							print("Adding " + sensorControl[s].getLightLevel(s) + " for room " + n + " sensor " + s);
-							l += sensorControl[s].getLightLevel(s);
+							print("Adding " + sensorControl[s].getQuantity(s, Quantity.ILLUMINANCE) + " for room " + n + " sensor " + s);
+							l += sensorControl[s].getQuantity(s, Quantity.ILLUMINANCE);
 							i++;			
 						}
 						return "" + (i == 0 ? 0 : (l/i));
@@ -1317,8 +1308,8 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 						boolean occ = false;
 						i = 0;
 						for(int s: config.roomSensors[n-1]) {
-							print("Testing " + sensorControl[s].getMotion(s) + " for sensor " + s);
-							if (sensorControl[s].getMotion(s)) occ = true;
+							print("Testing " + sensorControl[s].getQuantity(s, Quantity.MOTION) + " for sensor " + s);
+							if (sensorControl[s].getQuantity(s, Quantity.MOTION) > 0) occ = true;
 							i++;			
 						}
 						return switchString(occ);

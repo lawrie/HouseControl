@@ -17,19 +17,20 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import net.geekgrandad.interfaces.Quantity;
+
 public class Config {
 	
   private boolean debug = false;
 		
   public static final int MAX_FLOORS = 3;
   public static final int MAX_ROOMS = 9;
-  public static final int MAX_SENSORS = 12;
-  public static final int MAX_MQTT_SENSORS = 1;
+  public static final int MAX_SENSORS = 20;
   public static final int MAX_SWITCHES = 2;
   public static final int MAX_LIGHTS = 5;
   public static final int MAX_SOCKETS = 10;
   public static final int MAX_CAMERAS = 2;
-  public static final int MAX_APPLIANCES = 5;
+  public static final int MAX_APPLIANCES = 6;
   public static final int MAX_WINDOWS = 3;
   public static final int MAX_DOORS = 0;
   public static final int MAX_BATTERIES = 11;
@@ -44,7 +45,6 @@ public class Config {
   public int[][] roomLights = new int[MAX_ROOMS][];
   public int[][] roomAppliances = new int[MAX_ROOMS][];
   public int[][] roomSensors = new int[MAX_ROOMS][];
-  public int[][] roomMqttSensors = new int[MAX_ROOMS][];
   public int[][] roomCameras = new int[MAX_ROOMS][];
   public int[][] roomWindows = new int[MAX_ROOMS][];
   public int[][] roomSwitches = new int[MAX_ROOMS][];
@@ -56,7 +56,6 @@ public class Config {
   private int[] windows = new int[MAX_WINDOWS];
   private int[] appliances = new int[MAX_APPLIANCES];
   private int[] sensors = new int[MAX_SENSORS];
-  private int[] mqttSensors = new int[MAX_MQTT_SENSORS];
   private int[] media = new int[MAX_MEDIA];
   private int[] cameras = new int[MAX_CAMERAS];
   private int[] switches = new int[MAX_SWITCHES];
@@ -77,6 +76,7 @@ public class Config {
   public String[] computerServers = new String[MAX_COMPUTERS];
   
   public String[] cameraHostNames = new String[MAX_CAMERAS];
+  public String[] applianceHostNames = new String[MAX_APPLIANCES];
   
   public byte[][] lightCodes = new byte[MAX_LIGHTS][];
   public int[] lightChannels = new int[MAX_LIGHTS];
@@ -132,7 +132,6 @@ public class Config {
   private static final String FLOOR = "floor";
   private static final String ROOM = "room";
   private static final String SENSOR = "sensor";
-  private static final String MQTT_SENSOR = "mqtt_sensor";
   private static final String LIGHT = "light";
   private static final String SOCKET = "socket";
   private static final String SWITCH = "switch";
@@ -182,7 +181,6 @@ public class Config {
   public String[] floorNames = new String[MAX_FLOORS];
   public String[] roomNames = new String[MAX_ROOMS];
   public String[] sensorNames = new String[MAX_SENSORS];
-  public String[] mqttSensorNames = new String[MAX_MQTT_SENSORS];
   public String[] lightNames = new String[MAX_LIGHTS];
   public String[] socketNames = new String[MAX_SOCKETS];
   public String[] switchNames = new String[MAX_SWITCHES];
@@ -215,7 +213,7 @@ public class Config {
   private String playlist, link;
   
   private int numLights, numSockets, numWindows, numCameras, numAppliances, 
-              numMedia, numSensors, numSwitches, numSpeech, numComputers, numMqttSensors;
+              numMedia, numSensors, numSwitches, numSpeech, numComputers;
   private int numFloors = 0;
   private int numRooms = 0;
   
@@ -251,7 +249,7 @@ public class Config {
   public String cameraControlClass, speechControlClass, emailControlClass;
   public String applianceControlClass, datalogControlClass, heatingControlClass,alarmControlClass;
   public String calendarControlClass, lightControlClass, sensorControlClass;;
-  public String cameraHost;
+  public String cameraHost, applianceHost;
   
   private String socketType, lightType, switchType, sensorType, applianceType, cameraType, mediaType;
   private String interfaceName;
@@ -310,7 +308,6 @@ public class Config {
               numCameras=0;
               numAppliances = 0;
               numSensors = 0;
-              numMqttSensors = 0;
               numMedia = 0;
               numSwitches = 0;
               numSpeech = 0;
@@ -341,18 +338,6 @@ public class Config {
             	sensorName = attribute.getValue();
               } else if (attribute.getName().toString().equals(TYPE)) {
             	sensorType = attribute.getValue();
-              }
-            }
-          } else if (event.asStartElement().getName().getLocalPart().equals(MQTT_SENSOR)) {
-        	debug("Start mqtt sensor");
-        	
-            // We read the attributes from this tag and process the is and name attributes
-            Iterator<Attribute> attributes = startElement.getAttributes();
-            while (attributes.hasNext()) {
-              Attribute attribute = attributes.next();
-              if (attribute.getName().toString().equals(NAME)) {
-            	sensorName = attribute.getValue();
-            	numMqttSensors++;
               }
             }
           } else if (event.asStartElement().getName().getLocalPart().equals(LIGHT)) {
@@ -561,6 +546,16 @@ public class Config {
             }
       } else if (event.asStartElement().getName().getLocalPart().equals(LIGHTLEVEL)) {
             debug("Start light level");
+            
+            
+            Iterator<Attribute> attributes = startElement.getAttributes();
+            while (attributes.hasNext()) {
+              Attribute attribute = attributes.next();
+              if (attribute.getName().toString().equals(TOPIC)) {
+            	  topic = attribute.getValue();
+            	  mqttTopics.put(sensorName + ":" + Quantity.ILLUMINANCE.name().toLowerCase(), topic);
+              }
+            }
         } else if (event.asStartElement().getName().getLocalPart().equals(TEMPERATURE)) {
             debug("Start temperature");
             
@@ -569,13 +564,22 @@ public class Config {
               Attribute attribute = attributes.next();
               if (attribute.getName().toString().equals(TOPIC)) {
             	  topic = attribute.getValue();
-            	  mqttTopics.put(sensorName + ":" + TEMPERATURE, topic);
+            	  mqttTopics.put(sensorName + ":" + Quantity.TEMPERATURE.name().toLowerCase(), topic);
               }
             }
         } else if (event.asStartElement().getName().getLocalPart().equals(MOTION)) {
             debug("Start motion");
         } else if (event.asStartElement().getName().getLocalPart().equals(HUMIDITY)) {
-            debug("Start humidity");
+        	debug("Start humidity");
+        	
+            Iterator<Attribute> attributes = startElement.getAttributes();
+            while (attributes.hasNext()) {
+              Attribute attribute = attributes.next();
+              if (attribute.getName().toString().equals(TOPIC)) {
+            	  topic = attribute.getValue();
+            	  mqttTopics.put(sensorName + ":" + Quantity.RELATIVE_HUMIDITY.name().toLowerCase(), topic);
+              }
+            }
         } else if (event.asStartElement().getName().getLocalPart().equals(PRESSURE)) {
             debug("Start pressure");
             
@@ -584,7 +588,7 @@ public class Config {
               Attribute attribute = attributes.next();
               if (attribute.getName().toString().equals(TOPIC)) {
             	  topic = attribute.getValue();
-            	  mqttTopics.put(sensorName + ":" + PRESSURE, topic);
+            	  mqttTopics.put(sensorName + ":" + Quantity.ATMOSPHERIC_PRESSURE.name().toLowerCase(), topic);
               }
             }
         } else if (event.asStartElement().getName().getLocalPart().equals(PLANT)) {
@@ -593,6 +597,7 @@ public class Config {
             
       } else if (event.asStartElement().getName().getLocalPart().equals(APPLIANCE)) {
           debug("Start appliance");
+          applianceHost = null;
           
           // We read the attributes from this tag and process the id and name attributes
           Iterator<Attribute> attributes = startElement.getAttributes();
@@ -607,7 +612,9 @@ public class Config {
               iamCode = Long.parseLong(attribute.getValue());
             } else if (attribute.getName().toString().equals(TYPE)) {
               applianceType = attribute.getValue();
-            }
+            } else if (attribute.getName().toString().equals(HOST)) {
+                applianceHost = attribute.getValue();
+              }
           }
           } else if (event.asStartElement().getName().getLocalPart().equals(CAMERA)) {
             debug("Start camera");
@@ -841,6 +848,7 @@ public class Config {
           } else if (endElement.getName().getLocalPart() == (APPLIANCE)) {
           	  applianceNames[applianceId-1] = applianceName;
           	  applianceTypes[applianceId-1] = applianceType;
+          	  applianceHostNames[applianceId-1] = applianceHost;
           	  iamCodes[applianceId-1] = iamCode;
           	devices.add(new Device(applianceType, applianceName, "" + iamCode, applianceId, 0, Device.APPLIANCE));
           	  debug("End appliance id  = " + applianceId + ", name = " + applianceNames[applianceId-1]);
@@ -856,10 +864,6 @@ public class Config {
           	  sensorNames[sensorId-1] = sensorName;
           	  sensorTypes[sensorId-1] = sensorType;
           	  debug("End sensor id  = " + sensorId + ", name = " + sensorNames[sensorId-1]);
-          } else if (endElement.getName().getLocalPart() == (MQTT_SENSOR)) {
-        	  mqttSensors[numMqttSensors-1] = numMqttSensors;
-          	  mqttSensorNames[numMqttSensors-1] = sensorName;
-          	  debug("End mqtt name = " + mqttSensorNames[numMqttSensors-1]);
           } else if (endElement.getName().getLocalPart() == (ROOM)) {
           	roomNames[roomId-1] = roomName;
           	
@@ -867,10 +871,6 @@ public class Config {
           	int[] a = new int[numSensors];
           	roomSensors[roomId-1] = a;
           	for(int i=0;i<numSensors;i++) a[i] = sensors[i];
-          	
-          	a = new int[numMqttSensors];
-          	roomMqttSensors[roomId-1] = a;
-          	for(int i=0;i<numMqttSensors;i++) a[i] = mqttSensors[i];
           	
           	// Room sockets
           	a = new int[numSockets];
@@ -983,18 +983,6 @@ public class Config {
 	    	for(int j = 0;j<roomSensors[i].length;j++) {
 	    		int n = roomSensors[i][j];
 	    		System.out.print(n + "(" + sensorNames[n-1] + "," + sensorTypes[n-1] + ") ");
-	    	}
-	    	System.out.println();
-    	}
-    }
-    
-    System.out.println("\nRoom Mqtt Sensors:");
-    for(int i=0;i<MAX_ROOMS;i++) {
-    	if (roomMqttSensors[i] != null && roomMqttSensors[i].length > 0) {
-	    	System.out.print("  " + roomNames[i] + ": ");
-	    	for(int j = 0;j<roomMqttSensors[i].length;j++) {
-	    		int n = roomMqttSensors[i][j];
-	    		System.out.print(n + "(" + mqttSensorNames[n-1] + ") ");
 	    	}
 	    	System.out.println();
     	}
