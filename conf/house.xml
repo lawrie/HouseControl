@@ -141,7 +141,9 @@
             </window>
             <window id="3" name="back">
                 <blind id="3" type="coulisse" name="back"></blind>
-            </window>  
+                <switch id="3" name="Middle" type="mqtt" topic="/house/rooms/first-floor/living-room/middle-switch"></switch>
+            </window>
+            <switch id="4" name="Button" type="mqtt" topic="/house/rooms/first-floor/living-room/button"></switch>
             <camera id="2" type="Wanscam" name="Bond" host="ipcam:99"></camera>
             <speech id="1" name="spl" voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" 
                type="FreeTTS"></speech> 
@@ -179,6 +181,11 @@
                 <motion></motion>
                 <battery></battery>
             </sensor>   
+        </room>
+        <room id="8" name="Bathroom">
+            <sensor id="16" name="enoceant" type="mqtt">
+                <temperature topic="/house/rooms/second-floor/bathroom/temperature"></temperature>
+            </sensor>
         </room>
     </floor>
     <wstation id="1" name="wunder"></wstation>
@@ -266,6 +273,7 @@
         <plugin class="net.geekgrandad.plugin.MQTTControl" type="mqtt">
             <interface name="MQTT"></interface>
             <interface name="SensorControl"></interface>
+            <interface name="SwitchControl"></interface>
         </plugin>
     </plugins>
 </house>

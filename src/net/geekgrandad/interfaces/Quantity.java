@@ -14,5 +14,6 @@ public enum Quantity {
 	POWER,
 	ENERGY,
 	VOLTAGE,
-	BATTERY_LOW
+	BATTERY_LOW,
+	SWITCH
 }

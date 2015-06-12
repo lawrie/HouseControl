@@ -26,7 +26,7 @@ public class Config {
   public static final int MAX_FLOORS = 3;
   public static final int MAX_ROOMS = 9;
   public static final int MAX_SENSORS = 20;
-  public static final int MAX_SWITCHES = 2;
+  public static final int MAX_SWITCHES = 4;
   public static final int MAX_LIGHTS = 5;
   public static final int MAX_SOCKETS = 10;
   public static final int MAX_CAMERAS = 2;
@@ -393,11 +393,14 @@ public class Config {
                 } else if (attribute.getName().toString().equals(NAME)) {
               	  switchName = attribute.getValue();
                 } else if (attribute.getName().toString().equals(TYPE)) {
-                	switchType = attribute.getValue();
+                  switchType = attribute.getValue();
                 } else if (attribute.getName().toString().equals(CODE)) {
                   switchCode = attribute.getValue();
                 } else if (attribute.getName().toString().equals(CHANNEL)) {
               	  switchChannel = Integer.parseInt(attribute.getValue());
+                }  else if (attribute.getName().toString().equals(TOPIC)) {
+                    topic = attribute.getValue();
+                    mqttTopics.put(switchName + ":" + Quantity.SWITCH.name().toLowerCase(), topic);
                 }
               }
             } else if (event.asStartElement().getName().getLocalPart().equals(PHONE)) {

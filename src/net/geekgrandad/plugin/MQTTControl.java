@@ -17,8 +17,9 @@ import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Quantity;
 import net.geekgrandad.interfaces.Reporter;
 import net.geekgrandad.interfaces.SensorControl;
+import net.geekgrandad.interfaces.SwitchControl;
 
-public class MQTTControl implements MQTT, MqttCallback, SensorControl {
+public class MQTTControl implements MQTT, MqttCallback, SensorControl, SwitchControl {
 	private Reporter reporter;
 	private MqttClient client;
 	private HashMap<String,String> values = new HashMap<String,String>();
@@ -111,11 +112,28 @@ public class MQTTControl implements MQTT, MqttCallback, SensorControl {
 		String topic = config.mqttTopics.get(key);
 		//System.out.println("Key is " + key + ", topic is " + topic);
 		if (topic == null) return Float.NaN;
-		float value = Float.parseFloat(values.get(topic));
+		String s = values.get(topic);
+		if (s == null) return Float.NaN;
+		float value = Float.parseFloat(s);
 		if (q == Quantity.TEMPERATURE) value /= 10;
 		else if (q == Quantity.ATMOSPHERIC_PRESSURE) value /= 100;
 		else if (q == Quantity.RELATIVE_HUMIDITY) value /= 10;
 		else if (q == Quantity.ILLUMINANCE) value /= 10;
 		return value;
+	}
+
+	@Override
+	public boolean getSwitchStatus(int id) {
+		System.out.println("Getting status for id " + id);
+		String name = config.switchNames[id];
+		String key = name + ":" + Quantity.SWITCH.name().toLowerCase();
+		String topic = config.mqttTopics.get(key);
+		System.out.println("Key is " + key + ", topic is " + topic);
+		if (topic == null) return false;
+		String s = values.get(topic);
+		if (s == null) return false;
+		float value = Float.parseFloat(s);
+		System.out.println("Value is " + value);
+		return value > 0;
 	}
 }

@@ -51,9 +51,10 @@ $power = array(
 <?php	    
 foreach ($power as $key => $value) {
 
-  $result = number_format(house($host, $port, $value), 0);
+  $result = house($host, $port, $value);
   if ($key == "Total") $total = $result;
   else $rest += $result;
+  $result = number_format($result,0);
 ?>	    
 	      <tr>
 	        <td>
@@ -239,6 +240,7 @@ $livingRoom = array(
     "Back light" => "picasso status",
     "Couch weight" => "humidity 8",
     "Camera socket" => "spy status",
+    "Middle window" => "switch 3 status",
     "Back window" => "switch 2 status",
     "Table socket" => "coffee status",
     "Computer socket" => "print status",
@@ -246,7 +248,8 @@ $livingRoom = array(
     "Banjolele socket" => "banjolele status",
     "Fan socket" => "fan status",
     "Bench socket" => "bench status",
-    "Tablet socket" => "trans status");
+    "Tablet socket" => "trans status",
+    "Enocean button" => "switch 4 status");
  ?>        
       <table class="table">
 	    <thead>
@@ -315,7 +318,8 @@ foreach ($diningRoom as $key => $value) {
 	  </table>
 	  <h3>Bathroom</h3>
 <?php      
-$bathroom = array();
+$bathroom = array(
+    "Temperature" => "enoceant temperature");
 ?>	  
       <table class="table">
 	    <thead>
