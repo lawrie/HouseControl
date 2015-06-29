@@ -196,7 +196,7 @@
     <cosm api_key="5e8sM5Ls6RJhqilxUPtdq3LEF8ySAKxIbkVMS2RudjZiTT0g" 
         feed="86697" power="0" energy="1"></cosm>
     <!-- Windows ports:  rfm12_port="COM15" lwrf_port="COM8" x10_port="COM9" iam_port="COM20"-->
-    <!-- Linux ports:  rfm12_port="/dev/ttyUSB0" lwrf_port="/dev/ACM0" x10_port="COM9" iam_port="/dev/ttyUSB1"-->
+    <!-- Linux ports:  rfm12_port="/dev/ttyUSB0" lwrf_port="/dev/ttyACM0" x10_port="COM9" iam_port="/dev/ttyUSB1"-->
     <config listen_port="50000" rfm12_port="COM15" lwrf_port="COM8" x10_port="COM9"
         iam_port="COM20" iam_min_value="3" iam_min_off_period="120000"
         occupied_interval="300000" ping_timeout="5000" background_delay="10000"

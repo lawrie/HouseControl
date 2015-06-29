@@ -84,7 +84,7 @@ public class WemoControl implements ApplianceControl {
 	public int getAppliancePower(int appliance) {
 		for(int i=0;i<3;i++) {
 			insightUrl = "http://" + config.applianceHostNames[appliance] + ":" + port + "/upnp/control/insight1";
-			System.out.println("Trying + " + insightUrl);
+			System.out.println("Trying " + insightUrl);
 			try {
 				SOAPMessage soapResponse = soapConnection.call(createInsightParamsRequest(), new URL(null, insightUrl, handler));
 				SOAPBody msg = soapResponse.getSOAPBody();
@@ -94,8 +94,10 @@ public class WemoControl implements ApplianceControl {
 		        String power = array[7];
 		        return  (int) (Math.round(Integer.parseInt(power)/1000.0));
 			} catch (Exception e) {
+				System.out.println("Exception is " + e);
+				if (++port > 49154) port = 49152;
 				if (e.getCause().getCause() instanceof SocketTimeoutException) {
-					if (++port > 49154) port = 49152;
+					System.out.println("Timed out");		
 				} else reporter.error(e.getMessage());
 			}
 		}
