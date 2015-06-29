@@ -73,8 +73,7 @@ public class WemoControl implements ApplianceControl {
 		        return (val == 1);
 			} catch (Exception e) {
 				if (e.getCause().getCause() instanceof SocketTimeoutException) {
-					if (++port <= 49154) continue;
-					else reporter.error(e.getMessage());
+					if (++port > 49154) port = 49152;
 				} else reporter.error(e.getMessage());
 			}
 		}
@@ -83,9 +82,9 @@ public class WemoControl implements ApplianceControl {
 
 	@Override
 	public int getAppliancePower(int appliance) {
-		//System.out.println("Host is " + config.applianceHostNames[appliance]);
 		for(int i=0;i<3;i++) {
 			insightUrl = "http://" + config.applianceHostNames[appliance] + ":" + port + "/upnp/control/insight1";
+			System.out.println("Trying + " + insightUrl);
 			try {
 				SOAPMessage soapResponse = soapConnection.call(createInsightParamsRequest(), new URL(null, insightUrl, handler));
 				SOAPBody msg = soapResponse.getSOAPBody();
@@ -96,8 +95,7 @@ public class WemoControl implements ApplianceControl {
 		        return  (int) (Math.round(Integer.parseInt(power)/1000.0));
 			} catch (Exception e) {
 				if (e.getCause().getCause() instanceof SocketTimeoutException) {
-					if (++port <= 49154) continue;
-					else reporter.error(e.getMessage());
+					if (++port > 49154) port = 49152;
 				} else reporter.error(e.getMessage());
 			}
 		}
