@@ -153,7 +153,7 @@
         </room>
         <room id="2" name="Kitchen">
             <appliance id="3" name="Dishwasher" code="1077486631" type="IAM"></appliance>
-            <appliance id="6" name="Fridge" host="192.168.0.11:49153" type="Wemo"></appliance>
+            <appliance id="6" name="Fridge" host="192.168.0.6" type="Wemo"></appliance>
         </room>
     </floor>
     <floor id="3" name="Second floor">
