@@ -30,7 +30,9 @@ public class WemoControl implements ApplianceControl {
     private String insightUrl;
     private Config config;
     private URLStreamHandler handler;
-    private int port = 49152;
+    private static final int START_PORT = 49152;
+    private static final int END_PORT = 49154;
+    private int port = START_PORT;
     
 	@Override
 	public void setProvider(Provider provider) {
@@ -64,7 +66,7 @@ public class WemoControl implements ApplianceControl {
 
 	@Override
 	public boolean getApplianceStatus(int appliance) {
-		for(int i=0;i<3;i++) {
+		for(int i=0;i<(END_PORT-START_PORT) + 1;i++) {
 			basicEventUrl = "http://" + config.applianceHostNames[appliance] + ":" + port + "/upnp/control/basicevent1";
 			try {
 				SOAPMessage soapResponse = soapConnection.call(createBinaryStateRequest(), new URL(null, basicEventUrl, handler));
@@ -73,7 +75,7 @@ public class WemoControl implements ApplianceControl {
 		        return (val == 1);
 			} catch (Exception e) {
 				if (e.getCause().getCause() instanceof SocketTimeoutException) {
-					if (++port > 49154) port = 49152;
+					if (++port > END_PORT) port = START_PORT;
 				} else reporter.error(e.getMessage());
 			}
 		}
@@ -84,7 +86,7 @@ public class WemoControl implements ApplianceControl {
 	public int getAppliancePower(int appliance) {
 		for(int i=0;i<3;i++) {
 			insightUrl = "http://" + config.applianceHostNames[appliance] + ":" + port + "/upnp/control/insight1";
-			System.out.println("Trying " + insightUrl);
+			//System.out.println("Trying " + insightUrl);
 			try {
 				SOAPMessage soapResponse = soapConnection.call(createInsightParamsRequest(), new URL(null, insightUrl, handler));
 				SOAPBody msg = soapResponse.getSOAPBody();
@@ -94,10 +96,9 @@ public class WemoControl implements ApplianceControl {
 		        String power = array[7];
 		        return  (int) (Math.round(Integer.parseInt(power)/1000.0));
 			} catch (Exception e) {
-				System.out.println("Exception is " + e);
 				if (++port > 49154) port = 49152;
-				if (e.getCause().getCause() instanceof SocketTimeoutException) {
-					System.out.println("Timed out");		
+				if (e.getCause() instanceof SocketTimeoutException || e.getCause().getCause() instanceof SocketTimeoutException) {
+					reporter.error("Wemo on port " +  port  + " timed out");		
 				} else reporter.error(e.getMessage());
 			}
 		}
