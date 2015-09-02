@@ -80,7 +80,6 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 	class ReadInput implements Runnable {
 		public void run() {
 			DecimalFormat df = new DecimalFormat("#####.##");
-			String name = config.sensorNames[sensor-1];
 			String key, topic;
 			for (;;) {
 				int b = -1;
@@ -90,6 +89,8 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 					sensor = (b & 0x1f);
 					sensorOn[sensor] = true;
 					reporter.print("Room: " + sensor);
+					String name = config.sensorNames[sensor-1];
+					reporter.print("Sensor name: " + name);
 					if (b == config.getEmontxId()) { // Special value for emonTx
 						power = (rfc.readByte() + (rfc.readByte() << 8));
 						reporter.print("  Power: " + power + " watts");
