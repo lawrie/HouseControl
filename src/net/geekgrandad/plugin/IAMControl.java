@@ -30,12 +30,14 @@ public class IAMControl implements ApplianceControl {
 	private int[] iamValue = new int[Config.MAX_APPLIANCES];
 	private double[] iamEnergy = new double[Config.MAX_APPLIANCES];
 	private long[] iamIds;
+	private Provider provider;
 	private MQTT mqtt;
 	
 	private Thread inThreadIAM = new Thread(new ReadIAMInput());
 	
 	@Override
 	public void setProvider(Provider provider) {
+		this.provider = provider;
 		config = provider.getConfig();
 		alerter = provider.getAlerter();
 		reporter = provider.getReporter();
@@ -177,7 +179,8 @@ public class IAMControl implements ApplianceControl {
 								iamValue[n] = val;
 								// Publish to MQTT server
 								reporter.print("Key: " + key + ", topic: " + (topic == null ? "null" : topic));
-								if (topic != null) mqtt.publish(topic, "" + val, 0);
+								if (mqtt == null) mqtt = provider.getMQTTControl();
+								if (mqtt != null && topic != null) mqtt.publish(topic, "" + val, 0);
 								// calculate energy usage
 								if (iamLast[n] != 0) {
 									int diff = (int) (millis - iamLast[n]);
