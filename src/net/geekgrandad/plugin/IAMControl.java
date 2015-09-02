@@ -177,7 +177,7 @@ public class IAMControl implements ApplianceControl {
 								iamValue[n] = val;
 								// Publish to MQTT server
 								reporter.print("Key: " + key + ", topic: " + (topic == null ? "null" : topic));
-								mqtt.publish(topic, "" + val, 0);
+								if (topic != null) mqtt.publish(topic, "" + val, 0);
 								// calculate energy usage
 								if (iamLast[n] != 0) {
 									int diff = (int) (millis - iamLast[n]);
