@@ -550,8 +550,7 @@ public class Config {
             }
       } else if (event.asStartElement().getName().getLocalPart().equals(LIGHTLEVEL)) {
             debug("Start light level");
-            
-            
+                       
             Iterator<Attribute> attributes = startElement.getAttributes();
             while (attributes.hasNext()) {
               Attribute attribute = attributes.next();
@@ -573,6 +572,15 @@ public class Config {
             }
         } else if (event.asStartElement().getName().getLocalPart().equals(MOTION)) {
             debug("Start motion");
+            
+            Iterator<Attribute> attributes = startElement.getAttributes();
+            while (attributes.hasNext()) {
+              Attribute attribute = attributes.next();
+              if (attribute.getName().toString().equals(TOPIC)) {
+            	  topic = attribute.getValue();
+            	  mqttTopics.put(sensorName + ":" + Quantity.MOTION.name().toLowerCase(), topic);
+              }
+            }
         } else if (event.asStartElement().getName().getLocalPart().equals(HUMIDITY)) {
         	debug("Start humidity");
         	
