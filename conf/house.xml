@@ -10,15 +10,13 @@
             <computer id="7" name="Gripper" type="remote" server="keith" ></computer>
             <computer id="8" name="Base" type="remote" server="keith" ></computer>
             <computer id="9" name="Keith" type="remote" server="keith" ></computer>
-            <sensor id="14" name="pihall" type="mqtt">
-                <temperature topic="/house/rooms/ground-floor/hall/temperature"></temperature>
-            </sensor>
         </room>
         <room id="5" name="Dining">
-            <emontx id="10">
-                <battery low="3000"></battery>
-                <power></power>
-            </emontx>
+            <sensor id="10" name="emontx" type="emontx">
+                <battery topic="/house/rooms/ground-floor/dining-room/emontx/battery" low="3000"></battery>
+                <power topic="/house/rooms/ground-floor/dining-room/emontx/power"></power>
+                <energy topic="/house/rooms/ground-floor/dining-room/emontx/energy"></energy>
+            </sensor>
             <appliance id="5" name="xbox" code="1880848504" type="IAM"></appliance>
         </room>
         <room id="6" name="Utility">
@@ -110,26 +108,22 @@
             <media id="7" name="it" type="remote" server="musicserver" ></media>
             <media id="8" name="itl" type="iTunes"></media>
             <media id="9" name="spotl" type="Spotify"></media>
-            <sensor id="1" name="Jeenode" type="Jeenode">
-                <temperature></temperature>
-                <lightlevel></lightlevel>
-                <motion></motion>
-                <humidity></humidity>
-                <battery></battery>
-            </sensor>
             <sensor id="3" name="Airwick" type="Jeenode">
-                <temperature></temperature>
-                <lightlevel></lightlevel>
-                <motion></motion>
-                <plant></plant>
-                <battery></battery>
+                <temperature topic="/house/rooms/first-floor/living-room/front/temperature"></temperature>
+                <lightlevel topic="/house/rooms/first-floor/living-room/front/light-level"></lightlevel>
+                <motion topic="/house/rooms/first-floor/living-room/front/oocupied"></motion>
+                <plant topic="/house/rooms/first-floor/living-room/front/soil-humidity"></plant>
+                <battery topic="/house/rooms/first-floor/living-room/front/battery-level"></battery>
+            </sensor>
+            <sensor id="2" name="Airwick2" type="Jeenode">
+                <temperature topic="/house/rooms/first-floor/living-room/back/temperature"></temperature>
+                <lightlevel topic="/house/rooms/first-floor/living-room/back/light-level"></lightlevel>
+                <motion topic="/house/rooms/first-floor/living-room/back/oocupied"></motion>
+                <battery topic="/house/rooms/first-floor/living-room/back/battery-level"></battery>
             </sensor>
             <sensor id="8" name="Couch" type="Jeenode">
-                <temperature></temperature>
-                <lightlevel></lightlevel>
-                <humidity></humidity>
-                <motion></motion>
-                <battery></battery>
+                <humidity topic="/house/rooms/first-floor/living-room/couch/occupied"></humidity>
+                <battery topic="/house/rooms/first-floor/living-room/couch/battery"></battery>
             </sensor>
             <window id="1" name="front">
                 <blind id="1" type="coulisse" name="front"></blind>
@@ -154,6 +148,12 @@
         <room id="2" name="Kitchen">
             <appliance id="3" name="Dishwasher" code="1077486631" type="IAM"></appliance>
             <appliance id="6" name="Fridge" host="192.168.0.6" type="Wemo"></appliance>
+            <sensor id="5" name="Jeenode" type="Jeenode">
+                <temperature topic="/house/rooms/first-floor/kitchen/temperature"></temperature>
+                <lightlevel topic="/house/rooms/first-floor/kitchen/light-level"></lightlevel>
+                <motion topic="/house/rooms/first-floor/kitchen/occupied"></motion>
+                <battery topic="/house/rooms/first-floor/kitchen/battery"></battery>
+            </sensor>
         </room>
     </floor>
     <floor id="3" name="Second floor">
@@ -170,16 +170,14 @@
                 <temperature topic="/house/rooms/second-floor/second-bedroom/temperature"></temperature>
                 <humidity topic="/house/rooms/second-floor/second-bedroom/humidity"></humidity>
             </sensor>
-            <radiator></radiator>
-            <windowswitch></windowswitch>
-            <thermostat></thermostat>
         </room>
         <room id="9" name="Landing">
-           <sensor id="2" name="land" type="Jeenode">
-                <temperature></temperature>
-                <lightlevel></lightlevel>
-                <motion></motion>
-                <battery></battery>
+           <sensor id="1" name="land" type="Jeenode">
+                <temperature topic="/house/rooms/second-floor/landing/temperature"></temperature>
+                <humidity topic="/house/rooms/second-floor/landing/humidity"></humidity>
+                <lightlevel topic="/house/rooms/second-floor/landing/lightlevel"></lightlevel>
+                <motion topic="/house/rooms/second-floor/landing/occupied"></motion>
+                <battery topic="/house/rooms/second-floor/landing/battery"></battery>
             </sensor>   
         </room>
         <room id="8" name="Bathroom">

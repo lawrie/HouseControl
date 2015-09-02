@@ -60,8 +60,7 @@ public class WemoControl implements ApplianceControl {
 
 	@Override
 	public void switchAppliance(int socket, boolean on) throws IOException {
-		// TODO Auto-generated method stub
-		
+		reporter.error("Switching Wemo device not yet supported");	
 	}
 
 	@Override

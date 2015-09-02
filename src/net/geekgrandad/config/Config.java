@@ -338,6 +338,7 @@ public class Config {
             	sensorName = attribute.getValue();
               } else if (attribute.getName().toString().equals(TYPE)) {
             	sensorType = attribute.getValue();
+            	if (sensorType.equals("emontx")) emontxId = sensorId;
               }
             }
           } else if (event.asStartElement().getName().getLocalPart().equals(LIGHT)) {
@@ -750,7 +751,25 @@ public class Config {
             }
          } else if (event.asStartElement().getName().getLocalPart().equals(POWER)) {
              debug("Start power");
-          } else if (event.asStartElement().getName().getLocalPart().equals(BATTERY)) {
+             Iterator<Attribute> attributes = startElement.getAttributes();
+             while (attributes.hasNext()) {
+               Attribute attribute = attributes.next();
+               if (attribute.getName().toString().equals(TOPIC)) {
+             	  topic = attribute.getValue();
+             	  mqttTopics.put(sensorName + ":" + Quantity.POWER.name().toLowerCase(), topic);
+               }
+             }
+          }  else if (event.asStartElement().getName().getLocalPart().equals(ENERGY)) {
+              debug("Start energy");
+              Iterator<Attribute> attributes = startElement.getAttributes();
+              while (attributes.hasNext()) {
+                Attribute attribute = attributes.next();
+                if (attribute.getName().toString().equals(TOPIC)) {
+              	  topic = attribute.getValue();
+              	  mqttTopics.put(sensorName + ":" + Quantity.ENERGY.name().toLowerCase(), topic);
+                }
+              }
+           }else if (event.asStartElement().getName().getLocalPart().equals(BATTERY)) {
              debug("Start battery");
              
           // We read the attributes from this tag and process the id and name attributes
@@ -759,7 +778,10 @@ public class Config {
                Attribute attribute = attributes.next();
                if (attribute.getName().toString().equals(BATTERY_LOW)) {
              	 emontxBatteryLow = Integer.parseInt(attribute.getValue());
-               } 
+               }  else if (attribute.getName().toString().equals(TOPIC)) {
+                  topic = attribute.getValue();
+                  mqttTopics.put(sensorName + ":" + Quantity.BATTERY_LOW.name().toLowerCase(), topic);
+               }
              }
           } 
         } else if (event.isEndElement()) {

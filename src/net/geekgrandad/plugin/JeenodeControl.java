@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import net.geekgrandad.config.Config;
 import net.geekgrandad.interfaces.DatalogControl;
 import net.geekgrandad.interfaces.InfraredControl;
+import net.geekgrandad.interfaces.MQTT;
 import net.geekgrandad.interfaces.PlantControl;
 import net.geekgrandad.interfaces.PowerControl;
 import net.geekgrandad.interfaces.Provider;
@@ -37,6 +38,7 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 	private long[] occupied = new long[Config.MAX_SENSORS];
 	private boolean[] sensorOn = new boolean[Config.MAX_SENSORS];
 	private Thread inThread = new Thread(new ReadInput());
+	private MQTT mqtt;
 	
 	/**
 	 * Set the datalog controller (e.g. COSM) to send power and energy data to
@@ -78,6 +80,8 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 	class ReadInput implements Runnable {
 		public void run() {
 			DecimalFormat df = new DecimalFormat("#####.##");
+			String name = config.sensorNames[sensor-1];
+			String key, topic;
 			for (;;) {
 				int b = -1;
 
@@ -92,16 +96,21 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 						long millis = System.currentTimeMillis();
 						if (lastPower != 0) {
 							int diff = (int) (millis - lastPower);
-							energy += (diff * power) / 3600000000d; // from
-																	// watt-milliseconds
-																	// to kwh
+							energy += (diff * power) / 3600000000d; // from watt-milliseconds to kwh
 							roundedEnergy = Double.parseDouble(df.format(energy));
 							if (datalogControl != null) {
 								datalogControl.updateEnergy(energy);
 							}
 							reporter.print("  Energy: " + roundedEnergy + " kwh");
+							key = name + ":" + Quantity.ENERGY.name().toLowerCase();
+							topic = config.mqttTopics.get(key);
+							if (topic != null) mqtt.publish(topic, "" + energy, 0);
 						}
 						lastPower = millis;
+						key = name + ":" + Quantity.POWER.name().toLowerCase();
+						topic = config.mqttTopics.get(key);
+						if (topic != null) mqtt.publish(topic, "" + power, 0);
+						config.mqttTopics.get(key);
 						if (datalogControl != null) {
 							datalogControl.updatePower(power);
 						}
@@ -111,6 +120,9 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 						rfc.readByte();
 						int batt = (rfc.readByte() + (rfc.readByte() << 8));
 						reporter.print("  Battery: " + batt);
+						key = name + ":" + Quantity.BATTERY_LOW.name().toLowerCase();
+						topic = config.mqttTopics.get(key);
+						if (topic != null) mqtt.publish(topic, "" + batt, 0);
 						batteryLow[sensor] = (batt < config.emontxBatteryLow);
 					} else { // Room node
 						for (int i = 0; i < 4; i++) {
@@ -118,9 +130,15 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 							if (i == 0) {
 								light[sensor] = Math.round(b / 2.56f);
 								reporter.print("  Light: " + b);
+								key = name + ":" + Quantity.ILLUMINANCE.name().toLowerCase();
+								topic = config.mqttTopics.get(key);
+								if (topic != null) mqtt.publish(topic, "" + b, 0);
 							} else if (i == 1) {
 								humidity[sensor] = b >> 1;
 								reporter.print("  Humidity: " + (b >> 1));
+								key = name + ":" + Quantity.RELATIVE_HUMIDITY.name().toLowerCase();
+								topic = config.mqttTopics.get(key);
+								if (topic != null) mqtt.publish(topic, "" + power, 0);
 								if ((b & 1) == 1) {
 									reporter.print("  *** MOTION ***");
 									occupied[sensor] = System.currentTimeMillis();
@@ -128,6 +146,9 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 							} else if (i == 2) {
 								temp[sensor] = Math.round(b / 10f);
 								reporter.print("  Temperature: " + ((float) (b / 10f)));
+								key = name + ":" + Quantity.TEMPERATURE.name().toLowerCase();
+								topic = config.mqttTopics.get(key);
+								if (topic != null) mqtt.publish(topic, "" + power, 0);
 							} else if (i == 3) {
 								reporter.debug("Battery low: " + b);
 								batteryLow[sensor] = (b == 0 ? false : true);
@@ -147,6 +168,7 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 		config = provider.getConfig();
 		reporter = provider.getReporter();
 		datalogControl = provider.getDatalogControl();
+		mqtt = provider.getMQTTControl();
 		
 		// Connect to the Jeenode network, if transceiver port defined
 		if (config.rfm12Port != null && config.rfm12Port.length() > 0) {
@@ -177,7 +199,7 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 	}
 
 	@Override
-	public float getQuantity(int sensor, Quantity q) {
+	public float getQuantity(int sensor, Quantity q) {		
 		switch(q) {
 		case TEMPERATURE:
 			return temp[sensor];
@@ -198,7 +220,6 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 		case POWER:
 			return power;
 		case RELATIVE_HUMIDITY:
-			return humidity[sensor];
 		case SOIL_HUMIDITY:
 			return humidity[sensor];
 		case SOUND_LEVEL:

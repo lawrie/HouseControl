@@ -39,6 +39,7 @@ import net.geekgrandad.interfaces.SwitchControl;
 import net.geekgrandad.interfaces.WeatherControl;
 import net.geekgrandad.parser.Parser;
 import net.geekgrandad.parser.Token;
+import net.geekgrandad.plugin.MQTTControl;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -1496,5 +1497,10 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 	@Override
 	public void setCurrentMediaDevice(int id) {
 		defaultMediaDevice = id;		
+	}
+
+	@Override
+	public MQTT getMQTTControl() {
+		return mqttControl;
 	}
 }

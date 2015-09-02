@@ -1,6 +1,7 @@
 package net.geekgrandad.interfaces;
 
 import net.geekgrandad.config.*;
+import net.geekgrandad.plugin.MQTTControl;
 
 public interface Provider {
 	
@@ -27,5 +28,7 @@ public interface Provider {
 	public void setCurrentMediaDevice(int id);
 	
 	public Browser getBrowser();
+	
+	public MQTT getMQTTControl();
 
 }
