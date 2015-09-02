@@ -139,7 +139,7 @@ public class IAMControl implements ApplianceControl {
 							int n = findIAMIndex(id);
 							if (n >= 0) {
 								String name = config.applianceNames[n];
-								String key = name + ":" + Quantity.ENERGY.name().toLowerCase();
+								String key = name + ":" + Quantity.POWER.name().toLowerCase();
 								String topic = config.mqttTopics.get(key);
 								
 								iamOn[n] = (obj.getInt("state") == 1);
@@ -177,6 +177,7 @@ public class IAMControl implements ApplianceControl {
 								iamValue[n] = val;
 								// Publish to MQTT server
 								reporter.print("Key: " + key + ", topic: " + (topic == null ? "null" : topic));
+								mqtt.publish(topic, "" + val, 0);
 								// calculate energy usage
 								if (iamLast[n] != 0) {
 									int diff = (int) (millis - iamLast[n]);
