@@ -158,6 +158,10 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 								if (topic != null) mqtt.publish(topic, "" + batteryLow[sensor], 0);
 							}
 						}
+						key = name + ":" + Quantity.MOTION.name().toLowerCase();
+						topic = config.mqttTopics.get(key);
+						String occ = (occupied[sensor] != 0 && (System.currentTimeMillis() - occupied[sensor]) < config.occupiedInterval) ? "yes" : "no";
+						if (topic != null) mqtt.publish(topic, occ, 0);		
 					}
 				} catch (IOException e) {
 					reporter.error("IOException in ReadInput: " + e.getMessage());
