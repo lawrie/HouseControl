@@ -133,7 +133,7 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 								reporter.print("  Light: " + b);
 								key = name + ":" + Quantity.ILLUMINANCE.name().toLowerCase();
 								topic = config.mqttTopics.get(key);
-								if (topic != null) mqtt.publish(topic, "" + b, 0);
+								if (topic != null) mqtt.publish(topic, "" + light[sensor], 0);
 							} else if (i == 1) {
 								humidity[sensor] = b >> 1;
 								reporter.print("  Humidity: " + (b >> 1));
@@ -153,6 +153,9 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 							} else if (i == 3) {
 								reporter.debug("Battery low: " + b);
 								batteryLow[sensor] = (b == 0 ? false : true);
+								key = name + ":" + Quantity.BATTERY_LOW.name().toLowerCase();
+								topic = config.mqttTopics.get(key);
+								if (topic != null) mqtt.publish(topic, "" + batteryLow[sensor], 0);
 							}
 						}
 					}
