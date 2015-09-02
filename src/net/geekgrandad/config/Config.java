@@ -626,7 +626,10 @@ public class Config {
               applianceType = attribute.getValue();
             } else if (attribute.getName().toString().equals(HOST)) {
                 applianceHost = attribute.getValue();
-              }
+            } else if (attribute.getName().toString().equals(TOPIC)) {
+          	  topic = attribute.getValue();
+          	  mqttTopics.put(applianceName + ":" + Quantity.POWER.name().toLowerCase(), topic);
+            }
           }
           } else if (event.asStartElement().getName().getLocalPart().equals(CAMERA)) {
             debug("Start camera");

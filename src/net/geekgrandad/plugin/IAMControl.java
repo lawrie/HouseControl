@@ -10,7 +10,9 @@ import org.json.JSONObject;
 import net.geekgrandad.config.Config;
 import net.geekgrandad.interfaces.Alerter;
 import net.geekgrandad.interfaces.ApplianceControl;
+import net.geekgrandad.interfaces.MQTT;
 import net.geekgrandad.interfaces.Provider;
+import net.geekgrandad.interfaces.Quantity;
 import net.geekgrandad.interfaces.Reporter;
 import net.geekgrandad.rf.RFControl;
 
@@ -28,6 +30,7 @@ public class IAMControl implements ApplianceControl {
 	private int[] iamValue = new int[Config.MAX_APPLIANCES];
 	private double[] iamEnergy = new double[Config.MAX_APPLIANCES];
 	private long[] iamIds;
+	private MQTT mqtt;
 	
 	private Thread inThreadIAM = new Thread(new ReadIAMInput());
 	
@@ -36,6 +39,7 @@ public class IAMControl implements ApplianceControl {
 		config = provider.getConfig();
 		alerter = provider.getAlerter();
 		reporter = provider.getReporter();
+		mqtt = provider.getMQTTControl();
 		
 		iamIds = config.iamCodes;
 		
@@ -134,6 +138,10 @@ public class IAMControl implements ApplianceControl {
 							long id = obj.getLong("id");
 							int n = findIAMIndex(id);
 							if (n >= 0) {
+								String name = config.applianceNames[n];
+								String key = name + ":" + Quantity.ENERGY.name().toLowerCase();
+								String topic = config.mqttTopics.get(key);
+								
 								iamOn[n] = (obj.getInt("state") == 1);
 								int val = ((JSONObject) obj.get("sensors"))
 										.getInt("1");
@@ -143,10 +151,10 @@ public class IAMControl implements ApplianceControl {
 										&& !iamStarted[n]) {
 									iamStarted[n] = true;
 									iamFinished[n] = false;
-									reporter.print("*** " + config.applianceNames[n]
+									reporter.print("*** " + name
 											+ " started ***");
-									alerter.say(config.applianceNames[n] + " started");
-									alerter.sendEmail(config.applianceNames[n]
+									alerter.say(name + " started");
+									alerter.sendEmail(name
 											+ " started", "Started at "
 											+ (new Date()));
 									iamEnergy[n] = 0;
@@ -158,22 +166,21 @@ public class IAMControl implements ApplianceControl {
 									
 									iamFinished[n] = true;
 									iamStarted[n] = false;
-									reporter.print("*** " + config.applianceNames[n] 
+									reporter.print("*** " + name 
 											+ " finished ***");
-									alerter.say(config.applianceNames[n] + " finished");
-									alerter.sendEmail(config.applianceNames[n]
+									alerter.say(name + " finished");
+									alerter.sendEmail(name
 											+ " finished", "Finished at "
 											+ (new Date()) + " and used "
 											+ df.format(iamEnergy[n]) + "kwh");
 								}
 								iamValue[n] = val;
+								// Publish to MQTT server
+								if (topic != null) mqtt.publish(topic, "" + val, 0);
 								// calculate energy usage
 								if (iamLast[n] != 0) {
 									int diff = (int) (millis - iamLast[n]);
-									iamEnergy[n] += (diff * val) / 3600000000d; // from
-																				// watt-milliseconds
-																				// to
-																				// kwh
+									iamEnergy[n] += (diff * val) / 3600000000d; // from watt-milliseconds to kwh
 									reporter.debug("IAM " + (n + 1) + " energy: "
 											+ iamEnergy[n]);
 								}

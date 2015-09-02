@@ -17,11 +17,11 @@
                 <power topic="/house/rooms/ground-floor/dining-room/emontx/power"></power>
                 <energy topic="/house/rooms/ground-floor/dining-room/emontx/energy"></energy>
             </sensor>
-            <appliance id="5" name="xbox" code="1880848504" type="IAM"></appliance>
+            <appliance id="5" topic="/house/rooms/ground-floor/dining-room/games/power" name="xbox" code="1880848504" type="IAM"></appliance>
         </room>
         <room id="6" name="Utility">
-            <appliance id="1" name="Dryer" type="IAM" code="1884046140"></appliance>
-            <appliance id="2" name="Washer" type="IAM" code="1567559737"></appliance>
+            <appliance id="1" topic="/house/rooms/ground-floor/utility/dryer/power" name="Dryer" type="IAM" code="1884046140"></appliance>
+            <appliance id="2" topic="/house/rooms/ground-floor/utility/washer/power" name="Washer" type="IAM" code="1567559737"></appliance>
             <sensor id="12" name="esputil" type="mqtt">
                 <temperature topic="/weather/temperature"></temperature>
                 <pressure topic="/weather/pressure"></pressure>
@@ -41,7 +41,7 @@
             <socket id="8" name="Trans" type="LWRF" code="6febbeedb77b" channel="9"></socket>
             <socket id="9" name="Pi" type="LWRF" code="6febbeedb77b" channel="13"></socket>
             <socket id="10" name="Bench" type="LWRF" code="6febbeedb77b" channel="14"></socket>
-            <appliance id="4" name="bedmedia" code="2037787242" type="IAM"></appliance>
+            <appliance id="4" topic="/house/rooms/second-floor/second-bedroom/bedmedia/power" name="bedmedia" code="2037787242" type="IAM"></appliance>
             <media id="1" channel="1" name="tv" type="TIVO"></media>
             <media id="2" channel="2" name="vt" type="TIVO">
             	<channel id="101" name="bbc1"></channel>
@@ -111,7 +111,7 @@
             <sensor id="3" name="Airwick" type="Jeenode">
                 <temperature topic="/house/rooms/first-floor/living-room/front/temperature"></temperature>
                 <lightlevel topic="/house/rooms/first-floor/living-room/front/light-level"></lightlevel>
-                <motion topic="/house/rooms/first-floor/living-room/front/oocupied"></motion>
+                <motion topic="/house/rooms/first-floor/living-room/front/occupied"></motion>
                 <plant topic="/house/rooms/first-floor/living-room/front/soil-humidity"></plant>
                 <battery topic="/house/rooms/first-floor/living-room/front/battery-level"></battery>
             </sensor>
@@ -146,7 +146,7 @@
             <computer id="2" name="desk" type="remote" server="musicserver"></computer>
         </room>
         <room id="2" name="Kitchen">
-            <appliance id="3" name="Dishwasher" code="1077486631" type="IAM"></appliance>
+            <appliance id="3" topic="/house/rooms/first-floor/kitchen/dishwasher/power" name="Dishwasher" code="1077486631" type="IAM"></appliance>
             <appliance id="6" name="Fridge" host="192.168.0.6" type="Wemo"></appliance>
             <sensor id="5" name="Jeenode" type="Jeenode">
                 <temperature topic="/house/rooms/first-floor/kitchen/temperature"></temperature>
