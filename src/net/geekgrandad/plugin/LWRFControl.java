@@ -301,12 +301,10 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 					byte[] receiveData = new byte[1024];
 					DatagramPacket receivePacket = new DatagramPacket(receiveData,
 							receiveData.length);
-					System.out.println("Waiting for UDP message");
+					reporter.debug("Waiting for UDP message");
 					receiveSocket.receive(receivePacket);
 					receivedMessage = new String(receivePacket.getData(), 0,
 							receivePacket.getLength());
-					
-					//System.out.println("RECEIVED," + receivedMessage);
 					
 					String[] part = receivedMessage.split(",");
 					if (part.length != 2) {
@@ -315,15 +313,11 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 					}
 					
 					int seq = Integer.parseInt(part[0]);
-					//System.out.println("Sequence: " + seq);
 					if (seq == lastSeq) {
-						//System.out.println("Duplicate message");
 						continue;
 					}
 					
 					lastSeq = seq;
-					
-					//System.out.println("Command: " + part[1]);
 					
 					String[] cpart = match(part[1], "^!R([0-9]+)D([0-9]+)F([0-9]+)$");
 					
@@ -331,10 +325,11 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 						int room = Integer.parseInt(cpart[0]);
 						int device = Integer.parseInt(cpart[1]);
 						int onoff = Integer.parseInt(cpart[2]);
-						System.out.println("Switch command detected");
-						System.out.println("Room is " + room);
-						System.out.println("Device is " + device);
-						System.out.println("On/off is " + onoff);
+						reporter.print("Switch command detected");
+						reporter.print("Room is " + room);
+						reporter.print("Device is " + device);
+						reporter.print("On/off is " + onoff);
+						lwCmd((byte) 0, (byte) device, (byte) onoff, config.socketCodes[1]);
 					} else {
 						
 						cpart = match(part[1], "^!R([0-9]+)D([0-9]+)FdP([0-9]+)$");
@@ -343,12 +338,13 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 							int room = Integer.parseInt(cpart[0]);
 							int device = Integer.parseInt(cpart[1]);
 							int percent = Integer.parseInt(cpart[2]);
-							System.out.println("Dimmer command detected");
-							System.out.println("Room is " + room);
-							System.out.println("Device is " + device);
-							System.out.println("Percent is " + percent);
+							reporter.print("Dimmer command detected");
+							reporter.print("Room is " + room);
+							reporter.print("Device is " + device);
+							reporter.print("Percent is " + percent);
+							lwCmd((byte) percent, (byte) device, (byte) 1, config.socketCodes[1]);
 						} else {
-							System.out.println("Comand not recognised");
+							reporter.print("Comand not recognised");
 						}
 					}
 				} catch (IOException e) {
