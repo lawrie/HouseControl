@@ -329,7 +329,7 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 						reporter.print("Room is " + room);
 						reporter.print("Device is " + device);
 						reporter.print("On/off is " + onoff);
-						lwCmd((byte) 0, (byte) device, (byte) onoff, config.socketCodes[1]);
+						lwCmd((byte) 0, (byte) (device-1), (byte) onoff, config.socketCodes[1]);
 					} else {
 						
 						cpart = match(part[1], "^!R([0-9]+)D([0-9]+)FdP([0-9]+)$");
@@ -342,7 +342,7 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 							reporter.print("Room is " + room);
 							reporter.print("Device is " + device);
 							reporter.print("Percent is " + percent);
-							lwCmd((byte) percent, (byte) device, (byte) 1, config.socketCodes[1]);
+							lwCmd((byte) percent, (byte) (device-1), (byte) 1, config.socketCodes[1]);
 						} else {
 							reporter.print("Comand not recognised");
 						}
