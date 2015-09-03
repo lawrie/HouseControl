@@ -1,6 +1,10 @@
 package net.geekgrandad.plugin;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.geekgrandad.config.Config;
 import net.geekgrandad.config.Device;
@@ -28,6 +32,11 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 	private int[] lightValue = new int[Config.MAX_LIGHTS];
 	private boolean[] windowOpen = new boolean[Config.MAX_SWITCHES];
 	private long lastSwitch = System.currentTimeMillis();
+	
+	private static final int LIGHTWAVERF_PORT = 9760; 
+	private DatagramSocket receiveSocket; 
+	private int lastSeq = -1;
+	private Thread udpThread = new Thread(new UDPThread());
 	
 	@Override
 	public boolean getSwitchStatus(int id) {
@@ -140,6 +149,14 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 			} catch (IOException e1) {
 				reporter.error(e1.getMessage());
 			}
+		}
+		
+		try {
+			receiveSocket = new DatagramSocket(LIGHTWAVERF_PORT);
+			udpThread.setDaemon(true);
+			udpThread.start();
+		} catch (IOException e) {
+			reporter.error("Failed to connect to LightWWaveRF UDP Port");
 		}
 		
 		// Start the LightwaveRF thread, if required
@@ -271,5 +288,86 @@ public class LWRFControl implements LightControl, SocketControl, SwitchControl {
 		}
 		return -1;
 	  }
+	}
+	
+	class UDPThread implements Runnable {
+
+		@Override
+		public void run() {
+			while (true) {
+				String receivedMessage = "";
+
+				try {
+					byte[] receiveData = new byte[1024];
+					DatagramPacket receivePacket = new DatagramPacket(receiveData,
+							receiveData.length);
+					System.out.println("Waiting for UDP message");
+					receiveSocket.receive(receivePacket);
+					receivedMessage = new String(receivePacket.getData(), 0,
+							receivePacket.getLength());
+					
+					//System.out.println("RECEIVED," + receivedMessage);
+					
+					String[] part = receivedMessage.split(",");
+					if (part.length != 2) {
+						System.err.println("Invalid Message");
+						continue;
+					}
+					
+					int seq = Integer.parseInt(part[0]);
+					//System.out.println("Sequence: " + seq);
+					if (seq == lastSeq) {
+						//System.out.println("Duplicate message");
+						continue;
+					}
+					
+					lastSeq = seq;
+					
+					//System.out.println("Command: " + part[1]);
+					
+					String[] cpart = match(part[1], "^!R([0-9]+)D([0-9]+)F([0-9]+)$");
+					
+					if (cpart.length == 3) {
+						int room = Integer.parseInt(cpart[0]);
+						int device = Integer.parseInt(cpart[1]);
+						int onoff = Integer.parseInt(cpart[2]);
+						System.out.println("Switch command detected");
+						System.out.println("Room is " + room);
+						System.out.println("Device is " + device);
+						System.out.println("On/off is " + onoff);
+					} else {
+						
+						cpart = match(part[1], "^!R([0-9]+)D([0-9]+)FdP([0-9]+)$");
+						
+						if (cpart.length == 3) {
+							int room = Integer.parseInt(cpart[0]);
+							int device = Integer.parseInt(cpart[1]);
+							int percent = Integer.parseInt(cpart[2]);
+							System.out.println("Dimmer command detected");
+							System.out.println("Room is " + room);
+							System.out.println("Device is " + device);
+							System.out.println("Percent is " + percent);
+						} else {
+							System.out.println("Comand not recognised");
+						}
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+		String[] match(String s, String regex) {
+			Pattern p = Pattern.compile(regex);
+			Matcher m = p.matcher(s);
+			if (m == null || !m.find()) return new String[0];
+			int count = m.groupCount();
+			String[] ss = new String[count];
+			for(int i=0;i<m.groupCount();i++) {
+				ss[i] = m.group(i+1);
+			}
+			return ss;
+		}
 	}
 }
