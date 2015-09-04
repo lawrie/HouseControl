@@ -12,6 +12,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import net.geekgrandad.config.Config;
+import net.geekgrandad.interfaces.ApplianceControl;
 import net.geekgrandad.interfaces.MQTT;
 import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Quantity;
@@ -54,8 +55,8 @@ public class MQTTControl implements MQTT, MqttCallback, SensorControl, SwitchCon
 	        }
 	        
 	        if (config.mqttCommandTopic != null) subscribe(config.mqttCommandTopic);
-	        
-	        
+	        if (config.mqttIamControlTopic != null) subscribe(config.mqttIamControlTopic);
+	                
         } catch(MqttException me) {
         	reporter.error("Failed to connect to MQTT broker");
         }
@@ -99,6 +100,12 @@ public class MQTTControl implements MQTT, MqttCallback, SensorControl, SwitchCon
 		reporter.print("MQTT message arrived: " + topic + ":" + message);
 		if (topic.equals(config.mqttCommandTopic)) {
 			reporter.print("Result from "  + message + " : " +provider.parse(message.toString()));
+		} else if (topic.equals(config.mqttIamControlTopic)) {
+			ApplianceControl ac = provider.getApplianceControl(1);
+			if (ac != null && ac instanceof IAMControl) {
+				reporter.print("Sending " + message.toString() + " to IAMControl");
+				((IAMControl) ac).sendIAMString(message.toString());
+			}
 		} else {
 			values.put(topic, message.toString());
 			lastMessage = System.currentTimeMillis();

@@ -1504,4 +1504,9 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 	public MQTT getMQTTControl() {
 		return mqttControl;
 	}
+
+	@Override
+	public ApplianceControl getApplianceControl(int n) {
+		return applianceControl[n];
+	}
 }

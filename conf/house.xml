@@ -198,7 +198,9 @@
     <config listen_port="50000" rfm12_port="COM15" lwrf_port="COM8" x10_port="COM9"
         iam_port="COM20" iam_min_value="3" iam_min_off_period="120000"
         occupied_interval="300000" ping_timeout="5000" background_delay="10000"
-        mqtt_server="tcp://nodered:1883" mqtt_command_topic="/house/command"></config>
+        mqtt_server="tcp://nodered:1883" mqtt_command_topic="/house/command"
+        mqtt_iam_control_topic="/house/iamcontrol">
+    </config>
     <plugins>
         <plugin class="net.geekgrandad.plugin.TivoControl" type="TIVO">
             <interface name="MediaControl"></interface>

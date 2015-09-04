@@ -99,12 +99,12 @@ public class IAMControl implements ApplianceControl {
 	}
 
 	// Send a string to IAM transceiver
-	private void sendIAMString(String s) throws IOException {
+	public void sendIAMString(String s) throws IOException {
 		for (int i = 0; i < s.length(); i++) {
 			sendRFCIAM(s.charAt(i));
 		}
 	}
-
+	
 	@Override
 	public boolean getApplianceStatus(int appliance) {
 		return iamOn[appliance];

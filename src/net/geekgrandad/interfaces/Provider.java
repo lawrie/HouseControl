@@ -24,6 +24,8 @@ public interface Provider {
 	
 	public MediaControl getMediaControl(int n);
 	
+	public ApplianceControl getApplianceControl(int n);
+	
 	public int getCurrentMediaDevice();
 	
 	public void setCurrentMediaDevice(int id);

@@ -128,6 +128,7 @@ public class Config {
   private static final String TOPIC = "topic";
   private static final String MQTT_SERVER = "mqtt_server";
   private static final String MQTT_COMMAND_TOPIC = "mqtt_command_topic";
+  private static final String MQTT_IAM_CONTROL_TOPIC = "mqtt_iam_control_topic";
   
   // Elements
   private static final String FLOOR = "floor";
@@ -220,7 +221,7 @@ public class Config {
   
   public boolean email=false;
   public String emailUser, emailPassword, emailRecipient;
-  public String topic, mqttServer, mqttCommandTopic;
+  public String topic, mqttServer, mqttCommandTopic, mqttIamControlTopic;
   
   public boolean cosm = false;
   public String cosmApiKey, cosmFeed, cosmPower, cosmEnergy;
@@ -735,6 +736,8 @@ public class Config {
                     mqttServer = attribute.getValue();
                 } else if (attribute.getName().toString().equals(MQTT_COMMAND_TOPIC)) {
                     mqttCommandTopic = attribute.getValue();
+                } else if (attribute.getName().toString().equals(MQTT_IAM_CONTROL_TOPIC)) {
+                    mqttIamControlTopic = attribute.getValue();
                 }
               }
            } else if (event.asStartElement().getName().getLocalPart().equals(HEATING)) {
@@ -1075,6 +1078,7 @@ public class Config {
     
     System.out.println("\nMQTT Server: " + mqttServer);
     System.out.println("\nMQTT Comand topic: " + mqttCommandTopic);
+    System.out.println("\nMQTT IAM control topic: " + mqttIamControlTopic);
     
     System.out.println("\nPhone name: " + phoneName);
     
