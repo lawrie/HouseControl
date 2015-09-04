@@ -404,6 +404,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 
 	public synchronized String parse(String source) throws IOException {
 		debug("Command is " + source);
+		cmd = source;
 		tokens = parser.parse(source);
 		if (tokens == null) return ERROR;
 
