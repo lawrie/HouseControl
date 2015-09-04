@@ -402,7 +402,7 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 		if (emailControl != null) emailControl.email(subject, msg);
 	}
 
-	public String parse(String source) throws IOException {
+	public synchronized String parse(String source) throws IOException {
 		debug("Command is " + source);
 		tokens = parser.parse(source);
 		if (tokens == null) return ERROR;
