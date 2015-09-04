@@ -1,7 +1,8 @@
 package net.geekgrandad.interfaces;
 
+import java.io.IOException;
+
 import net.geekgrandad.config.*;
-import net.geekgrandad.plugin.MQTTControl;
 
 public interface Provider {
 	
@@ -30,5 +31,7 @@ public interface Provider {
 	public Browser getBrowser();
 	
 	public MQTT getMQTTControl();
+	
+	public String parse(String cmd) throws IOException;
 
 }

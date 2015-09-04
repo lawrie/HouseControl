@@ -25,11 +25,13 @@ public class MQTTControl implements MQTT, MqttCallback, SensorControl, SwitchCon
 	private HashMap<String,String> values = new HashMap<String,String>();
 	private long lastMessage = 0;
 	private Config config;
+	Provider provider;
 
 	@Override
 	public void setProvider(Provider provider) {
 		reporter = provider.getReporter();
 		config = provider.getConfig();
+		this.provider = provider;
 		
 		MemoryPersistence persistence = new MemoryPersistence();
 		String broker = provider.getConfig().mqttServer;
@@ -44,9 +46,14 @@ public class MQTTControl implements MQTT, MqttCallback, SensorControl, SwitchCon
             client.connect(connOpts);
             reporter.print("Connected to MQTT broker");
 	        client.setCallback(this);
+	        
+	        /* Subscribe to all topics */
+	        
 	        for(String topic: topics) {
 	        	subscribe(topic);
 	        }
+	        
+	        if (config.mqttCommandTopic != null) subscribe(config.mqttCommandTopic);
 	        
 	        
         } catch(MqttException me) {
@@ -90,8 +97,12 @@ public class MQTTControl implements MQTT, MqttCallback, SensorControl, SwitchCon
 	@Override
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
 		reporter.print("MQTT message arrived: " + topic + ":" + message);
-		values.put(topic, message.toString());
-		lastMessage = System.currentTimeMillis();
+		if (topic.equals(config.mqttCommandTopic)) {
+			reporter.print("Result from "  + message + " : " +provider.parse(message.toString()));
+		} else {
+			values.put(topic, message.toString());
+			lastMessage = System.currentTimeMillis();
+		}
 	}
 
 	@Override
