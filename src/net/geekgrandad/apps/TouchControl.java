@@ -82,6 +82,7 @@ public class TouchControl extends JFrame {
 		details.add(detail("Temperature", "temperature 3", " C", livingRoom));
 		details.add(detail("Light level", "lightlevel 3", " %", livingRoom));
 		details.add(detail("Occupied", "occupied 3", "", livingRoom));
+		details.add(detail("Couch", "Couch humidity", "", livingRoom));
 		
 		TitledBorder kitchenBorder = BorderFactory.createTitledBorder("kitchen");
 		kitchenBorder.setTitleJustification(TitledBorder.CENTER);

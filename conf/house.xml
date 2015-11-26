@@ -17,6 +17,10 @@
                 <power topic="/house/rooms/ground-floor/dining-room/emontx/power"></power>
                 <energy topic="/house/rooms/ground-floor/dining-room/emontx/energy"></energy>
             </sensor>
+             <sensor id="5" name="emonPi" type="emonPi">
+                <power topic="/house/rooms/ground-floor/dining-room/emonpi/power"></power>
+                <energy topic="/house/rooms/ground-floor/dining-room/emonpi/energy"></energy>
+            </sensor>
             <appliance id="5" topic="/house/rooms/ground-floor/dining-room/games/power" name="xbox" code="1880848504" type="IAM"></appliance>
         </room>
         <room id="6" name="Utility">
@@ -148,7 +152,7 @@
         <room id="2" name="Kitchen">
             <appliance id="3" topic="/house/rooms/first-floor/kitchen/dishwasher/power" name="Dishwasher" code="1077486631" type="IAM"></appliance>
             <appliance id="6" name="Fridge" host="192.168.0.6" type="Wemo"></appliance>
-            <sensor id="5" name="Jeenode" type="Jeenode">
+            <sensor id="1" name="Jeenode" type="Jeenode">
                 <temperature topic="/house/rooms/first-floor/kitchen/temperature"></temperature>
                 <lightlevel topic="/house/rooms/first-floor/kitchen/light-level"></lightlevel>
                 <motion topic="/house/rooms/first-floor/kitchen/occupied"></motion>
@@ -172,7 +176,7 @@
             </sensor>
         </room>
         <room id="9" name="Landing">
-           <sensor id="1" name="land" type="Jeenode">
+           <sensor id="6" name="land" type="Jeenode">
                 <temperature topic="/house/rooms/second-floor/landing/temperature"></temperature>
                 <humidity topic="/house/rooms/second-floor/landing/humidity"></humidity>
                 <lightlevel topic="/house/rooms/second-floor/landing/lightlevel"></lightlevel>
@@ -260,9 +264,6 @@
         </plugin>
         <plugin class="net.geekgrandad.plugin.RemoteHouseControl" type="remote">
             <interface name="RemoteControl"></interface>
-        </plugin>
-        <plugin class="net.geekgrandad.plugin.XPControl" type="XP">
-            <interface name="ComputerControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.X10Remote" type="X10">
             <interface name="Controller"></interface>

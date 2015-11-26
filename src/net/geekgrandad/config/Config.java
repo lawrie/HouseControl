@@ -150,6 +150,7 @@ public class Config {
   private static final String CHANNEL = "channel";
   private static final String CAMERA = "camera";
   private static final String EMONTX = "emontx";
+  private static final String EMONPI = "emonPi";
   private static final String BLIND = "blind";
   private static final String RADIATOR = "radiator";
   private static final String PLANT = "plant";
@@ -203,7 +204,7 @@ public class Config {
   public HashMap<String,String> mqttTopics = new HashMap<String,String>();
   
   private int floorId, roomId, sensorId, lightId, socketId, windowId, cameraId, applianceId, mediaId;
-  private int phoneId, channelId, tabletId, switchId,emontxId, speechId, computerId;
+  private int phoneId, channelId, tabletId, switchId,emontxId, emonPiId, speechId, computerId;
   
   private String floorName, roomName, sensorName, lightName, socketName, windowName, cameraName, applianceName;
   private String channelName, tabletName, switchName, mediaName, computerName;
@@ -340,8 +341,9 @@ public class Config {
             	sensorName = attribute.getValue();
               } else if (attribute.getName().toString().equals(TYPE)) {
             	sensorType = attribute.getValue();
-            	if (sensorType.equals("emontx")) emontxId = sensorId;
-              }
+            	if (sensorType.equals(EMONTX)) emontxId = sensorId;
+            	else if (sensorType.equals(EMONPI)) emonPiId = sensorId;
+              } 
             }
           } else if (event.asStartElement().getName().getLocalPart().equals(LIGHT)) {
             debug("Start light");
@@ -766,6 +768,18 @@ public class Config {
             	emontxId = Integer.parseInt(attribute.getValue());
               }
             }
+            
+            } else if (event.asStartElement().getName().getLocalPart().equals(EMONPI)) {
+            debug("Start emonPI");
+            
+            // We read the attributes from this tag and process the id and name attributes
+            Iterator<Attribute> attributes = startElement.getAttributes();
+            while (attributes.hasNext()) {
+              Attribute attribute = attributes.next();
+              if (attribute.getName().toString().equals(ID)) {
+            	emonPiId = Integer.parseInt(attribute.getValue());
+              }
+            }
          } else if (event.asStartElement().getName().getLocalPart().equals(POWER)) {
              debug("Start power");
              Iterator<Attribute> attributes = startElement.getAttributes();
@@ -826,6 +840,8 @@ public class Config {
           	  debug("End switch id  = " + switchId + ", name = " + switchNames[switchId-1]);
           } else if (endElement.getName().getLocalPart() == (EMONTX)) {
         	  debug("End emontx");
+          } else if (endElement.getName().getLocalPart() == (EMONPI)) {
+        	  debug("End emonPi");
           } else if (endElement.getName().getLocalPart() == (BATTERY)) {
         	  debug("End battery");
           } else if (endElement.getName().getLocalPart() == (POWER)) {
@@ -1055,6 +1071,7 @@ public class Config {
     }
     
     System.out.println("\nemonTx id: " + emontxId);
+    System.out.println("\nemonPI id: " + emonPiId);
     
     System.out.println("\nEmail: " + email);
     System.out.println("Email user: " + emailUser);
@@ -1167,6 +1184,10 @@ public class Config {
   
   public int getEmontxId () {
 	  return emontxId;
+  }
+  
+  public int getEmonPiId () {
+	  return emonPiId;
   }
   
   private void debug(String msg) {
