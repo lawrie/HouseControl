@@ -84,9 +84,10 @@ foreach ($power as $key => $value) {
 	  <h3>Kitchen</h3>
 <?php
 $kitchen = array(
-    "Temperature" => "temperature 5",
-    "Light level" => "lightlevel 5",
-    "Occupied" => "occupied 5",
+    "Temperature" => "Jeenode temperature",
+    "Light level" => "Jeenode lightlevel",
+    "Humidity" => "Jeenode humidity",
+    "Occupied" => "Jeenode occupied",
     "Dish washer" => "dishwasher status");
 ?>          
       <table class="table">
@@ -191,7 +192,6 @@ foreach ($secondBedroom as $key => $value) {
 <?php      
 $landing = array(
     "Temperature" => "land temperature",
-    "Humidity" => "land humidity",
     "Light level" => "land lightlevel",
     "Occupied" => "land occupied");
 ?>	  
@@ -389,8 +389,7 @@ foreach ($utilityRoom as $key => $value) {
 	  </table>     
       <h3>Hall</h3>
 <?php      
-$hall = array(
-    "Temperature" => "pihall temperature");
+$hall = array();
 ?>
       <table class="table">
 	    <thead>
