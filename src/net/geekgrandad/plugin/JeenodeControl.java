@@ -125,7 +125,7 @@ public class JeenodeControl implements SensorControl, PowerControl, PlantControl
 						topic = config.mqttTopics.get(key);
 						if (topic != null) mqtt.publish(topic, "" + batt, 0);
 						batteryLow[sensor] = (batt < config.emontxBatteryLow);
-					} else if (b == config.getEmonPiId()) { // Special value for emonTx
+					} else if (b == config.getEmonPiId()) { // Special value for emonPi
 						power = (rfc.readByte() + (rfc.readByte() << 8));
 						reporter.print("  Power: " + power + " watts");
 						long millis = System.currentTimeMillis();

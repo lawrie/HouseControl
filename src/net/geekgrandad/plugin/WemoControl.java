@@ -19,8 +19,11 @@ import javax.xml.soap.SOAPPart;
 
 import net.geekgrandad.config.Config;
 import net.geekgrandad.interfaces.ApplianceControl;
+import net.geekgrandad.interfaces.MQTT;
 import net.geekgrandad.interfaces.Provider;
+import net.geekgrandad.interfaces.Quantity;
 import net.geekgrandad.interfaces.Reporter;
+import net.geekgrandad.plugin.JeenodeControl.ReadInput;
 
 public class WemoControl implements ApplianceControl {
 	private Reporter reporter;
@@ -32,12 +35,17 @@ public class WemoControl implements ApplianceControl {
     private URLStreamHandler handler;
     private static final int START_PORT = 49152;
     private static final int END_PORT = 49154;
-    private int port = START_PORT;
+    private static final int POLL_INTERVAL = 30;
+    private MQTT mqtt;
+    private Thread publishThread = new Thread(new Publish());
+    private int[] ports = new int[Config.MAX_APPLIANCES];
     
 	@Override
 	public void setProvider(Provider provider) {
 		reporter = provider.getReporter();
 		config = provider.getConfig();
+		mqtt = provider.getMQTTControl();
+		for(int i=0;i<Config.MAX_APPLIANCES;i++) ports[i] = START_PORT;
 		try {
 			soapConnectionFactory = SOAPConnectionFactory.newInstance();
 			soapConnection = soapConnectionFactory.createConnection();
@@ -56,6 +64,8 @@ public class WemoControl implements ApplianceControl {
 		} catch (SOAPException e) {
 			reporter.error(e.getMessage());
 		}
+		publishThread.setDaemon(true);
+		publishThread.start();
 	}
 
 	@Override
@@ -66,7 +76,7 @@ public class WemoControl implements ApplianceControl {
 	@Override
 	public boolean getApplianceStatus(int appliance) {
 		for(int i=0;i<(END_PORT-START_PORT) + 1;i++) {
-			basicEventUrl = "http://" + config.applianceHostNames[appliance] + ":" + port + "/upnp/control/basicevent1";
+			basicEventUrl = "http://" + config.applianceHostNames[appliance] + ":" + ports[appliance] + "/upnp/control/basicevent1";
 			try {
 				SOAPMessage soapResponse = soapConnection.call(createBinaryStateRequest(), new URL(null, basicEventUrl, handler));
 				SOAPBody msg = soapResponse.getSOAPBody();
@@ -74,7 +84,7 @@ public class WemoControl implements ApplianceControl {
 		        return (val == 1);
 			} catch (Exception e) {
 				if (e.getCause().getCause() instanceof SocketTimeoutException) {
-					if (++port > END_PORT) port = START_PORT;
+					if (++ports[appliance] > END_PORT) ports[appliance] = START_PORT;
 				} else reporter.error(e.getMessage());
 			}
 		}
@@ -84,7 +94,7 @@ public class WemoControl implements ApplianceControl {
 	@Override
 	public int getAppliancePower(int appliance) {
 		for(int i=0;i<3;i++) {
-			insightUrl = "http://" + config.applianceHostNames[appliance] + ":" + port + "/upnp/control/insight1";
+			insightUrl = "http://" + config.applianceHostNames[appliance] + ":" + ports[appliance] + "/upnp/control/insight1";
 			//System.out.println("Trying " + insightUrl);
 			try {
 				SOAPMessage soapResponse = soapConnection.call(createInsightParamsRequest(), new URL(null, insightUrl, handler));
@@ -95,9 +105,9 @@ public class WemoControl implements ApplianceControl {
 		        String power = array[7];
 		        return  (int) (Math.round(Integer.parseInt(power)/1000.0));
 			} catch (Exception e) {
-				if (++port > 49154) port = 49152;
+				if (++ports[appliance] > END_PORT) ports[appliance] = START_PORT;
 				if (e.getCause() instanceof SocketTimeoutException || e.getCause().getCause() instanceof SocketTimeoutException) {
-					reporter.error("Wemo on port " +  port  + " timed out");		
+					reporter.error("Wemo on port " +  ports[appliance]  + " timed out");		
 				} else reporter.error(e.getMessage());
 			}
 		}
@@ -146,5 +156,32 @@ public class WemoControl implements ApplianceControl {
         soapMessage.saveChanges();
 
         return soapMessage;
+    }
+    
+    class Publish implements Runnable {
+
+		@Override
+		public void run() {
+			// Poll for power 
+			for(;;) {
+				for(int i=0;i<Config.MAX_APPLIANCES;i++) {
+					if (config.applianceTypes[i].equals("Wemo")) {
+						String name = config.applianceNames[i];
+						String key = name + ":" + Quantity.POWER.name().toLowerCase();
+						String topic = config.mqttTopics.get(key);
+						int power = getAppliancePower(i);
+						reporter.print("Wemo: publishing Name: " + name + " , topic : " + topic + " , power: " + power);
+						//System.out.println("Wemo: publishing Name: " + name + " , topic : " + topic + " , power: " + power);
+						if (topic != null )
+							mqtt.publish(topic, "" + power, 0);						
+					}
+				}
+				try {
+					Thread.sleep(POLL_INTERVAL * 1000);
+				} catch (InterruptedException e) {}
+			}
+			
+		}
+    	
     }
 }

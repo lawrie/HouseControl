@@ -46,6 +46,7 @@
             <socket id="9" name="Pi" type="LWRF" code="6febbeedb77b" channel="13"></socket>
             <socket id="10" name="Bench" type="LWRF" code="6febbeedb77b" channel="14"></socket>
             <appliance id="4" topic="/house/rooms/second-floor/second-bedroom/bedmedia/power" name="bedmedia" code="2037787242" type="IAM"></appliance>
+            <appliance id="7" name="Media" topic="/house/rooms/first-floor/living-room/media/power" host="192.168.0.18" type="Wemo"></appliance>           
             <media id="1" channel="1" name="tv" type="TIVO"></media>
             <media id="2" channel="2" name="vt" type="TIVO">
             	<channel id="101" name="bbc1"></channel>
@@ -151,9 +152,10 @@
         </room>
         <room id="2" name="Kitchen">
             <appliance id="3" topic="/house/rooms/first-floor/kitchen/dishwasher/power" name="Dishwasher" code="1077486631" type="IAM"></appliance>
-            <appliance id="6" name="Fridge" host="192.168.0.6" type="Wemo"></appliance>
+            <appliance id="6" name="Fridge" topic="/house/rooms/first-floor/kitchen/fridge/power" host="192.168.0.6" type="Wemo"></appliance>
             <sensor id="1" name="Jeenode" type="Jeenode">
                 <temperature topic="/house/rooms/first-floor/kitchen/temperature"></temperature>
+                <humidity topic="/house/rooms/first-floor/kitchen/humidity"></humidity>
                 <lightlevel topic="/house/rooms/first-floor/kitchen/light-level"></lightlevel>
                 <motion topic="/house/rooms/first-floor/kitchen/occupied"></motion>
                 <battery topic="/house/rooms/first-floor/kitchen/battery"></battery>
@@ -179,7 +181,7 @@
            <sensor id="6" name="land" type="Jeenode">
                 <temperature topic="/house/rooms/second-floor/landing/temperature"></temperature>
                 <humidity topic="/house/rooms/second-floor/landing/humidity"></humidity>
-                <lightlevel topic="/house/rooms/second-floor/landing/lightlevel"></lightlevel>
+                <lightlevel topic="/house/rooms/second-floor/landing/light-level"></lightlevel>
                 <motion topic="/house/rooms/second-floor/landing/occupied"></motion>
                 <battery topic="/house/rooms/second-floor/landing/battery"></battery>
             </sensor>   
