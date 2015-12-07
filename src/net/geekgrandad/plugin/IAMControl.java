@@ -180,7 +180,10 @@ public class IAMControl implements ApplianceControl {
 								// Publish to MQTT server
 								reporter.print("Key: " + key + ", topic: " + (topic == null ? "null" : topic));
 								if (mqtt == null) mqtt = provider.getMQTTControl();
-								if (mqtt != null && topic != null) mqtt.publish(topic, "" + val, 0);
+								if (mqtt != null && topic != null) {
+									mqtt.publish(topic, "" + val, 0);
+									mqtt.publish(topic.replace("/power",  "/status"), (iamOn[n] ? "on" : "off"), 0);
+								}
 								// calculate energy usage
 								if (iamLast[n] != 0) {
 									int diff = (int) (millis - iamLast[n]);

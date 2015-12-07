@@ -170,10 +170,13 @@ public class WemoControl implements ApplianceControl {
 						String key = name + ":" + Quantity.POWER.name().toLowerCase();
 						String topic = config.mqttTopics.get(key);
 						int power = getAppliancePower(i);
-						reporter.print("Wemo: publishing Name: " + name + " , topic : " + topic + " , power: " + power);
-						//System.out.println("Wemo: publishing Name: " + name + " , topic : " + topic + " , power: " + power);
-						if (topic != null )
-							mqtt.publish(topic, "" + power, 0);						
+						boolean status = getApplianceStatus(i);
+						reporter.print("Wemo: publishing Name: " + name + " , topic : " + topic + " , power: " + power + " , status: " + status);
+						System.out.println("Wemo: publishing Name: " + name + " , topic : " + topic + " , power: " + power + " , status: " + status);
+						if (topic != null ) {
+							mqtt.publish(topic, "" + power, 0);
+							mqtt.publish(topic.replace("/power", "/status"), (status ? "on" : "off"), 0);
+						}
 					}
 				}
 				try {
