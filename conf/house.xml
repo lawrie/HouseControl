@@ -1,22 +1,10 @@
 <house>
     <floor id="1" name="Ground floor">
         <room id="7" name="Hall">
-            <camera id="1" name="Snooper" type="rpi" host="doorcam:8081"></camera>
-            <socket id="3" name="Snoopy" type="LWRF" code="6febbeedb77b" channel="3"></socket>
-            <computer id="3" name="Led" type="remote" server="keith" ></computer>
-            <computer id="4" name="Shoulder" type="remote" server="keith" ></computer>
-            <computer id="5" name="Elbow" type="remote" server="keith" ></computer>
-            <computer id="6" name="Wrist" type="remote" server="keith" ></computer>
-            <computer id="7" name="Gripper" type="remote" server="keith" ></computer>
-            <computer id="8" name="Base" type="remote" server="keith" ></computer>
-            <computer id="9" name="Keith" type="remote" server="keith" ></computer>
+            <camera id="1" name="Snooper" type="rpi" host="doorcam"></camera>
+            <switch id="3" name="Letterbox" type="mqtt" topic="/house/rooms/ground-floor/hall/letterbox"></switch>
         </room>
         <room id="5" name="Dining">
-            <sensor id="10" name="emontx" type="emontx">
-                <battery topic="/house/rooms/ground-floor/dining-room/emontx/battery" low="3000"></battery>
-                <power topic="/house/rooms/ground-floor/dining-room/emontx/power"></power>
-                <energy topic="/house/rooms/ground-floor/dining-room/emontx/energy"></energy>
-            </sensor>
              <sensor id="5" name="emonPi" type="emonPi">
                 <power topic="/house/rooms/ground-floor/dining-room/emonpi/power"></power>
                 <energy topic="/house/rooms/ground-floor/dining-room/emonpi/energy"></energy>
@@ -45,17 +33,17 @@
             <socket id="8" name="Trans" type="LWRF" code="6febbeedb77b" channel="9"></socket>
             <socket id="9" name="Pi" type="LWRF" code="6febbeedb77b" channel="13"></socket>
             <socket id="10" name="Bench" type="LWRF" code="6febbeedb77b" channel="14"></socket>
-            <appliance id="4" topic="/house/rooms/second-floor/second-bedroom/bedmedia/power" name="bedmedia" code="2037787242" type="IAM"></appliance>
-            <appliance id="7" name="Media" topic="/house/rooms/first-floor/living-room/media/power" host="192.168.0.18" type="Wemo"></appliance>           
+            <appliance id="7" name="Media" topic="/house/rooms/first-floor/living-room/media/power" host="192.168.0.18" type="Wemo"></appliance>
+            <appliance id="4" topic="/house/rooms/first-floor/living-room/desktop/power" name="desktop" code="2037787242" type="IAM"></appliance>          
             <media id="1" channel="1" name="tv" type="TIVO"></media>
             <media id="2" channel="2" name="vt" type="TIVO">
             	<channel id="101" name="bbc1"></channel>
-            	<channel id="102" name="bbc2"></channel>
-            	<channel id="103" name="itv"></channel>
-            	<channel id="104" name="c4"></channel>
+            	<channel id="162" name="bbc2"></channel>
+            	<channel id="113" name="itv"></channel>
+            	<channel id="142" name="c4"></channel>
             	<channel id="105" name="five"></channel>
-            	<channel id="106" name="bbc3"></channel>
-            	<channel id="107" name="bbc4"></channel>
+            	<channel id="163" name="bbc3"></channel>
+            	<channel id="164" name="bbc4"></channel>
             	<channel id="108" name="bbc1 hd"></channel>
             </media>
             <media id="3" channel="3" name="av" type="TIVO"></media>
@@ -140,7 +128,6 @@
             </window>
             <window id="3" name="back">
                 <blind id="3" type="coulisse" name="back"></blind>
-                <switch id="3" name="Middle" type="mqtt" topic="/house/rooms/first-floor/living-room/middle-switch"></switch>
             </window>
             <switch id="4" name="Button" type="mqtt" topic="/house/rooms/first-floor/living-room/button"></switch>
             <camera id="2" type="Wanscam" name="Bond" host="ipcam:99"></camera>
