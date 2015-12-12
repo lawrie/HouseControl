@@ -26,26 +26,23 @@ public class MQTTControl implements MQTT, MqttCallback, SensorControl, SwitchCon
 	private HashMap<String,String> values = new HashMap<String,String>();
 	private long lastMessage = 0;
 	private Config config;
-	Provider provider;
-
-	@Override
-	public void setProvider(Provider provider) {
-		reporter = provider.getReporter();
-		config = provider.getConfig();
-		this.provider = provider;
-		
-		MemoryPersistence persistence = new MemoryPersistence();
-		String broker = provider.getConfig().mqttServer;
-		String clientId = "housecontrol";
+	private Provider provider;
+	private boolean connected = false;
+	private MqttConnectOptions connOpts = new MqttConnectOptions();
+	private String clientId = "housecontrol";
+	private MemoryPersistence persistence = new MemoryPersistence();
+	String broker;
+	
+	private void connect() {
 		Collection<String> topics = config.mqttTopics.values();
 		
         try {
-            client = new MqttClient(broker, clientId, persistence);
-            MqttConnectOptions connOpts = new MqttConnectOptions();
+                        
             connOpts.setCleanSession(true);
             reporter.print("Connecting to MQTT broker: "+ broker);
             client.connect(connOpts);
             reporter.print("Connected to MQTT broker");
+            connected = true;
 	        client.setCallback(this);
 	        
 	        /* Subscribe to all topics */
@@ -63,8 +60,23 @@ public class MQTTControl implements MQTT, MqttCallback, SensorControl, SwitchCon
 	}
 
 	@Override
+	public void setProvider(Provider provider) {
+		reporter = provider.getReporter();
+		config = provider.getConfig();
+		this.provider = provider;
+		broker = provider.getConfig().mqttServer;
+		try {
+			client = new MqttClient(broker, clientId, persistence);
+		} catch (MqttException e) {
+			reporter.error("Failed to create MQTT client");
+		}
+	}
+
+	@Override
 	public void publish(String topic, String content, int qos) {
         reporter.debug("Publishing message: " + content);
+        if (!connected) connect();
+
         MqttMessage message = new MqttMessage(content.getBytes());
         message.setQos(qos);
         try {
@@ -87,7 +99,8 @@ public class MQTTControl implements MQTT, MqttCallback, SensorControl, SwitchCon
 
 	@Override
 	public void connectionLost(Throwable arg0) {
-		reporter.debug("MQTT connection lost");	
+		reporter.debug("MQTT connection lost");
+		connected = false;
 	}
 
 	@Override

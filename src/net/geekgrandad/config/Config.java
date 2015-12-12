@@ -835,7 +835,7 @@ public class Config {
           	  switchNames[switchId-1] = switchName;
           	  switchTypes[switchId-1] = switchType;
           	  switchChannels[switchId-1] = switchChannel;
-          	  switchCodes[switchId-1] = hexStringToByteArray(switchCode);
+          	  if (switchCode != null) switchCodes[switchId-1] = hexStringToByteArray(switchCode);
           	  devices.add(new Device(switchType, switchName, switchCode, switchId, switchChannel, Device.SWITCH));
           	  debug("End switch id  = " + switchId + ", name = " + switchNames[switchId-1]);
           } else if (endElement.getName().getLocalPart() == (EMONTX)) {

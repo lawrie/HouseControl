@@ -1,6 +1,5 @@
 package net.geekgrandad.plugin;
 
-import java.awt.AWTException;
 import java.awt.Robot;
 import java.io.IOException;
 
@@ -16,7 +15,7 @@ import net.geekgrandad.interfaces.Provider;
 import net.geekgrandad.interfaces.Reporter;
 import net.geekgrandad.util.ActivateWindow;
 
-public class XPControl implements ComputerControl {
+public class SystemControl implements ComputerControl {
 	private Reporter reporter;
 	private Robot robot;
 	private Browser browser;
@@ -28,8 +27,8 @@ public class XPControl implements ComputerControl {
 		
 		try {
 			robot = new Robot();
-		} catch (AWTException e) {
-			e.printStackTrace();
+		} catch (Exception e) {;
+			reporter.error("Robot not supported");
 		}
 	}
 
@@ -42,7 +41,7 @@ public class XPControl implements ComputerControl {
 	    } else if (osName.startsWith("Linux") || osName.startsWith("Mac")) {
 	      shutdownCommand = "shutdown -h now";
 	    } else {
-	      System.err.println("Shutdown unsupported operating system ...");
+	      reporter.error("Shutdown unsupported operating system ...");
 	    }
 	    if (shutdownCommand != null)
 	      try {
@@ -128,6 +127,10 @@ public class XPControl implements ComputerControl {
 
 	@Override
 	public void sendKey(String program, int keyCode) {
+		if (robot == null) {
+			reporter.error("activation mot supported");
+			return;
+		}
 		reporter.print("Activating " + program);
 		String title = ActivateWindow.activate(program);
 		reporter.print("Title is " + title);

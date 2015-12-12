@@ -3,6 +3,7 @@
         <room id="7" name="Hall">
             <camera id="1" name="Snooper" type="rpi" host="doorcam"></camera>
             <switch id="3" name="Letterbox" type="mqtt" topic="/house/rooms/ground-floor/hall/letterbox"></switch>
+            <computer id="6" name="doorcam" type="remote" server="doorcam"></computer>
         </room>
         <room id="5" name="Dining">
              <sensor id="5" name="emonPi" type="emonPi">
@@ -10,6 +11,7 @@
                 <energy topic="/house/rooms/ground-floor/dining-room/emonpi/energy"></energy>
             </sensor>
             <appliance id="5" topic="/house/rooms/ground-floor/dining-room/games/power" name="xbox" code="1880848504" type="IAM"></appliance>
+            <computer id="7" name="emonpi" type="remote" server="emonpi"></computer>
         </room>
         <room id="6" name="Utility">
             <appliance id="1" topic="/house/rooms/ground-floor/utility/dryer/power" name="Dryer" type="IAM" code="1884046140"></appliance>
@@ -134,8 +136,10 @@
             <speech id="1" name="spl" voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" 
                type="FreeTTS"></speech> 
             <speech id="2" name="spr" type="remote" server="musicserver"></speech>
-            <computer id="1" name="tosh" type="XP"></computer>
+            <computer id="1" name="housecontrol" type="Computer"></computer>
             <computer id="2" name="desk" type="remote" server="musicserver"></computer>
+            <computer id="3" name="nodered" type="remote" server="nodered"></computer>
+            <computer id="4" name="enocean" type="remote" server="enocean"></computer>
         </room>
         <room id="2" name="Kitchen">
             <appliance id="3" topic="/house/rooms/first-floor/kitchen/dishwasher/power" name="Dishwasher" code="1077486631" type="IAM"></appliance>
@@ -147,6 +151,7 @@
                 <motion topic="/house/rooms/first-floor/kitchen/occupied"></motion>
                 <battery topic="/house/rooms/first-floor/kitchen/battery"></battery>
             </sensor>
+            <computer id="5" name="touch" type="remote" server="touch"></computer>
         </room>
     </floor>
     <floor id="3" name="Second floor">
@@ -157,6 +162,7 @@
                 <temperature topic="/house/rooms/second-floor/master-bedroom/temperature"></temperature>
                 <lightlevel topic="/house/rooms/second-floor/master-bedroom/light-level"></lightlevel>
             </sensor>
+            <computer id="8" name="radio" type="remote" server="radio"></computer>
         </room>
         <room id="4" name="Second">
             <sensor id="13" name="espsecond" type="mqtt">
@@ -256,6 +262,9 @@
         </plugin>
         <plugin class="net.geekgrandad.plugin.X10Remote" type="X10">
             <interface name="Controller"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.SystemControl" type="Computer">
+            <interface name="ComputerControl"></interface>
         </plugin>
         <plugin class="net.geekgrandad.plugin.WundergroundWeather">
             <interface name="WeatherControl"></interface>
