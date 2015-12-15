@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 
 import net.geekgrandad.config.Config;
@@ -43,6 +44,7 @@ import net.geekgrandad.plugin.MQTTControl;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.java_websocket.WebSocketImpl;
 
 public class HouseControl implements Reporter, Alerter, Provider, Browser {
 
@@ -235,6 +237,13 @@ public class HouseControl implements Reporter, Alerter, Provider, Browser {
 		} catch (IOException e) {
 			error("Failed to create server socket:" + e.getMessage());
 			System.exit(1);
+		}
+		
+		// Start the Web socket thread
+		try {
+			new HouseWebSocketServer( 8887, HouseControl.this ).start();
+		} catch (UnknownHostException e1) {
+			error("Failed to create websocke server");
 		}
 
 		// Main loop
