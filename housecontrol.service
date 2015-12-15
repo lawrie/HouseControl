@@ -12,14 +12,16 @@
 SERVICE_NAME=housecontrol
 PID_PATH_NAME=/tmp/housecontrol.pid
 CONFIG=gigabyte
-HOME=/home/lawrie
+USER=lawrie
+HOME=/home/$USER
 DIR=`pwd`
+
 case $1 in
     start)
         echo "Starting $SERVICE_NAME ..."
         if [ ! -f $PID_PATH_NAME ]; then
             cd $HOME/HouseControl/bin
-            ./housecontrol.sh $CONFIG $PID_PATH_NAME
+            su $USER -c "./housecontrol.sh $CONFIG $PID_PATH_NAME"
             echo "$SERVICE_NAME started ..."
         else
             echo "$SERVICE_NAME is already running ..."
@@ -45,7 +47,7 @@ case $1 in
             rm $PID_PATH_NAME
             echo "$SERVICE_NAME starting ..."
             cd $HOME/HouseControl/bin
-            ./housecontrol.sh $CONFIG $PID_PATH_NAME
+            su $USER -c "./housecontrol.sh $CONFIG $PID_PATH_NAME"
             echo "$SERVICE_NAME started ..."
         else
             echo "$SERVICE_NAME is not running ..."
