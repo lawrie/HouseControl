@@ -1,0 +1,13 @@
+<house>
+    <floor id="2" name="First floor">
+        <room id="1" name="Kitchen">
+            <speech id="2" name="spr" voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" type="FreeTTS"></speech> 
+        </room>
+    </floor>
+    <config listen_port="50000" background_delay="10000"></config>
+    <plugins>
+        <plugin class="net.geekgrandad.plugin.LocalSpeech" type="FreeTTS">
+            <interface name="SpeechControl"></interface>
+        </plugin>
+    </plugins>
+</house>

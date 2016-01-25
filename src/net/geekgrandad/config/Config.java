@@ -30,7 +30,7 @@ public class Config {
   public static final int MAX_LIGHTS = 5;
   public static final int MAX_SOCKETS = 10;
   public static final int MAX_CAMERAS = 2;
-  public static final int MAX_APPLIANCES = 7;
+  public static final int MAX_APPLIANCES = 8;
   public static final int MAX_WINDOWS = 3;
   public static final int MAX_DOORS = 0;
   public static final int MAX_BATTERIES = 11;

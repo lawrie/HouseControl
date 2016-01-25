@@ -36,6 +36,7 @@
             <socket id="9" name="Pi" type="LWRF" code="6febbeedb77b" channel="13"></socket>
             <socket id="10" name="Bench" type="LWRF" code="6febbeedb77b" channel="14"></socket>
             <appliance id="7" name="Media" topic="/house/rooms/first-floor/living-room/media/power" host="192.168.0.18" type="Wemo"></appliance>
+   			<appliance id="8" name="Floor" topic="/house/rooms/first-floor/living-room/floor/power" host="192.168.0.26" type="Wemo"></appliance>
             <appliance id="4" topic="/house/rooms/first-floor/living-room/desktop/power" name="desktop" code="2037787242" type="IAM"></appliance>          
             <media id="1" channel="1" name="tv" type="TIVO"></media>
             <media id="2" channel="2" name="vt" type="TIVO">
