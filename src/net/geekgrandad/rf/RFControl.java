@@ -52,6 +52,7 @@ public class RFControl {
 
     try {
       // open serial port, and use class name for the appName.
+      System.setProperty("gnu.io.rxtx.SerialPorts", portName);
       CommPortIdentifier id = CommPortIdentifier.getPortIdentifier(portName);
       serialPort = (SerialPort) id.open(this.getClass().getName(), timeOut);
 
@@ -65,7 +66,7 @@ public class RFControl {
 
     } catch (Exception e) {
       System.err.println(e.toString());
-      throw new IOException("Could not open " + name + " COM port");
+      throw new IOException("Could not open " + name + " COM port: " + portName);
     }
   }
 
