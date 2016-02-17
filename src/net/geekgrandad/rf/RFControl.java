@@ -33,13 +33,14 @@ public class RFControl {
   }
 
   public void initialize() throws IOException {
-    /*CommPortIdentifier portId = null;
+    CommPortIdentifier portId = null;
     @SuppressWarnings("rawtypes")
 	Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
 
     // iterate through, looking for the port
     while (portEnum.hasMoreElements()) {
       CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();
+      System.out.println("Found port: " + currPortId.getName());
       if (currPortId.getName().equals(portName)) {
         portId = currPortId;
         break;
@@ -48,7 +49,7 @@ public class RFControl {
 
     if (portId == null) {
       throw new IOException("Could not find " + name + " COM port");
-    }*/
+    }
 
     try {
       // open serial port, and use class name for the appName.
