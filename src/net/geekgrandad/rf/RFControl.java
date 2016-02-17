@@ -66,7 +66,7 @@ public class RFControl {
 
     } catch (Exception e) {
       System.err.println(e.toString());
-      throw new IOException("Could not open " + name + " COM port: " + portName);
+      throw new IOException("Could not open " + name + " COM port: " + portName + ": " + e);
     }
   }
 
