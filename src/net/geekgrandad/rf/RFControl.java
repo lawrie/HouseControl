@@ -52,7 +52,6 @@ public class RFControl {
 
     try {
       // open serial port, and use class name for the appName.
-      System.setProperty("gnu.io.rxtx.SerialPorts", portName);
       CommPortIdentifier id = CommPortIdentifier.getPortIdentifier(portName);
       serialPort = (SerialPort) id.open(this.getClass().getName(), timeOut);
 
