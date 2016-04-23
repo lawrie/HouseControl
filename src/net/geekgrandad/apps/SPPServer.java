@@ -1,4 +1,5 @@
 package net.geekgrandad.apps;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +25,7 @@ public class SPPServer {
   
         //Create a UUID for SPP
         UUID uuid = new UUID("1101", true);
-        //Create the servicve url
+        //Create the service url
         String connectionString = "btspp://localhost:" + uuid +";name=Sample SPP Server";
         
         //open server url
@@ -32,59 +33,64 @@ public class SPPServer {
         
         //Wait for client connection
         System.out.println("\nServer Started. Waiting for clients to connect...");
-        StreamConnection connection=streamConnNotifier.acceptAndOpen();
-  
-        RemoteDevice dev = RemoteDevice.getRemoteDevice(connection);
-        System.out.println("Remote device address: "+dev.getBluetoothAddress());
-        System.out.println("Remote device name: "+dev.getFriendlyName(true));
         
-        //read string from spp client
-        InputStream inStream=connection.openInputStream();
-        BufferedReader bReader=new BufferedReader(new InputStreamReader(inStream));
-        
-        OutputStream outStream=connection.openOutputStream();
-        PrintWriter pWriter=new PrintWriter(new OutputStreamWriter(outStream));
-        boolean connected = true;
-        
-        while (connected) {
-	        String lineRead=bReader.readLine();
-	        System.out.println(lineRead);
-	        Socket sock = null;
-	        String host = "192.168.0.100";
-	        String ret = "No reply";
-	        
-			try {
-				sock = new Socket(host, 50000);
-			    PrintWriter out = new PrintWriter(sock.getOutputStream(),true);
-			    BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-			    out.println(lineRead);
-			    ret = in.readLine();
-			    System.out.println("Reply is " + ret);
-			    out.close();
-			    in.close();
-			    sock.close();
-			    sock = null;
-			} catch (UnknownHostException e1) {
-				System.err.println("Unknown host");
-				connected = false;
-			} catch (IOException e1) {
-				connected = false;
-				System.err.println(e1);
-				try {
-					if (sock != null) sock.close();
-				} catch (IOException e2) {
-				}
-			}
-        
-	        //send response to spp client
-	
-	        pWriter.write(ret);
-	        pWriter.flush();
-        }
+        for(;;) {
+	        StreamConnection connection=streamConnNotifier.acceptAndOpen();
 	  
-        pWriter.close();
-        streamConnNotifier.close();
-  
+	        RemoteDevice dev = RemoteDevice.getRemoteDevice(connection);
+	        System.out.println("Remote device address: "+dev.getBluetoothAddress());
+	        System.out.println("Remote device name: "+dev.getFriendlyName(true));
+	        
+	        //read string from spp client
+	        InputStream inStream=connection.openInputStream();
+	        BufferedReader bReader=new BufferedReader(new InputStreamReader(inStream));
+	        
+	        OutputStream outStream=connection.openOutputStream();
+	        PrintWriter pWriter=new PrintWriter(new OutputStreamWriter(outStream));
+	        boolean connected = true;
+	        
+	        while (connected) {
+		        String lineRead=bReader.readLine();
+		        if (lineRead == null) {
+		        	System.out.println("Connection terminated");
+		        	break;
+		        }
+		        System.out.println(lineRead);
+		        Socket sock = null;
+		        String host = "192.168.0.100";
+		        String ret = "No reply";
+		        
+				try {
+					sock = new Socket(host, 50000);
+				    PrintWriter out = new PrintWriter(sock.getOutputStream(),true);
+				    BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+				    out.println(lineRead);
+				    ret = in.readLine();
+				    System.out.println("Reply is " + ret);
+				    out.close();
+				    in.close();
+				    sock.close();
+				    sock = null;
+				} catch (UnknownHostException e1) {
+					System.err.println("Unknown host");
+					connected = false;
+				} catch (IOException e1) {
+					connected = false;
+					System.err.println(e1);
+					try {
+						if (sock != null) sock.close();
+					} catch (IOException e2) {
+					}
+				}
+	        
+		        //send response to spp client
+		
+		        pWriter.write(ret);
+		        pWriter.flush();
+	        }
+		  
+	        pWriter.close();	        
+        } 
     }
   
   

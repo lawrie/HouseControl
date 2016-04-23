@@ -24,6 +24,7 @@
     </floor>
     <floor id="2" name="First floor">
         <room id="1" name="Living">
+            <heating id="1" name="Hive"></heating>
             <light id="3" name="Pollock" type="LWRF" code="6febbeedb77b" channel="7"></light>
             <light id="4" name="Picasso" type="LWRF" code="6febbeedb77b" channel="8"></light>
             <socket id="1" name="Fan" type="LWRF" code="6febbeedb77b" channel="1"></socket>
@@ -82,7 +83,7 @@
             <camera id="2" type="Wanscam" name="Bond" host="ipcam:99"></camera>
             <speech id="1" name="spl" voice="com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory" 
                type="FreeTTS"></speech> 
-            <speech id="2" name="spr" type="remote" server="musicserver"></speech>
+            
             <computer id="1" name="housecontrol" type="Computer"></computer>
             <computer id="2" name="desk" type="remote" server="musicserver"></computer>
             <computer id="3" name="nodered" type="remote" server="nodered"></computer>
@@ -98,6 +99,7 @@
                 <motion topic="/house/rooms/first-floor/kitchen/occupied"></motion>
                 <battery topic="/house/rooms/first-floor/kitchen/battery"></battery>
             </sensor>
+            <speech id="2" name="kitchen" type="remote" server="touch"></speech>
             <computer id="5" name="touch" type="remote" server="touch"></computer>
         </room>
     </floor>
@@ -109,7 +111,7 @@
                 <temperature topic="/house/rooms/second-floor/master-bedroom/temperature"></temperature>
                 <lightlevel topic="/house/rooms/second-floor/master-bedroom/light-level"></lightlevel>
             </sensor>
-            <computer id="8" name="radio" type="remote" server="radio"></computer>
+            <speech id="3" name="radio" type="remote" server="radio"></speech>
         </room>
         <room id="4" name="Second">
             <sensor id="13" name="espsecond" type="mqtt">
@@ -199,6 +201,9 @@
             <interface name="MQTT"></interface>
             <interface name="SensorControl"></interface>
             <interface name="SwitchControl"></interface>
+        </plugin>
+        <plugin class="net.geekgrandad.plugin.MQTTHeating">
+            <interface name="HeatingControl"></interface>
         </plugin>
     </plugins>
 </house>
